@@ -1,0 +1,521 @@
+id: two-pointers-asteroid-belt
+pattern: two-pointers
+difficulty: easy
+
+# The reference implementation - optimal Two Pointers solution
+solution_code_python: |
+  def find_asteroid_pair(positions, target_distance):
+      """
+      Optimal Two Pointers solution.
+      Time: O(n), Space: O(1)
+      """
+      left = 0
+      right = len(positions) - 1
+      
+      while left < right:
+          current_distance = positions[right] - positions[left]
+          
+          if current_distance == target_distance:
+              return [positions[left], positions[right]]
+          elif current_distance < target_distance:
+              left += 1  # Need larger distance
+          else:
+              right -= 1  # Need smaller distance
+      
+      return None  # No pair found
+
+solution_code_javascript: |
+  function findAsteroidPair(positions, targetDistance) {
+      /**
+       * Optimal Two Pointers solution.
+       * Time: O(n), Space: O(1)
+       */
+      let left = 0;
+      let right = positions.length - 1;
+      
+      while (left < right) {
+          const currentDistance = positions[right] - positions[left];
+          
+          if (currentDistance === targetDistance) {
+              return [positions[left], positions[right]];
+          } else if (currentDistance < targetDistance) {
+              left++;  // Need larger distance
+          } else {
+              right--;  // Need smaller distance
+          }
+      }
+      
+      return null;  // No pair found
+  }
+
+# Expected execution trace for primary example
+reference_trace:
+  input:
+    positions: [100, 250, 350, 500, 750]
+    target_distance: 250
+  
+  steps:
+    - step: 0
+      line: 6
+      action: "Initialize pointers"
+      state:
+        left: 0
+        right: 4
+        positions_left: 100
+        positions_right: 750
+      explanation: "Start at opposite ends - widest possible distance"
+    
+    - step: 1
+      line: 8
+      action: "Enter while loop (left < right)"
+      state:
+        left: 0
+        right: 4
+      check: "0 < 4 ✓ Continue"
+    
+    - step: 2
+      line: 9
+      action: "Calculate current distance"
+      state:
+        current_distance: 650
+      calculation: "positions[4] - positions[0] = 750 - 100 = 650"
+    
+    - step: 3
+      line: 11
+      action: "Compare to target"
+      state:
+        current_distance: 650
+        target_distance: 250
+      comparison: "650 > 250"
+      decision: "Distance too large, need to decrease"
+    
+    - step: 4
+      line: 15
+      action: "Move right pointer left (right -= 1)"
+      state:
+        left: 0
+        right: 3
+        positions_left: 100
+        positions_right: 500
+      reasoning: "Moving right left decreases the distance"
+      visualization_note: "Highlight right pointer moving from index 4 to 3"
+    
+    - step: 5
+      line: 8
+      action: "Loop continues (left < right)"
+      state:
+        left: 0
+        right: 3
+      check: "0 < 3 ✓ Continue"
+    
+    - step: 6
+      line: 9
+      action: "Calculate current distance"
+      state:
+        current_distance: 400
+      calculation: "positions[3] - positions[0] = 500 - 100 = 400"
+    
+    - step: 7
+      line: 11
+      action: "Compare to target"
+      state:
+        current_distance: 400
+        target_distance: 250
+      comparison: "400 > 250"
+      decision: "Still too large, decrease again"
+    
+    - step: 8
+      line: 15
+      action: "Move right pointer left (right -= 1)"
+      state:
+        left: 0
+        right: 2
+        positions_left: 100
+        positions_right: 350
+      reasoning: "Continue decreasing distance"
+      visualization_note: "Right pointer moves from index 3 to 2"
+    
+    - step: 9
+      line: 8
+      action: "Loop continues (left < right)"
+      state:
+        left: 0
+        right: 2
+      check: "0 < 2 ✓ Continue"
+    
+    - step: 10
+      line: 9
+      action: "Calculate current distance"
+      state:
+        current_distance: 250
+      calculation: "positions[2] - positions[0] = 350 - 100 = 250"
+    
+    - step: 11
+      line: 11
+      action: "Compare to target"
+      state:
+        current_distance: 250
+        target_distance: 250
+      comparison: "250 == 250 ✓"
+      decision: "FOUND IT!"
+      visualization_note: "Highlight both pointers in green - solution found"
+    
+    - step: 12
+      line: 12
+      action: "Return the pair"
+      return_value: [100, 350]
+      state:
+        final_left: 0
+        final_right: 2
+        final_positions: [100, 350]
+      success: true
+
+  summary:
+    total_iterations: 3
+    comparisons_made: 3
+    pointer_moves: 2
+    result: "Found pair [100, 350] in 3 iterations"
+    efficiency: "O(n) - linear time with single pass"
+
+# Additional example traces for edge cases
+additional_traces:
+  - name: "No pair exists"
+    input:
+      positions: [1, 2, 3, 4, 5]
+      target_distance: 10
+    
+    outcome:
+      pointers_converge_at:
+        left: 4
+        right: 4
+      total_iterations: 4
+      result: null
+      explanation: "Pointers meet without finding target distance"
+  
+  - name: "Pair at edges"
+    input:
+      positions: [1, 11]
+      target_distance: 10
+    
+    outcome:
+      iterations: 1
+      result: [1, 11]
+      explanation: "First comparison finds the answer"
+  
+  - name: "Multiple valid pairs"
+    input:
+      positions: [10, 20, 30, 40, 50]
+      target_distance: 10
+    
+    outcome:
+      result: [10, 20]
+      note: "Returns first found pair, but [20,30], [30,40], [40,50] also valid"
+
+# Complexity analysis
+complexity:
+  time:
+    best_case: "O(1)"
+    best_case_scenario: "Target pair at opposite ends (first comparison)"
+    
+    average_case: "O(n)"
+    average_case_scenario: "Need to check roughly half the array"
+    
+    worst_case: "O(n)"
+    worst_case_scenario: "No pair exists, pointers converge after n iterations"
+    
+    explanation: |
+      Each pointer moves at most n times (left moves right, right moves left).
+      Total operations: left_moves + right_moves ≤ n
+      Therefore: O(n) linear time complexity
+  
+  space:
+    value: "O(1)"
+    explanation: "Only using two pointer variables (left, right) and one temp (current_distance)"
+    note: "Constant space regardless of input size"
+
+# Alternative approaches for comparison
+alternative_solutions:
+  - name: "Brute Force (Nested Loops)"
+    approach: "Check all possible pairs with nested loops"
+    
+    code_python: |
+      def find_asteroid_pair_brute(positions, target_distance):
+          n = len(positions)
+          for i in range(n):
+              for j in range(i + 1, n):
+                  if positions[j] - positions[i] == target_distance:
+                      return [positions[i], positions[j]]
+          return None
+    
+    complexity:
+      time: "O(n²)"
+      space: "O(1)"
+    
+    comparison_for_n10:
+      brute_force_comparisons: 45
+      two_pointers_comparisons: "~9"
+      speedup: "5x faster"
+    
+    comparison_for_n1000:
+      brute_force_comparisons: "~500,000"
+      two_pointers_comparisons: "~1,000"
+      speedup: "500x faster"
+    
+    when_to_use: "Never for this problem - strictly worse than Two Pointers"
+    teaching_value: "Shows WHY Two Pointers is an optimization"
+  
+  - name: "Hash Set"
+    approach: "Use hash set to check if target complement exists"
+    
+    code_python: |
+      def find_asteroid_pair_hash(positions, target_distance):
+          seen = {}
+          for i, pos in enumerate(positions):
+              complement = pos - target_distance
+              if complement in seen:
+                  return [complement, pos]
+              seen[pos] = i
+          return None
+    
+    complexity:
+      time: "O(n)"
+      space: "O(n)"
+    
+    tradeoff: "Same time as Two Pointers but uses O(n) extra space"
+    
+    when_to_use: "When array is NOT sorted (Two Pointers requires sorting)"
+    
+    teaching_value: |
+      Shows there are multiple O(n) solutions.
+      Two Pointers is better here because:
+      1. Array is already sorted (given)
+      2. Uses O(1) space instead of O(n)
+      3. No hash collisions possible
+  
+  - name: "Binary Search"
+    approach: "For each element, binary search for the complement"
+    
+    code_python: |
+      def find_asteroid_pair_binary(positions, target_distance):
+          for i in range(len(positions)):
+              target_pos = positions[i] + target_distance
+              # Binary search for target_pos in positions[i+1:]
+              left, right = i + 1, len(positions) - 1
+              while left <= right:
+                  mid = (left + right) // 2
+                  if positions[mid] == target_pos:
+                      return [positions[i], positions[mid]]
+                  elif positions[mid] < target_pos:
+                      left = mid + 1
+                  else:
+                      right = mid - 1
+          return None
+    
+    complexity:
+      time: "O(n log n)"
+      space: "O(1)"
+    
+    comparison: "Slower than Two Pointers O(n), faster than Brute Force O(n²)"
+    
+    when_to_use: "Rarely - Two Pointers dominates this for sorted arrays"
+    
+    teaching_value: "Shows that binary search isn't always the answer for sorted arrays"
+
+# Approach explanation
+approach_explanation:
+  core_insight: |
+    Two Pointers works because the array is sorted. This sorted property
+    allows us to make greedy decisions that eliminate impossible pairs
+    without checking them.
+  
+  why_it_works:
+    - reason: "Sorted array enables directional reasoning"
+      detail: |
+        Because positions[left] < positions[right] is guaranteed,
+        we know exactly how pointer movements affect distance:
+        - Moving left right → increases positions[left] → increases distance
+        - Moving right left → decreases positions[right] → decreases distance
+    
+    - reason: "Each move eliminates a set of impossible pairs"
+      detail: |
+        When distance > target and we move right left:
+        ALL pairs involving the old right position are too large.
+        We can skip them without checking.
+    
+    - reason: "Pointers converge guarantees we check all valid pairs"
+      detail: |
+        Starting at opposite ends and moving toward middle ensures
+        we consider all possible pairs exactly once.
+  
+  step_by_step:
+    - step: 1
+      action: "Initialize left=0, right=n-1"
+      why: "Start with widest distance, can adjust from there"
+    
+    - step: 2
+      action: "Calculate distance = positions[right] - positions[left]"
+      why: "See how current distance compares to target"
+    
+    - step: 3
+      action: "Compare distance to target"
+      cases:
+        - "distance == target: Found it! Return the pair"
+        - "distance > target: Too large, move right left to decrease"
+        - "distance < target: Too small, move left right to increase"
+    
+    - step: 4
+      action: "Repeat until left >= right"
+      why: "When pointers meet, all pairs have been considered"
+  
+  visual_metaphor: |
+    Imagine the pointers as adjustable brackets around the array.
+    You start wide and squeeze them together, checking the distance
+    as you go. The sorted property tells you which side to squeeze
+    to get closer to your target distance.
+
+# Common pitfalls and how this solution avoids them
+correct_implementation_notes:
+  - pitfall: "Using positions[left] - positions[right] (always negative)"
+    solution: "Always subtract smaller from larger: positions[right] - positions[left]"
+    
+  - pitfall: "Comparing indices instead of values: right - left"
+    solution: "Use array values: positions[right] - positions[left]"
+    
+  - pitfall: "Moving both pointers in one iteration"
+    solution: "Move exactly ONE pointer per iteration based on comparison"
+    
+  - pitfall: "Not handling the no-pair case"
+    solution: "Return None when pointers meet (left >= right)"
+    
+  - pitfall: "Moving wrong pointer (e.g., moving left when distance too large)"
+    solution: "distance > target → move right; distance < target → move left"
+
+# Edge cases and how solution handles them
+edge_case_handling:
+  - case: "Array with only 2 elements"
+    example: "positions = [1, 11], target = 10"
+    handling: "Check the one pair, return immediately"
+    iterations: 1
+  
+  - case: "No valid pair exists"
+    example: "positions = [1, 2, 3], target = 10"
+    handling: "Pointers converge without finding match, return None"
+    iterations: "~n"
+  
+  - case: "Multiple valid pairs"
+    example: "positions = [10, 20, 30, 40], target = 10"
+    handling: "Returns first pair found [10, 20]"
+    note: "Could modify to return all pairs if needed"
+  
+  - case: "Target larger than max possible distance"
+    example: "positions = [1, 2, 3], target = 100"
+    handling: "left keeps moving right, never finds match, returns None"
+  
+  - case: "Target is 0 (looking for same element)"
+    example: "positions = [5, 5, 10], target = 0"
+    handling: "Not possible with 'strictly increasing' constraint from problem"
+    note: "Problem specifies no duplicates"
+  
+  - case: "Very large numbers"
+    example: "positions = [1000000000, 1000000100], target = 100"
+    handling: "Works correctly - distance calculation uses large integers"
+    note: "No overflow in Python; careful in JavaScript/Java"
+
+# Pattern recognition - when to apply Two Pointers
+pattern_signature:
+  required_conditions:
+    - "Input is sorted (or can be efficiently sorted)"
+    - "Looking for pair/triplet with specific property"
+    - "Can determine which direction to move based on comparison"
+  
+  indicators_in_problem:
+    - "Sorted array mentioned"
+    - "Find pair/two elements"
+    - "Specific sum/difference/product/relationship"
+    - "Optimize from O(n²) to O(n)"
+  
+  related_problems:
+    - "Two Sum (in sorted array)"
+    - "Three Sum"
+    - "Container With Most Water"
+    - "Trapping Rain Water"
+    - "Remove Duplicates from Sorted Array"
+
+# Extensions and variations
+variations:
+  - variation: "Find ALL pairs with target distance"
+    modification: "Don't return on first match, collect all and continue"
+    complexity_change: "Still O(n) time, but O(k) space for k pairs"
+  
+  - variation: "Find pair closest to target distance"
+    modification: "Track minimum difference instead of exact match"
+    key_change: "Update best_pair when abs(distance - target) is smaller"
+  
+  - variation: "Three Pointers (3Sum problem)"
+    modification: "Fix one element, run Two Pointers on remainder"
+    complexity: "O(n²) - n iterations of O(n) Two Pointers"
+  
+  - variation: "Two Pointers on unsorted array"
+    modification: "Sort first: O(n log n), then Two Pointers: O(n)"
+    total_complexity: "O(n log n) - dominated by sorting"
+
+# Teaching progression
+learning_progression:
+  beginner:
+    - "Understand that sorted enables greedy decisions"
+    - "Learn the move-based-on-comparison rule"
+    - "Practice implementing basic Two Pointers"
+  
+  intermediate:
+    - "Recognize Two Pointers pattern in new problems"
+    - "Understand why O(n) is achievable"
+    - "Explain why each move eliminates impossible pairs"
+  
+  advanced:
+    - "Adapt Two Pointers to variations (3Sum, etc.)"
+    - "Prove correctness of greedy approach"
+    - "Decide between Two Pointers vs Hash Set vs Binary Search"
+  
+  mastery:
+    - "Invent new Two Pointers applications"
+    - "Teach the pattern to others"
+    - "Recognize when Two Pointers won't work"
+
+# Real-world applications
+real_world_usage:
+  - domain: "Financial Trading"
+    application: "Find pairs of trades with specific profit margin"
+    why: "Trade timestamps naturally sorted"
+  
+  - domain: "Genomics"
+    application: "Find DNA sequence pairs with specific hamming distance"
+    why: "Sequences often sorted by position"
+  
+  - domain: "Network Analysis"
+    application: "Find packet pairs with specific delay difference"
+    why: "Packets sorted by timestamp"
+  
+  - domain: "Database Optimization"
+    application: "Merge join algorithms for sorted tables"
+    why: "Two Pointers on sorted indexes is fundamental DB operation"
+
+# Verification and testing
+verification:
+  invariants_maintained:
+    - "left < right throughout (until convergence)"
+    - "positions[left] < positions[right] (array sorted)"
+    - "Each pointer moves monotonically (left increases, right decreases)"
+  
+  correctness_proof:
+    - "By induction: at each step, all pairs before left and after right have been eliminated"
+    - "When pointers meet, all n(n-1)/2 pairs have been considered"
+    - "Therefore: algorithm is complete and correct"
+  
+  test_coverage:
+    - "Basic example with pair"
+    - "No pair exists"
+    - "Multiple pairs"
+    - "Pair at boundaries"
+    - "Minimum input (2 elements)"
+    - "Large numbers"
+    - "Edge cases from problem constraints"
