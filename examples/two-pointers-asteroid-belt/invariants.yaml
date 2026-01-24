@@ -1,0 +1,228 @@
+pattern: two-pointers
+problem_id: two-pointers-asteroid-belt
+
+# Invariants are conditions that MUST hold true for the algorithm to work correctly.
+# These represent the "rules of the game" for this pattern.
+# When user code violates an invariant, we know exactly what they misunderstood.
+
+core_invariants:
+  - id: "sorted-input-assumption"
+    description: "Input array must be sorted in ascending order"
+    
+    why_it_matters: |
+      Two Pointers pattern relies on the sorted property to make decisions
+      about which pointer to move. Without sorting, we can't determine if
+      moving a pointer will increase or decrease the distance.
+    
+    violation_detection:
+      - "Check if positions[i] <= positions[i+1] for all i"
+      - "If not sorted, this is not a Two Pointers problem"
+    
+    teaching_moment_if_violated: |
+      The Two Pointers pattern requires sorted data. If your input isn't
+      sorted, you'll need to either:
+      1. Sort it first (adding O(n log n) time), or
+      2. Use a different approach (like hash map for O(n) unsorted search)
+
+  - id: "pointer-ordering"
+    description: "Left pointer index must be less than right pointer index"
+    
+    why_it_matters: |
+      This ensures we don't check the same pair twice and that we make
+      progress toward the middle. When pointers cross or meet, we've
+      examined all possible pairs.
+    
+    violation_detection:
+      - "At each step: left < right"
+      - "If left >= right, we've finished searching"
+    
+    teaching_moment_if_violated: |
+      When your pointers meet (left >= right), you've checked all possible
+      pairs. This is your termination condition.
+
+  - id: "move-based-on-comparison"
+    description: "Pointer movement must be based on comparing current distance to target"
+    
+    why_it_matters: |
+      This is the CORE of the Two Pointers pattern. We use the comparison
+      to eliminate impossible pairs without checking them.
+      
+      If current_distance < target: need LARGER distance → move left right
+      If current_distance > target: need SMALLER distance → move right left
+      If current_distance == target: FOUND IT!
+    
+    violation_detection:
+      logic: |
+        At each step:
+        1. Calculate: current_distance = positions[right] - positions[left]
+        2. Compare: current_distance vs target_distance
+        3. Check which pointer moved
+        4. Verify move is correct:
+           - If current < target, should move left pointer right
+           - If current > target, should move right pointer left
+    
+    teaching_moment_if_violated: |
+      You moved the wrong pointer! Think about what you're trying to accomplish:
+      
+      Current distance is {current}, target is {target}.
+      Current is {too_large_or_too_small}.
+      
+      To {increase/decrease} distance, you should move the {left/right} pointer.
+
+  - id: "single-direction-movement"
+    description: "Each pointer only moves in one direction (left→right, right→left)"
+    
+    why_it_matters: |
+      Left pointer only moves right (increasing index).
+      Right pointer only moves left (decreasing index).
+      This ensures O(n) time - each element is visited at most twice.
+    
+    violation_detection:
+      - "Track left_history and right_history"
+      - "left_history must be monotonically increasing"
+      - "right_history must be monotonically decreasing"
+    
+    teaching_moment_if_violated: |
+      Two Pointers achieves O(n) by having each pointer move in only one
+      direction. If you're moving a pointer backwards, you're likely doing
+      something wrong or using a different pattern.
+
+algorithm_correctness_invariants:
+  - id: "distance-calculation"
+    description: "Distance must be calculated as: right_position - left_position"
+    
+    why_it_matters: |
+      Since left < right and array is sorted, positions[left] < positions[right].
+      Distance is always: larger - smaller = positions[right] - positions[left]
+    
+    violation_detection:
+      - "Check formula: distance = positions[right] - positions[left]"
+      - "Common mistake: positions[left] - positions[right] (always negative!)"
+    
+    teaching_moment_if_violated: |
+      Distance calculation error! Since the array is sorted and left < right,
+      we have positions[left] < positions[right].
+      
+      Distance = positions[right] - positions[left] (always positive)
+      
+      You calculated: positions[left] - positions[right] (always negative!)
+
+  - id: "boundary-checks"
+    description: "Must check that left and right are valid indices"
+    
+    why_it_matters: |
+      Before accessing positions[left] or positions[right], verify:
+      - left >= 0
+      - right < len(positions)
+      - left < right
+    
+    violation_detection:
+      - "Check for IndexError exceptions"
+      - "Verify boundary conditions before array access"
+    
+    teaching_moment_if_violated: |
+      Array index out of bounds! Always verify:
+      1. Pointers are within array bounds
+      2. Left pointer < right pointer
+      before accessing positions[left] or positions[right]
+
+efficiency_invariants:
+  - id: "linear-time-complexity"
+    description: "Algorithm must run in O(n) time"
+    
+    why_it_matters: |
+      The whole point of Two Pointers is to achieve O(n) instead of O(n²).
+      Each element should be visited at most twice (once by each pointer).
+    
+    violation_detection:
+      - "Count total iterations"
+      - "Should be approximately 2n iterations max"
+      - "If iterations >> n, likely using nested loops (O(n²))"
+    
+    teaching_moment_if_violated: |
+      Your solution is O(n²), not O(n)! 
+      
+      You're likely using nested loops to check all pairs.
+      Two Pointers solves this in O(n) by:
+      1. Starting pointers at opposite ends
+      2. Moving one pointer at a time based on comparison
+      3. Each pointer moves at most n times
+      
+      Total operations: ~2n = O(n)
+
+  - id: "constant-space-complexity"
+    description: "Should use O(1) extra space (just two pointer variables)"
+    
+    why_it_matters: |
+      Two Pointers is space-efficient - just tracking two indices.
+      No need for hash maps, sets, or additional arrays.
+    
+    violation_detection:
+      - "Check if additional data structures are used"
+      - "Should only use: left, right, and a few temp variables"
+    
+    teaching_moment_if_violated: |
+      Two Pointers should use O(1) space, but you're using additional
+      data structures. While your solution might work, it's not using
+      the Two Pointers pattern optimally.
+
+pattern_recognition_invariants:
+  - id: "problem-requires-pair-finding"
+    description: "Problem asks for finding pair(s) with specific property"
+    
+    why_it_matters: |
+      Two Pointers is specifically good for pair-finding problems in
+      sorted arrays. If problem asks for triplets, might need modification.
+      If unsorted, might need different approach.
+    
+    pattern_match_criteria:
+      - "Sorted array ✓"
+      - "Find pair(s) ✓"
+      - "Specific relationship between pair elements ✓"
+      - "Can make progress from both ends ✓"
+
+  - id: "greedy-choice-validity"
+    description: "Moving one pointer based on comparison is a safe greedy choice"
+    
+    why_it_matters: |
+      Two Pointers works because each move eliminates possibilities that
+      can't be optimal. This greedy approach doesn't miss the answer.
+      
+      When current_distance > target, ALL pairs with current right pointer
+      and ANY left pointer to its left will have distance >= current_distance.
+      So we can safely move right pointer left.
+    
+    correctness_proof: |
+      By moving the pointer that makes distance closer to target, we:
+      1. Never skip a valid pair
+      2. Always make progress (pointers converge)
+      3. Terminate when all pairs checked (pointers meet)
+
+teaching_progressions:
+  beginner_understanding:
+    - "Understand that sorted array enables Two Pointers"
+    - "Learn to compare current distance vs target"
+    - "Practice moving correct pointer based on comparison"
+  
+  intermediate_understanding:
+    - "Recognize why this achieves O(n) instead of O(n²)"
+    - "Understand the greedy choice is safe (doesn't miss answers)"
+    - "See how each move eliminates a set of impossible pairs"
+  
+  advanced_understanding:
+    - "Prove correctness of the greedy approach"
+    - "Adapt pattern to variations (3Sum, 4Sum, etc.)"
+    - "Recognize Two Pointers opportunities in new problems"
+
+common_misconceptions:
+  - misconception: "Need to check all pairs"
+    reality: "Sorted property lets us skip impossible pairs"
+    
+  - misconception: "Moving either pointer is fine"
+    reality: "Must move based on comparison to guarantee correctness"
+    
+  - misconception: "Two Pointers always starts at opposite ends"
+    reality: "Common, but not always - depends on problem variant"
+    
+  - misconception: "Can only find one pair"
+    reality: "Can be modified to find all pairs by continuing search"

@@ -1,0 +1,206 @@
+id: two-pointers-asteroid-belt
+title: "Asteroid Belt Navigation"
+difficulty: easy
+pattern: two-pointers
+theme: software-engineering
+estimated_time: 20-30 minutes
+
+description: |
+  You're piloting a spacecraft through an asteroid belt. Mission control has 
+  provided you with a sorted list of asteroid positions along your flight path.
+  
+  For safety planning, you need to identify pairs of asteroids that are exactly
+  a specific distance apart - this helps you plan evasive maneuvers.
+  
+  Given a sorted array of asteroid positions and a target distance, find any 
+  pair of asteroids that are exactly that distance apart. If multiple pairs 
+  exist, return any one. If no such pair exists, return None.
+
+story_context: |
+  🚀 Your spacecraft's navigation computer needs this calculation to plan the
+  optimal flight path through the asteroid field. Two asteroids exactly the
+  target distance apart create a "navigation window" - a safe corridor to fly
+  through.
+
+examples:
+  - input:
+      positions: [100, 250, 350, 500, 750]
+      target_distance: 250
+    output: [100, 350]
+    explanation: |
+      Asteroids at positions 100 and 350 are exactly 250 units apart.
+      (350 - 100 = 250). There's also another valid pair: [250, 500],
+      but we only need to return one pair.
+    
+  - input:
+      positions: [1, 5, 11, 15, 20]
+      target_distance: 9
+    output: [11, 20]
+    explanation: |
+      Only one pair has exactly 9 units distance: positions 11 and 20.
+      (20 - 11 = 9)
+  
+  - input:
+      positions: [1, 2, 3, 4, 5]
+      target_distance: 10
+    output: null
+    explanation: |
+      No pair of asteroids is exactly 10 units apart. The maximum possible
+      distance is 5 - 1 = 4 units.
+
+constraints:
+  - "2 <= positions.length <= 100,000"
+  - "1 <= positions[i] <= 1,000,000,000"
+  - "positions is sorted in strictly increasing order (no duplicates)"
+  - "1 <= target_distance <= 1,000,000,000"
+  - "All asteroid positions are unique"
+
+hints:
+  - level: 1
+    text: "Since the array is sorted, you can use two pointers starting at different ends."
+    
+  - level: 2
+    text: "Start with pointers at the beginning and end. Calculate the distance. If it's too large, which pointer should you move?"
+    
+  - level: 3
+    text: "If the current distance is larger than target, move the right pointer left. If smaller, move the left pointer right."
+
+starter_code_python: |
+  def find_asteroid_pair(positions, target_distance):
+      """
+      Find two asteroids exactly target_distance apart.
+      
+      Args:
+          positions: List[int] - sorted list of asteroid positions
+          target_distance: int - required distance between asteroids
+      
+      Returns:
+          List[int] - [pos1, pos2] where pos2 - pos1 == target_distance
+          None - if no such pair exists
+      
+      Examples:
+          >>> find_asteroid_pair([100, 250, 350, 500, 750], 250)
+          [100, 350]
+          
+          >>> find_asteroid_pair([1, 2, 3, 4, 5], 10)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two asteroids exactly targetDistance apart.
+   * 
+   * @param {number[]} positions - sorted array of asteroid positions
+   * @param {number} targetDistance - required distance between asteroids
+   * @return {number[]|null} - [pos1, pos2] or null if no pair exists
+   */
+  function findAsteroidPair(positions, targetDistance) {
+      // Your code here
+  }
+
+test_cases:
+  - id: "basic-example"
+    input:
+      positions: [100, 250, 350, 500, 750]
+      target_distance: 250
+    expected: [100, 350]
+    explanation: "Basic example from problem description"
+  
+  - id: "single-pair"
+    input:
+      positions: [1, 5, 11, 15, 20]
+      target_distance: 9
+    expected: [11, 20]
+    explanation: "Only one valid pair exists"
+  
+  - id: "no-pair-exists"
+    input:
+      positions: [1, 2, 3, 4, 5]
+      target_distance: 10
+    expected: null
+    explanation: "No pair with target distance"
+  
+  - id: "minimum-input"
+    input:
+      positions: [1, 11]
+      target_distance: 10
+    expected: [1, 11]
+    explanation: "Smallest valid input (2 elements)"
+  
+  - id: "large-distance"
+    input:
+      positions: [1, 100, 500, 1000, 10000]
+      target_distance: 9900
+    expected: [100, 10000]
+    explanation: "Large distance between asteroids"
+  
+  - id: "consecutive-positions"
+    input:
+      positions: [10, 20, 30, 40, 50]
+      target_distance: 10
+    expected: [10, 20]
+    explanation: "Multiple valid pairs, any is acceptable"
+  
+  - id: "distance-one"
+    input:
+      positions: [1, 2, 5, 8, 9]
+      target_distance: 1
+    expected: [1, 2]
+    explanation: "Minimum distance of 1"
+  
+  - id: "large-numbers"
+    input:
+      positions: [1000000000, 1000000100, 1000000250]
+      target_distance: 150
+    expected: [1000000100, 1000000250]
+    explanation: "Handle large position values"
+
+edge_cases:
+  - case: "Two elements only"
+    description: "Smallest possible array"
+    test_id: "minimum-input"
+  
+  - case: "All distances too small"
+    description: "Maximum distance less than target"
+    test_id: "no-pair-exists"
+  
+  - case: "Very large numbers"
+    description: "Positions near integer limits"
+    test_id: "large-numbers"
+
+pattern_learning_objectives:
+  - "Understand when Two Pointers pattern applies (sorted array, finding pairs)"
+  - "Learn how to move pointers based on comparison with target value"
+  - "Recognize O(n) vs O(n²) complexity trade-off"
+  - "Identify sorted data as a hint for Two Pointers approach"
+
+real_world_applications:
+  - "Finding pairs in financial data with specific price differences"
+  - "Matching timestamps with exact time intervals"
+  - "Network packet analysis (finding packets with specific delay)"
+  - "GPS coordinate matching with distance constraints"
+  - "Database query optimization for range searches"
+
+complexity_analysis:
+  time:
+    naive: "O(n²) - checking all pairs with nested loops"
+    optimal: "O(n) - single pass with two pointers"
+  space:
+    optimal: "O(1) - only using two pointer variables"
+
+pattern_signature:
+  indicators:
+    - "Sorted array or list"
+    - "Finding pairs with specific property"
+    - "Need to optimize from O(n²) to O(n)"
+    - "Comparison-based decision making"
+  
+  pattern_name: "Two Pointers"
+  
+  when_to_use:
+    - "Input is sorted (or can be sorted)"
+    - "Looking for pairs, triplets, or subarrays"
+    - "Need to find elements with specific relationship"
+    - "Can make progress from both ends simultaneously"
