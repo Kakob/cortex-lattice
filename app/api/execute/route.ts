@@ -9,8 +9,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { writeFile, unlink, mkdir } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { auth } from "@/auth";
 import { problemExists, getProblemDir } from "@/lib/problems";
 import type { ExecutionRequest, ExecutionResult } from "@/lib/types";
 
@@ -88,6 +89,15 @@ export async function POST(request: NextRequest) {
   let tempDir: string | null = null;
 
   try {
+    // Check authentication
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     // Parse request body
     const body: ExecutionRequest = await request.json();
     const { problemId, code, language = "python" } = body;

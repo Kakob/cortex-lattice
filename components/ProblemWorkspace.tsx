@@ -11,6 +11,7 @@ import { CodeEditor } from "./CodeEditor";
 import { TestResults } from "./TestResults";
 import { BottomSheet } from "./BottomSheet";
 import { LearningGuide } from "./LearningGuide";
+import { UserMenu } from "./auth/UserMenu";
 import { executeCode } from "@/lib/api";
 import type { Problem, LearningGuide as LearningGuideType, ExecutionResult } from "@/lib/types";
 import { ArrowLeft, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
@@ -93,13 +94,16 @@ export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspacePro
             </div>
           </div>
         </div>
-        <button
-          onClick={() => setShowDescription(!showDescription)}
-          className="flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-surface-light"
-        >
-          <BookOpen className="h-4 w-4" />
-          <span className="hidden sm:inline">Problem</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowDescription(!showDescription)}
+            className="flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-surface-light"
+          >
+            <BookOpen className="h-4 w-4" />
+            <span className="hidden sm:inline">Problem</span>
+          </button>
+          <UserMenu />
+        </div>
       </header>
 
       {/* Problem Description Panel (collapsible) */}
@@ -175,6 +179,7 @@ export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspacePro
             language="python"
             onRun={handleRunCode}
             isRunning={isRunning}
+            testResults={executionResult ?? undefined}
           />
         </div>
 

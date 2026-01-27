@@ -1,0 +1,119 @@
+# solution.yaml - Reference Solution Template
+# This file contains the optimal solution and execution traces
+
+id: pattern-name-problem-title  # Must match problem.yaml
+pattern: pattern-name
+difficulty: easy  # easy | medium | hard
+
+# The reference implementation - optimal solution
+solution_code_python: |
+  def solution(param1, param2):
+      """
+      Optimal solution using [pattern name].
+      Time: O(n), Space: O(1)
+
+      Key insight: [Explain the core insight that makes this work]
+      """
+      # Implementation here
+      return result
+
+solution_code_javascript: |
+  function solution(param1, param2) {
+      /**
+       * Optimal solution using [pattern name].
+       * Time: O(n), Space: O(1)
+       */
+      // Implementation here
+      return result;
+  }
+
+# Complexity analysis
+complexity:
+  time:
+    best_case: "O(1)"
+    best_case_scenario: "When answer is found immediately"
+    average_case: "O(n)"
+    average_case_scenario: "Typical case"
+    worst_case: "O(n)"
+    worst_case_scenario: "When no solution exists"
+    explanation: |
+      Explain why the time complexity is what it is.
+
+  space:
+    value: "O(1)"
+    explanation: "Only using a few variables, no extra data structures"
+
+# Approach explanation for teaching
+approach_explanation:
+  core_insight: |
+    The key insight that makes this solution work.
+    This should be the "aha moment" for learners.
+
+  why_it_works:
+    - reason: "First reason"
+      detail: |
+        Detailed explanation of why this reason matters.
+
+    - reason: "Second reason"
+      detail: |
+        Detailed explanation.
+
+  step_by_step:
+    - step: 1
+      action: "Initialize variables"
+      why: "Sets up the starting state"
+
+    - step: 2
+      action: "Main loop"
+      why: "Process each element"
+
+    - step: 3
+      action: "Return result"
+      why: "Output the answer"
+
+# Alternative approaches for comparison
+alternative_solutions:
+  - name: "Brute Force"
+    approach: "Check all possible combinations"
+    code_python: |
+      def solution_brute(param1, param2):
+          # O(n^2) implementation
+          pass
+    complexity:
+      time: "O(n^2)"
+      space: "O(1)"
+    when_to_use: "Never for this problem - strictly worse"
+    teaching_value: "Shows WHY the optimal solution is better"
+
+  - name: "Hash Map"
+    approach: "Use extra space for faster lookup"
+    complexity:
+      time: "O(n)"
+      space: "O(n)"
+    when_to_use: "When input is not sorted"
+    teaching_value: "Shows space/time trade-off"
+
+# Pattern recognition
+pattern_signature:
+  required_conditions:
+    - "Condition that must be true"
+    - "Another required condition"
+
+  indicators_in_problem:
+    - "Keywords or phrases that hint at this pattern"
+    - "Another indicator"
+
+  related_problems:
+    - "Similar Problem 1"
+    - "Similar Problem 2"
+
+# Edge case handling
+edge_case_handling:
+  - case: "Empty input"
+    handling: "Return null/None immediately"
+
+  - case: "Single element"
+    handling: "Check if it satisfies condition alone"
+
+  - case: "All elements same"
+    handling: "Handle uniformity case"

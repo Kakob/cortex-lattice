@@ -1,105 +1,140 @@
 # Cortex Lattice
 
-A cross-domain pattern education platform that teaches professional problem-solving patterns through interactive coding challenges.
+An AI safety learning platform that teaches professional problem-solving patterns through interactive coding challenges mapped to frontier AI research papers.
 
 ## What This Is
 
-Cortex Lattice teaches the 30-80 core patterns that experts use in professional fields (Software Engineering, Electrical Engineering, Physics, Aerospace) through hands-on coding problems with intelligent mistake detection and interactive learning.
+Cortex Lattice teaches the data structures and algorithms needed to implement frontier AI safety research. Instead of abstract LeetCode-style problems, every challenge maps directly to real code you'll write when implementing papers like:
 
-**The Core Insight:** Every professional field contains a finite set of reusable patterns that experts recognize and apply. We make these patterns visible, teachable, and transferable across domains.
+- **Attention is All You Need** (Transformers)
+- **Proximal Policy Optimization** (PPO)
+- **InstructGPT** (RLHF)
+- **Constitutional AI**
+- **Flash Attention**
+- And 9 more foundational AI safety papers
+
+**The Core Insight:** Every AI safety paper requires 5-10 core algorithmic patterns. Learn the pattern first, then read the paper and recognize: "Oh, this is that two-pointers pattern I just learned!"
 
 ## Current Status
 
-🚧 **Early Development** - Building MVP with first theme (Software Engineering patterns)
+Building MVP with AI Safety theme - 28 problems across 14 research papers.
 
-Currently working on: First challenge "Two Pointers - Asteroid Belt" to validate the teaching framework and establish content creation workflow.
+Currently working on: First challenge "Two Pointers - Asteroid Belt" to validate the teaching framework.
 
-## The Innovation
+## How It Works
 
-Unlike traditional coding platforms that just say "Wrong Answer", Cortex Lattice:
+### Traditional Approach (Broken)
+Read paper → Don't understand the algorithms → Struggle with implementation
 
-- **Detects exactly where your mental model diverges** - Uses invariant checking and trace analysis to pinpoint specific misunderstandings
-- **Shows side-by-side visualizations** - Your approach vs. optimal solution, making the difference crystal clear
-- **Interactive pause points** - Active learning moments that force pattern recognition, not passive watching
-- **Teaches transferable patterns** - Learn once, apply everywhere across domains
+### Cortex Lattice Approach
+Solve algorithmic problem → Understand the pattern → See exactly where it's used in the paper → Implement confidently
 
-### The 4-File Teaching System
+### Example
+Before reading the Flash Attention paper, solve "Two Pointers - Attention Head Selector". Learn the pattern. THEN read Section 3.2 and recognize the optimization technique immediately.
 
-Each problem consists of:
+## The Teaching System
 
-1. **problem.yaml** - Problem statement, examples, test cases, constraints
-2. **invariants.yaml** - What MUST be true for the algorithm to work correctly (how experts think)
-3. **mistakes.yaml** - Common errors, how to detect them, and intelligent teaching moments
-4. **pause-points.yaml** - Interactive moments where learners predict next steps
+Each problem includes a 5-category guidance system:
 
-This framework transforms passive problem-solving into active pattern learning.
+1. **Key Concepts** - Pattern fundamentals
+2. **Common Mistakes** - Implementation pitfalls to avoid
+3. **Project Context** - Where this appears in paper implementations
+4. **Paper Reference** - Direct citations to research papers
+5. **Solution Approach** - Step-by-step solution (last resort)
 
-## Why This Matters
+## Problem Collection (28 Problems)
 
-**Current education is broken:**
-- Theory disconnected from practice → Takes 4-6 years
-- Knowledge stays siloed → EE students don't learn from CS patterns
-- Passive learning → Low retention, slow mastery
+### Prerequisites (4 problems)
+- Attention is All You Need → Mini-GPT Implementation
+- Proximal Policy Optimization → PPO Implementation
 
-**Cortex Lattice approach:**
-- Learn by doing from day 1 → Compressed timeline (months, not years)
-- Cross-domain pattern transfer → Recognize Fourier Transforms in EE, Physics, and Finance
-- Active learning with intelligent guidance → Deep pattern understanding
+### Foundations (4 problems)
+- InstructGPT → RLHF Implementation
+- Constitutional AI → Self-Improvement Systems
 
-## Themes (Knowledge Domains)
+### Going Deeper (4 problems)
+- Specification Gaming → Reward Hacking Detection
+- Red Teaming → Adversarial Prompt Detection
 
-### Phase 1: Foundation (Months 1-12)
-- **Software Engineering** - DSA patterns, algorithms, system design (~30-50 patterns)
-- **Electrical Engineering** - Circuit analysis, signal processing, embedded systems (~60-80 patterns)
-- **Physics/Applied Math** - Mechanics, E&M, numerical methods (~30-50 patterns)
+### Advanced Safety (4 problems)
+- Multi-Objective RLHF → Balancing Multiple Goals
+- Safety Testing Framework → Systematic Evaluation
 
-### Phase 2: Specialization (Year 2+)
-- **Aerospace Engineering** - Orbital mechanics, propulsion, structures
-- **Mechanical Engineering** - Statics, dynamics, FEA, materials
-- **Advanced domains** - Biotech, Climate/Energy, Finance, Robotics
+### Interpretability (6 problems)
+- Activation Steering → Controlling Model Behavior
+- Transformer Circuits → Mechanistic Interpretability
+- Neural Network Probes → Representation Analysis
 
-Each theme contains 30-80 coding challenges teaching the core patterns professionals use daily.
+### Systems (4 problems)
+- KV Cache Systems → Efficient Inference
+- Distributed Training → Scaling to Multiple GPUs
+
+### Integration (2 problems)
+- End-to-End Safety System → Putting It All Together
+
+## Tech Stack
+
+- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
+- **Editors:** Monaco (desktop), CodeMirror (mobile)
+- **Execution:** Docker containers with Python 3.11 + PyTorch
+- **Mobile-first:** iOS-style bottom sheet hint system
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Build Docker executor
+docker build -t cortex-executor ./executor
+
+# Run development server
+npm run dev
+
+# Open browser
+open http://localhost:3001
+```
 
 ## Repository Structure
 
 ```
 cortex-lattice/
-├── docs/              # Vision, framework, architecture
-├── examples/          # Sample problems demonstrating teaching system
-└── (coming soon)      # Platform code as we build
+├── app/                 # Next.js pages
+├── components/          # React components
+├── hooks/               # Custom React hooks
+├── lib/                 # Utilities and API
+├── problems/            # Problem content (YAML)
+├── executor/            # Docker execution environment
+└── docs/                # Documentation
 ```
+
+## Why AI Safety?
+
+This isn't just another coding platform. It's designed to:
+
+1. **Build AI safety talent pipeline** - Train engineers who can implement safety research
+2. **Make papers accessible** - Break down complex research into learnable patterns
+3. **Enable hands-on learning** - You can't understand RLHF without implementing it
 
 ## Business Model
 
-**Individual:** $997/year (early pricing, value-based on outcomes)
-**Corporate:** Tiered pricing for organizational training
-**Open-core:** Visualization engine and basic problems open-source, premium content proprietary
-
-**Philosophy:** Worker-owned cooperative structure. Contributors receive meaningful equity.
-
-## Long-Term Vision
-
-This platform becomes infrastructure for human knowledge transfer - making professional patterns visible, teachable, and transferable. 
-
-**Connection to aerospace:** The platform trains engineers, becomes recruiting pipeline, enables crowdsourced R&D for future worker-owned rocket company.
-
-## Quick Start
-
-Coming soon - currently in design/planning phase. Watch this repo for updates as we build the MVP.
-
-## Contributing
-
-Not accepting contributions yet - focusing on establishing core framework and first theme. Will open up once foundation is solid.
+- **Individual:** $997/year (value-based on career outcomes)
+- **Philosophy:** Worker-owned cooperative structure
 
 ## Timeline
 
-- **Week 1:** Complete first problem, validate 3-4 hour creation estimate
-- **Month 1:** 10 Tier 1 problems, basic trace analyzer, simple UI
-- **Month 3:** Complete Software Engineering theme (30 problems), public launch
+- **Week 1:** 5 problems, mobile-first UI, Docker execution
+- **Month 1:** 14 problems (one per paper), user accounts
+- **Month 3:** 28 problems (complete collection), enhanced teaching
+- **Month 6:** Production deployment, community features
+
+## Contributing
+
+Not accepting contributions yet - focusing on establishing core framework. Will open up once foundation is solid.
 
 ## Contact
 
-Built by Jacob - learning by creating, building in public.
+Built by Jacob - learning AI safety by building, creating portfolio for frontier AI research.
 
 ## License
 

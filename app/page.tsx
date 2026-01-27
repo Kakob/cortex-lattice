@@ -6,6 +6,7 @@
 
 import Link from "next/link";
 import { getProblemsByTheme } from "@/lib/problems";
+import { UserMenu } from "@/components/auth/UserMenu";
 import {
   Brain,
   CheckCircle,
@@ -19,6 +20,15 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-surface-dark">
+      {/* Navigation Bar */}
+      <nav className="flex items-center justify-between border-b border-gray-800 bg-surface px-4 py-3">
+        <Link href="/" className="flex items-center gap-2">
+          <Brain className="h-6 w-6 text-accent-primary" />
+          <span className="font-semibold text-gray-100">Cortex Lattice</span>
+        </Link>
+        <UserMenu />
+      </nav>
+
       {/* Hero Section */}
       <header className="border-b border-gray-800 bg-gradient-to-b from-surface to-surface-dark px-4 py-12 text-center">
         <div className="mx-auto max-w-3xl">

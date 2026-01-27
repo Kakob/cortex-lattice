@@ -1,0 +1,60 @@
+# guidance.yaml - Teaching Content Template
+# This file provides hints and guidance for the Learning Guide panel
+
+title: "Pattern Name - Problem Title"
+pattern: "Pattern Name"
+
+hints:
+  key_concepts:
+    - text: "Key concept 1 - the most important insight"
+    - text: "Key concept 2 - supporting insight"
+    - text: "Key concept 3 - implementation detail"
+    - text: "Time complexity insight"
+    - text: "Space complexity insight"
+
+  common_mistakes:
+    - text: "Common mistake 1 - what learners often do wrong"
+    - text: "Common mistake 2 - another pitfall to avoid"
+    - text: "Common mistake 3 - subtle error"
+
+  real_world:
+    - text: |
+        Real World Application 1
+
+        Explain where this pattern appears in real systems.
+        Include specific examples from industry if possible.
+        Help learners connect abstract algorithms to practical use.
+
+    - text: |
+        Real World Application 2
+
+        Another domain where this pattern is useful.
+
+  solution_approach:
+    steps:
+      - "Step 1: Initialize (describe setup)"
+      - "Step 2: Main loop condition"
+      - "Step 3: Core logic inside loop"
+      - "Step 4: Update state"
+      - "Step 5: Handle termination"
+      - "Step 6: Return result"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Similar Problem 1"
+      invariants_shared: ["shared concept 1", "shared concept 2"]
+      difference: "How this problem differs"
+      modification: "How to adapt the solution"
+
+    - name: "Similar Problem 2"
+      invariants_shared: ["shared concept"]
+      difference: "Key difference"
+      modification: "Required changes"
+
+    - name: "Similar Problem 3"
+      invariants_shared: ["shared concept"]
+      difference: "Variation description"

@@ -1,0 +1,147 @@
+# problem.yaml - Problem Definition Template
+# Copy this directory to problems/your-problem-id/ and fill in the placeholders
+
+id: pattern-name-problem-title  # Must match directory name
+title: "Problem Title"
+difficulty: easy  # easy | medium | hard
+pattern: pattern-name  # e.g., two-pointers, sliding-window, binary-search
+theme: software-engineering  # Category for grouping
+estimated_time: "20-30 minutes"
+
+description: |
+  Clear problem description here.
+
+  - What is the input?
+  - What should the output be?
+  - What constraint must be satisfied?
+
+story_context: |
+  Optional narrative context to make the problem more engaging.
+  This helps learners connect abstract algorithms to real scenarios.
+
+examples:
+  - input:
+      param1: [1, 2, 3, 4, 5]
+      param2: 3
+    output: [2, 3]
+    explanation: |
+      Explain why this is the correct answer.
+      Walk through the logic step by step.
+
+  - input:
+      param1: [1, 2, 3]
+      param2: 10
+    output: null
+    explanation: |
+      Edge case explanation - why no valid answer exists.
+
+constraints:
+  - "2 <= array.length <= 100,000"
+  - "1 <= array[i] <= 1,000,000,000"
+  - "Array is sorted in ascending order"
+
+hints:
+  - level: 1
+    text: "First hint - general direction without giving away solution"
+
+  - level: 2
+    text: "Second hint - more specific guidance"
+
+  - level: 3
+    text: "Third hint - nearly gives away the approach"
+
+starter_code_python: |
+  def solution(param1, param2):
+      """
+      Brief description of what the function should do.
+
+      Args:
+          param1: List[int] - description
+          param2: int - description
+
+      Returns:
+          List[int] | None - description of return value
+
+      Examples:
+          >>> solution([1, 2, 3, 4, 5], 3)
+          [2, 3]
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Brief description of what the function should do.
+   *
+   * @param {number[]} param1 - description
+   * @param {number} param2 - description
+   * @return {number[]|null} - description of return value
+   */
+  function solution(param1, param2) {
+      // Your code here
+  }
+
+test_cases:
+  - id: "basic-example"
+    input:
+      param1: [1, 2, 3, 4, 5]
+      param2: 3
+    expected: [2, 3]
+    explanation: "Basic example from problem description"
+
+  - id: "no-solution"
+    input:
+      param1: [1, 2, 3]
+      param2: 10
+    expected: null
+    explanation: "No valid answer exists"
+
+  - id: "minimum-input"
+    input:
+      param1: [1, 2]
+      param2: 1
+    expected: [1, 2]
+    explanation: "Smallest valid input"
+
+  - id: "edge-case"
+    input:
+      param1: [1000000000, 1000000001]
+      param2: 1
+    expected: [1000000000, 1000000001]
+    explanation: "Handle large numbers near constraints"
+
+edge_cases:
+  - case: "Minimum input size"
+    description: "Array with only 2 elements"
+    test_id: "minimum-input"
+
+  - case: "No solution exists"
+    description: "When no valid answer can be found"
+    test_id: "no-solution"
+
+pattern_learning_objectives:
+  - "Understand when this pattern applies"
+  - "Learn the key insight that enables the optimization"
+  - "Recognize the time/space complexity trade-off"
+
+real_world_applications:
+  - "Application 1 - where this pattern appears in industry"
+  - "Application 2 - another real-world use case"
+
+complexity_analysis:
+  time:
+    naive: "O(n^2) - brute force approach"
+    optimal: "O(n) - using this pattern"
+  space:
+    optimal: "O(1) - constant extra space"
+
+pattern_signature:
+  indicators:
+    - "Clue 1 that suggests this pattern"
+    - "Clue 2 that suggests this pattern"
+
+  pattern_name: "Pattern Name"
+
+  when_to_use:
+    - "Condition 1 when this pattern is appropriate"
+    - "Condition 2 when this pattern is appropriate"

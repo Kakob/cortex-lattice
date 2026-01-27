@@ -1,0 +1,116 @@
+# invariants.yaml - Pattern Rules (Optional)
+# Invariants are conditions that MUST hold true for the algorithm to work correctly
+
+pattern: pattern-name
+problem_id: pattern-name-problem-title
+
+# Core invariants that define the pattern
+core_invariants:
+  - id: "input-requirement"
+    description: "What the input must satisfy"
+
+    why_it_matters: |
+      Explain why this property is essential for the pattern to work.
+
+    violation_detection:
+      - "How to detect when this is violated"
+
+    teaching_moment_if_violated: |
+      What to tell the learner if they violate this invariant.
+
+  - id: "state-invariant"
+    description: "What must be true at each step"
+
+    why_it_matters: |
+      Explain the importance of maintaining this state.
+
+    violation_detection:
+      - "How to detect violations"
+
+    teaching_moment_if_violated: |
+      Teaching content for violations.
+
+  - id: "progress-invariant"
+    description: "How we guarantee progress toward solution"
+
+    why_it_matters: |
+      Explain how this ensures termination and correctness.
+
+# Algorithm correctness invariants
+algorithm_correctness_invariants:
+  - id: "calculation-invariant"
+    description: "What calculations must be correct"
+
+    why_it_matters: |
+      Explain the correctness requirement.
+
+    violation_detection:
+      - "Detection method"
+
+    teaching_moment_if_violated: |
+      Teaching content.
+
+  - id: "boundary-invariant"
+    description: "Boundary conditions that must hold"
+
+    why_it_matters: |
+      Explain boundary requirements.
+
+# Efficiency invariants
+efficiency_invariants:
+  - id: "time-complexity"
+    description: "Algorithm must run in O(n) time"
+
+    why_it_matters: |
+      The main advantage of this pattern over brute force.
+
+    violation_detection:
+      - "Count iterations"
+      - "Should be approximately n"
+
+    teaching_moment_if_violated: |
+      Your solution is O(n^2), not O(n)!
+      The pattern achieves O(n) by [key insight].
+
+  - id: "space-complexity"
+    description: "Should use O(1) extra space"
+
+    why_it_matters: |
+      Pattern is space-efficient.
+
+# Pattern recognition
+pattern_recognition_invariants:
+  - id: "problem-structure"
+    description: "What problem structure suggests this pattern"
+
+    pattern_match_criteria:
+      - "Criterion 1"
+      - "Criterion 2"
+
+  - id: "greedy-validity"
+    description: "Why greedy choices are safe"
+
+    correctness_proof: |
+      Brief proof of why the greedy approach works.
+
+# Teaching progressions
+teaching_progressions:
+  beginner_understanding:
+    - "Basic concept 1"
+    - "Basic concept 2"
+
+  intermediate_understanding:
+    - "Deeper concept 1"
+    - "Deeper concept 2"
+
+  advanced_understanding:
+    - "Advanced concept 1"
+    - "Proof of correctness"
+
+# Common misconceptions
+common_misconceptions:
+  - misconception: "What learners often believe incorrectly"
+    reality: "The truth"
+
+  - misconception: "Another misconception"
+    reality: "The correction"

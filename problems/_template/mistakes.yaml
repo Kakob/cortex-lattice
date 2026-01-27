@@ -1,0 +1,133 @@
+# mistakes.yaml - Common Errors Catalog (Optional)
+# This file documents typical mistakes learners make and how to teach through them
+
+pattern: pattern-name
+problem_id: pattern-name-problem-title
+
+# Catalog of common mistakes with detection and teaching
+common_mistakes:
+  - id: "brute-force-approach"
+    severity: high  # high | medium | low
+    category: "wrong-pattern"
+
+    description: "Using nested loops instead of the optimal pattern"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Nested for loops
+        - Total iterations approaching n*(n-1)/2
+        - No optimization of search space
+
+      code_pattern:
+        - "Nested for loops"
+        - "No pattern-specific variables"
+
+    why_students_do_this: |
+      This is the intuitive first approach. It works correctly but
+      misses the optimization opportunity.
+
+    teaching_moment:
+      title: "Brute Force Works, But There's a Better Way"
+
+      explanation: |
+        Your solution correctly solves the problem, but it's O(n^2).
+
+        For n=1,000 elements:
+        - Your approach: ~500,000 operations
+        - Optimal approach: ~1,000 operations
+
+        The key insight is: [explain what enables the optimization]
+
+      hint: |
+        Think about this: [guiding question that leads to insight]
+
+      next_step: |
+        Try implementing the pattern:
+        1. Step 1
+        2. Step 2
+        3. Step 3
+
+  - id: "implementation-error-1"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Specific implementation error description"
+
+    detection:
+      code_analysis:
+        - "Pattern to look for in code"
+
+      execution_trace:
+        - "Symptom in execution"
+
+    teaching_moment:
+      title: "Error Title"
+
+      explanation: |
+        What went wrong and why.
+
+      fix: |
+        Change:
+          incorrect code
+        To:
+          correct code
+
+  - id: "logic-error-1"
+    severity: high
+    category: "logic-error"
+
+    description: "Logic error description"
+
+    detection:
+      execution_trace:
+        - "What to look for in trace"
+
+    teaching_moment:
+      title: "Logic Error Title"
+
+      explanation: |
+        Explain the logical mistake.
+
+      correct_pattern: |
+        Show the correct logic.
+
+# Categorize mistakes for analysis
+mistake_categories:
+  wrong_pattern:
+    - brute-force-approach
+
+  implementation_error:
+    - implementation-error-1
+
+  logic_error:
+    - logic-error-1
+
+# Expected learning progression
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-approach"
+      teaching: "Introduce pattern concept"
+
+    - stage: 2
+      mistake: "implementation-error-1"
+      teaching: "Clarify implementation details"
+
+    - stage: 3
+      achievement: "Correct implementation!"
+      next: "Try harder problems with this pattern"
+
+# Teaching strategies by mistake type
+teaching_strategies:
+  for_wrong_pattern_users:
+    - "Acknowledge correctness of their solution"
+    - "Show complexity comparison"
+    - "Explain the key insight"
+    - "Provide guided transition to pattern"
+
+  for_implementation_errors:
+    - "Point out exact error location"
+    - "Show what they calculated vs expected"
+    - "Provide visual if helpful"
+    - "Give corrected code"

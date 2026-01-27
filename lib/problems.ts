@@ -444,7 +444,8 @@ export async function buildCategorizedHints(
  * Get all available problems.
  */
 export async function getAllProblems(): Promise<ProblemCard[]> {
-  const problemDirs = await glob("*/problem.yaml", { cwd: PROBLEMS_DIR });
+  // Ignore underscore-prefixed directories (like _template)
+  const problemDirs = await glob("[!_]*/problem.yaml", { cwd: PROBLEMS_DIR });
 
   const problems: ProblemCard[] = [];
 
