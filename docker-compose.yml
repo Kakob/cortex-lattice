@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  # Code execution sandbox
+  # This service is not run directly - it's used via `docker run`
+  # to execute user code in isolated containers
+  executor:
+    build:
+      context: ./executor
+      dockerfile: Dockerfile
+    image: cortex-executor:latest
+    # Container constraints (for reference - applied via docker run)
+    # mem_limit: 512m
+    # cpus: 1
+    # network_mode: none  # Applied when running

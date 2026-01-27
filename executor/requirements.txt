@@ -1,0 +1,13 @@
+# Cortex Lattice - Executor Dependencies
+# Minimal set for running DSA problems with optional ML support
+
+# Core
+pyyaml>=6.0
+numpy>=1.26.0
+
+# PyTorch CPU-only (smaller footprint)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.1.0
+
+# Testing utilities
+pytest>=7.4.0

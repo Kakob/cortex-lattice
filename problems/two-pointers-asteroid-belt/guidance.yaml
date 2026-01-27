@@ -1,0 +1,70 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Following MVP Teaching Framework (Week 1 Required)
+
+title: "Two Pointers - Asteroid Belt Navigation"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "For finding a DIFFERENCE, both pointers start from the left (not opposite ends)"
+    - text: "Move right pointer forward to increase the difference"
+    - text: "Move left pointer forward to decrease the difference"
+    - text: "Array is sorted - this enables O(n) solution"
+    - text: "Time complexity: O(n) vs brute force O(n^2)"
+    - text: "Each pointer moves in only one direction (monotonic)"
+
+  common_mistakes:
+    - text: "Don't start from opposite ends - that works for SUM, not DIFFERENCE"
+    - text: "Don't move both pointers in one iteration (unless left catches up to right)"
+    - text: "Don't use nested loops - that's O(n^2) brute force"
+    - text: "Don't confuse index with value: distance = positions[right] - positions[left]"
+    - text: "Make sure left stays behind right (increment right if they meet)"
+
+  real_world:
+    - text: |
+        Spacecraft Navigation Systems
+
+        In real mission planning, finding optimal rendezvous points between
+        spacecraft requires similar calculations. NASA's trajectory planning
+        for ISS resupply missions uses sorted position data to find optimal
+        intercept windows - essentially the same algorithmic pattern.
+
+        The key insight: when positions are sorted chronologically or spatially,
+        two-pointer techniques provide O(n) solutions where brute force would
+        require O(n^2) comparisons.
+
+    - text: |
+        Financial Trading Systems
+
+        High-frequency trading platforms use two-pointer techniques on sorted
+        order book data. Finding pairs of orders with specific price spreads
+        must happen in microseconds - O(n) algorithms like this one enable
+        real-time arbitrage detection.
+
+  solution_approach:
+    steps:
+      - "Initialize: left = 0, right = 1 (both start from left side)"
+      - "While right < len(positions):"
+      - "  Calculate: distance = positions[right] - positions[left]"
+      - "  If distance == target: return [positions[left], positions[right]]"
+      - "  If distance < target: right++ (move right forward to increase distance)"
+      - "  If distance > target: left++ (move left forward to decrease distance)"
+      - "  If left == right after moving: right++ (keep right ahead of left)"
+      - "If loop ends without finding: return None"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Two Sum (sorted array)"
+      invariants_shared: ["sorted input", "pointer movement based on comparison"]
+
+    - name: "Container With Most Water"
+      invariants_shared: ["opposite-end initialization", "single-direction movement"]
+      difference: "Move pointer at smaller height instead of distance-based"
+
+    - name: "Three Sum"
+      invariants_shared: ["sorted array enables elimination"]
+      modification: "Fix one element, run two pointers on rest - O(n^2) total"

@@ -3,48 +3,62 @@ pattern: two-pointers
 difficulty: easy
 
 # The reference implementation - optimal Two Pointers solution
+# NOTE: For finding a DIFFERENCE (not sum), both pointers start from the left
 solution_code_python: |
   def find_asteroid_pair(positions, target_distance):
       """
-      Optimal Two Pointers solution.
+      Optimal Two Pointers solution for finding a specific difference.
       Time: O(n), Space: O(1)
+
+      Key insight: Both pointers start from the left and move forward.
+      - Move right to increase the difference
+      - Move left to decrease the difference
       """
       left = 0
-      right = len(positions) - 1
-      
-      while left < right:
+      right = 1
+
+      while right < len(positions):
           current_distance = positions[right] - positions[left]
-          
+
           if current_distance == target_distance:
               return [positions[left], positions[right]]
           elif current_distance < target_distance:
-              left += 1  # Need larger distance
+              right += 1  # Need larger distance, move right forward
           else:
-              right -= 1  # Need smaller distance
-      
+              left += 1  # Need smaller distance, move left forward
+              if left == right:  # Ensure left stays behind right
+                  right += 1
+
       return None  # No pair found
 
 solution_code_javascript: |
   function findAsteroidPair(positions, targetDistance) {
       /**
-       * Optimal Two Pointers solution.
+       * Optimal Two Pointers solution for finding a specific difference.
        * Time: O(n), Space: O(1)
+       *
+       * Key insight: Both pointers start from the left and move forward.
+       * - Move right to increase the difference
+       * - Move left to decrease the difference
        */
       let left = 0;
-      let right = positions.length - 1;
-      
-      while (left < right) {
+      let right = 1;
+
+      while (right < positions.length) {
           const currentDistance = positions[right] - positions[left];
-          
+
           if (currentDistance === targetDistance) {
               return [positions[left], positions[right]];
           } else if (currentDistance < targetDistance) {
-              left++;  // Need larger distance
+              right++;  // Need larger distance, move right forward
           } else {
-              right--;  // Need smaller distance
+              left++;  // Need smaller distance, move left forward
+              if (left === right) {  // Ensure left stays behind right
+                  right++;
+              }
           }
       }
-      
+
       return null;  // No pair found
   }
 

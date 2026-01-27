@@ -1,0 +1,635 @@
+# Cortex Lattice: MVP File Structure
+
+**Version:** 1.0  
+**Date:** January 26, 2026  
+**Purpose:** Clarify which files are MVP-critical vs. future enhancements
+
+---
+
+## The Complete Teaching System
+
+```
+/problems/
+  two-pointers/
+    asteroid-belt/
+      ├── problem.yaml          ⭐ MVP Week 1 (REQUIRED)
+      ├── solution.py            ⭐ MVP Week 1 (REQUIRED)
+      ├── guidance.yaml          ⭐ MVP Week 1 (REQUIRED)
+      ├── invariants.yaml        🔶 MVP Week 2 (HIGH VALUE)
+      ├── mistakes.yaml          🔶 MVP Week 2-3 (HIGH VALUE)
+      └── pause-points.yaml      🔮 Future (ADVANCED)
+```
+
+---
+
+## Priority Breakdown
+
+### ⭐ Tier 1: MVP Week 1 (MUST HAVE)
+*Can't launch without these*
+
+#### 1. problem.yaml
+**Purpose:** Define the challenge  
+**Time to create:** 30 minutes  
+**Why it's critical:** Without this, there's no problem to solve
+
+```yaml
+# problem.yaml
+id: "asteroid-belt-navigation"
+title: "Two Pointers - Asteroid Belt Navigation"
+difficulty: "medium"
+
+description: |
+  You're piloting through an asteroid belt.
+  Find two asteroids exactly targetDistance units apart.
+
+examples:
+  - input:
+      positions: [100, 250, 350, 500, 750]
+      target: 250
+    output: [100, 350]
+    explanation: "100 + 250 = 350"
+
+constraints:
+  - "2 <= positions.length <= 10^4"
+  - "Positions are sorted in ascending order"
+  - "All positions are unique"
+
+starter_code:
+  python: |
+    def find_asteroids(positions: List[int], target: int) -> List[int]:
+        # Your code here
+        pass
+
+test_cases:
+  - input: { positions: [100, 250, 350], target: 150 }
+    output: [100, 250]
+  - input: { positions: [1, 2, 3, 4, 5], target: 3 }
+    output: [1, 4]
+  # ... more test cases
+```
+
+---
+
+#### 2. solution.py
+**Purpose:** Reference implementation  
+**Time to create:** 30-45 minutes  
+**Why it's critical:** Needed to validate user submissions
+
+```python
+# solution.py
+def find_asteroids(positions: List[int], target: int) -> List[int]:
+    """
+    Two pointers approach - O(n) time, O(1) space
+    """
+    left = 0
+    right = len(positions) - 1
+    
+    while left < right:
+        current_distance = positions[right] - positions[left]
+        
+        if current_distance == target:
+            return [positions[left], positions[right]]
+        elif current_distance < target:
+            left += 1
+        else:
+            right -= 1
+    
+    return []
+```
+
+---
+
+#### 3. guidance.yaml
+**Purpose:** Categorized hint system (your sans-AI design)  
+**Time to create:** 1-1.5 hours  
+**Why it's critical:** This IS your teaching system for MVP
+
+```yaml
+# guidance.yaml
+title: "Two Pointers - Asteroid Belt Navigation"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "Start pointers at widest position (0 and len-1)"
+    - text: "Move the pointer that increases distance to target"
+    - text: "Array is sorted - this enables O(n) solution"
+    - text: "Time complexity: O(n) vs brute force O(n²)"
+
+  common_mistakes:
+    - text: "⚠️ Don't start both pointers at 0!"
+    - text: "⚠️ Don't move both pointers simultaneously"
+    - text: "⚠️ Don't use nested loops (that's O(n²))"
+
+  real_world:
+    - text: |
+        🚀 Spacecraft Rendezvous Planning
+        Finding optimal meeting points between satellites
+        in sorted orbital position data.
+
+  solution_approach:
+    steps:
+      - "Initialize: left = 0, right = len-1"
+      - "While left < right:"
+      - "  Calculate: distance = positions[right] - positions[left]"
+      - "  If distance == target: found it!"
+      - "  If distance < target: left++ (need bigger distance)"
+      - "  If distance > target: right-- (need smaller distance)"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+```
+
+**MVP Week 1 Total Time: 2.5-3 hours per problem**
+
+---
+
+### 🔶 Tier 2: MVP Week 2-3 (HIGH VALUE)
+*Makes your platform 10x better than LeetCode*
+
+#### 4. invariants.yaml
+**Purpose:** Define what MUST be true for pattern to work  
+**Time to create:** 1 hour  
+**Why it's valuable:** Teaches algorithmic thinking, not just solutions
+
+```yaml
+# invariants.yaml
+pattern: "Two Pointers"
+
+invariants:
+  - id: "sorted-array"
+    description: "Array must be sorted ascending"
+    rationale: |
+      Two pointers works because we can make decisions about
+      which pointer to move based on sorted order
+    violation_consequence: "Algorithm will miss valid pairs"
+
+  - id: "pointer-bounds"
+    description: "left < right at all times"
+    rationale: "We're looking for two DISTINCT positions"
+    violation_consequence: "Would return same element twice"
+
+  - id: "move-towards-target"
+    description: "Move pointer that brings distance closer to target"
+    rationale: |
+      If distance < target: move left (increase distance)
+      If distance > target: move right (decrease distance)
+    violation_consequence: "Will move away from solution"
+
+  - id: "single-pass"
+    description: "Each pointer moves at most n times"
+    rationale: "This is what makes it O(n) instead of O(n²)"
+    violation_consequence: "Inefficient solution"
+
+pattern_transfer:
+  - problem_type: "Sum of two numbers"
+    same_invariants: ["sorted-array", "pointer-bounds"]
+  
+  - problem_type: "Container with most water"
+    same_invariants: ["pointer-bounds", "single-pass"]
+    different: "Move bottleneck instead of towards target"
+```
+
+**Value Add:**
+- Users learn WHY the algorithm works
+- Enables pattern transfer to new problems
+- Foundation for future mistake detection
+
+---
+
+#### 5. mistakes.yaml
+**Purpose:** Catalog common errors + what to teach  
+**Time to create:** 1.5 hours  
+**Why it's valuable:** Transforms "Wrong Answer" into "Here's what you misunderstood"
+
+```yaml
+# mistakes.yaml
+pattern: "Two Pointers"
+
+mistakes:
+  - id: "wrong-initialization"
+    description: "Starting both pointers at beginning"
+    
+    detection:
+      code_pattern: |
+        left = 0
+        right = 0  # or right = 1
+      
+    frequency: "very_common"
+    
+    teaching_moment:
+      explanation: |
+        You started both pointers at the beginning, but two pointers
+        needs to start at the WIDEST possible range (0 and len-1).
+      
+      why_wrong: |
+        Starting narrow means you can only make the range narrower,
+        missing larger valid distances.
+      
+      hint: "Think about the maximum possible distance first"
+      
+      related_invariant: "pointer-bounds"
+
+  - id: "wrong-pointer-move"
+    description: "Moving pointer away from target"
+    
+    detection:
+      logic: |
+        if current_distance < target and user moved right:
+          FLAG
+        if current_distance > target and user moved left:
+          FLAG
+    
+    frequency: "common"
+    
+    teaching_moment:
+      explanation: |
+        You moved the wrong pointer. When distance is too small,
+        you need to INCREASE it by moving left++. When too large,
+        DECREASE it by moving right--.
+      
+      visualization: "show distance change graph"
+      
+      related_invariant: "move-towards-target"
+
+  - id: "nested-loops"
+    description: "Using brute force O(n²) approach"
+    
+    detection:
+      code_pattern: |
+        for i in range(len(positions)):
+            for j in range(i+1, len(positions)):
+    
+    frequency: "common"
+    
+    teaching_moment:
+      explanation: |
+        You're checking every pair (nested loops = O(n²)).
+        Two pointers can solve this in O(n) by intelligently
+        moving just two pointers.
+      
+      hint: "You don't need to check every pair - just move pointers smartly"
+      
+      related_invariant: "single-pass"
+
+  - id: "off-by-one"
+    description: "Including left == right case"
+    
+    detection:
+      code_pattern: "while left <= right:"
+    
+    frequency: "occasional"
+    
+    teaching_moment:
+      explanation: |
+        You're allowing left == right, but we need TWO distinct
+        asteroids. The condition should be: while left < right
+      
+      related_invariant: "pointer-bounds"
+```
+
+**Value Add:**
+- Specific, actionable feedback vs generic "Wrong Answer"
+- Shows EXACTLY what they misunderstood
+- References invariants to teach pattern thinking
+- Foundation for future ML-powered detection
+
+---
+
+### 🔮 Tier 3: Future (ADVANCED)
+*Interactive execution, pauses, visualizations*
+
+#### 6. pause-points.yaml
+**Purpose:** Stop execution at key moments, ask user to predict  
+**Time to create:** 45 minutes  
+**Why it's future:** Requires execution trace infrastructure
+
+```yaml
+# pause-points.yaml
+pattern: "Two Pointers"
+
+pause_points:
+  - id: "initialization"
+    trigger: "after variable initialization"
+    
+    question: |
+      You've set left=0, right=8
+      Current distance = positions[8] - positions[0] = 650
+      Target distance = 250
+      
+      Which pointer should move?
+    
+    options:
+      - id: "move_left"
+        text: "Move left pointer (left++)"
+        correct: false
+        feedback: "This would INCREASE distance (to 750). We need to decrease it."
+      
+      - id: "move_right"
+        text: "Move right pointer (right--)"
+        correct: true
+        feedback: "Correct! Distance is too large, so decrease it by moving right inward."
+    
+    teaching_moment: |
+      When distance > target, move RIGHT inward (decrease distance)
+      When distance < target, move LEFT outward (increase distance)
+
+  - id: "middle-decision"
+    trigger: "step 3, after some moves"
+    
+    visualization:
+      type: "array_with_pointers"
+      show:
+        - array: [100, 250, 350, 500, 750]
+        - left: 1  # pointing at 250
+        - right: 3 # pointing at 500
+        - current_distance: 250
+        - target: 250
+    
+    question: "What should happen now?"
+    
+    options:
+      - id: "return"
+        text: "Return [250, 500] - we found it!"
+        correct: true
+      
+      - id: "keep_moving"
+        text: "Keep moving pointers"
+        correct: false
+        feedback: "We already found target distance - no need to continue!"
+
+  - id: "not-found-case"
+    trigger: "left >= right and no solution found"
+    
+    question: "What should we return when no valid pair exists?"
+    
+    teaching_moment: |
+      When pointers meet/cross without finding target, return empty
+      result ([] or null). This means no valid pair exists.
+```
+
+**Why it's future:**
+- Requires execution trace system
+- Needs step-through debugger UI
+- More complex state management
+- Needs visualization engine
+
+**Build this after:**
+- Basic code execution works
+- Trace generation is stable
+- You have 20+ problems and want to enhance them
+
+---
+
+## File Creation Time Summary
+
+### Week 1 MVP (Per Problem)
+```
+problem.yaml:   30 min
+solution.py:    45 min
+guidance.yaml:  90 min
+───────────────────────
+Total:          2.5-3 hours
+```
+
+**Goal:** Create 10 Tier 1 problems in Week 1
+- **Total time:** 25-30 hours (1 week full-time or 2-3 weeks part-time)
+
+---
+
+### Week 2-3 Enhancement (Per Problem)
+```
+invariants.yaml:  60 min
+mistakes.yaml:    90 min
+────────────────────────
+Additional:       2.5 hours
+```
+
+**Goal:** Add to 5 showcase problems
+- **Additional time:** 12-15 hours
+
+---
+
+### Future Enhancement (Per Problem)
+```
+pause-points.yaml: 45 min
+```
+
+**Build this after:** Trace system exists (Month 2-3)
+
+---
+
+## MVP Launch Strategy
+
+### Week 1: Core Problem Set
+Create **10 problems** with Tier 1 files:
+- ✅ problem.yaml (define challenge)
+- ✅ solution.py (validate answers)
+- ✅ guidance.yaml (categorized hints)
+
+**This is enough to launch!** Users can:
+- Read problem
+- Write code
+- Get test feedback
+- Use categorized hints
+- See solution after solving
+
+---
+
+### Week 2-3: Enhanced Teaching
+Add Tier 2 files to **5 showcase problems:**
+- ✅ invariants.yaml (pattern rules)
+- ✅ mistakes.yaml (better feedback)
+
+**Now you have:**
+- 5 deeply educational problems (showcase)
+- 5 standard problems (coverage)
+- Enough to validate teaching approach
+
+---
+
+### Month 2-3: Interactive Features
+Add Tier 3 files to **2-3 star problems:**
+- ✅ pause-points.yaml (interactive stepping)
+
+**Requires:**
+- Trace generation system
+- Step-through debugger UI
+- Visualization engine
+
+---
+
+## Which Files Go Where?
+
+### Problem Directory Structure
+
+```
+/problems/
+  two-pointers/                    # Pattern folder
+    asteroid-belt/                 # Problem folder
+      ├── README.md               # Problem overview
+      │
+      ├── problem.yaml            # ⭐ Week 1
+      ├── solution.py             # ⭐ Week 1
+      ├── guidance.yaml           # ⭐ Week 1
+      │
+      ├── invariants.yaml         # 🔶 Week 2
+      ├── mistakes.yaml           # 🔶 Week 2-3
+      │
+      └── pause-points.yaml       # 🔮 Future
+```
+
+---
+
+## Authoring Workflow
+
+### Week 1: Rapid Content Creation
+For each problem:
+1. **Write problem.yaml** (30 min)
+   - Problem statement
+   - Examples
+   - Test cases
+   - Starter code
+
+2. **Write solution.py** (45 min)
+   - Reference implementation
+   - Add comments explaining approach
+   - Verify all test cases pass
+
+3. **Write guidance.yaml** (90 min)
+   - 4 key concept hints
+   - 3 common mistake hints
+   - 1 real-world example
+   - Solution approach steps
+
+**Time: 2.5-3 hours → Launch quality problem**
+
+---
+
+### Week 2: Deepen Understanding
+For showcase problems:
+
+4. **Write invariants.yaml** (60 min)
+   - What must be true
+   - Why it must be true
+   - What breaks if violated
+   - Pattern transfer examples
+
+5. **Write mistakes.yaml** (90 min)
+   - Common errors
+   - Detection patterns
+   - Teaching moments
+   - Related invariants
+
+**Additional time: 2.5 hours → Deeply educational problem**
+
+---
+
+### Month 2: Interactive Learning
+For star problems:
+
+6. **Write pause-points.yaml** (45 min)
+   - 3-4 key decision points
+   - Questions + options
+   - Teaching moments
+   - Visualizations needed
+
+**Additional time: 45 min → Interactive problem**
+
+---
+
+## Content Tiers Recap
+
+### Tier 0: Coverage Problem (2 hours)
+Just the basics:
+- ✅ problem.yaml (minimal examples)
+- ✅ solution.py (working code)
+- ✅ guidance.yaml (basic hints)
+
+**Purpose:** Fill out pattern coverage quickly
+
+---
+
+### Tier 1: Launch Quality (3 hours)
+Standard problem:
+- ✅ problem.yaml (full examples)
+- ✅ solution.py (commented)
+- ✅ guidance.yaml (full categories)
+
+**Purpose:** Good learning experience, launchable
+
+---
+
+### Tier 2: Showcase Problem (5-6 hours)
+Deep teaching:
+- ✅ All Tier 1 files
+- ✅ invariants.yaml
+- ✅ mistakes.yaml
+
+**Purpose:** Demonstrate teaching power, marketing
+
+---
+
+### Tier 3: Star Problem (6-7 hours)
+Full experience:
+- ✅ All Tier 2 files
+- ✅ pause-points.yaml
+- ✅ Visualizations
+- ✅ Multiple solution paths
+
+**Purpose:** Showcase features, wow factor
+
+---
+
+## The Bottom Line
+
+### For MVP Launch (Week 1):
+
+**MUST HAVE:**
+- problem.yaml
+- solution.py
+- guidance.yaml
+
+**THAT'S IT!** 3 files per problem, 2.5-3 hours each.
+
+### For Enhanced MVP (Week 2-3):
+
+**ADD TO SHOWCASE PROBLEMS:**
+- invariants.yaml
+- mistakes.yaml
+
+### For Future (Month 2+):
+
+**ADD WHEN INFRASTRUCTURE EXISTS:**
+- pause-points.yaml
+
+---
+
+## Decision Matrix
+
+| File | Week 1? | Week 2? | Future? | Why? |
+|------|---------|---------|---------|------|
+| problem.yaml | ✅ Required | - | - | Can't work without it |
+| solution.py | ✅ Required | - | - | Need reference answer |
+| guidance.yaml | ✅ Required | - | - | This IS the teaching |
+| invariants.yaml | ❌ | ✅ High value | - | Makes teaching 10x better |
+| mistakes.yaml | ❌ | ✅ High value | - | Better than "wrong answer" |
+| pause-points.yaml | ❌ | ❌ | ✅ Advanced | Needs trace infrastructure |
+
+---
+
+## Quick Reference
+
+**"I want to launch in 1 week with 10 problems"**
+→ 3 files per problem (problem, solution, guidance) = 25-30 hours
+
+**"I want 5 deeply educational showcase problems"**
+→ 5 files per problem (add invariants, mistakes) = 25-30 hours
+
+**"I want interactive stepping through execution"**
+→ 6 files per problem (add pause-points) = Needs trace system first
+
+---
+
+**Start with the 3-file MVP. Launch. Then enhance based on user feedback.**

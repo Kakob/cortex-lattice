@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f0f1a;
+  --foreground: #e5e7eb;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Bottom sheet drag handle */
+.drag-handle {
+  width: 48px;
+  height: 4px;
+  background: #4b5563;
+  border-radius: 2px;
+  margin: 8px auto;
+}
+
+/* Editor container styling */
+.editor-container {
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Smooth transitions */
+.transition-default {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Mobile-optimized touch targets */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
