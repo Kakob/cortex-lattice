@@ -1,0 +1,17 @@
+title: "End-to-End Safety System"
+pattern: "Systems Integration"
+difficulty: "expert"
+
+why_this_matters: |
+  Individual safety techniques must work together.
+  A complete system provides defense in depth.
+
+hints:
+  key_concepts:
+    - text: "Layer multiple safety mechanisms"
+    - text: "Monitor at input, output, and behavior levels"
+    - text: "Generate reports for ongoing safety assessment"
+  
+  common_mistakes:
+    - text: "Safety checks too slow for real-time use"
+    - text: "Not logging enough data for analysis"

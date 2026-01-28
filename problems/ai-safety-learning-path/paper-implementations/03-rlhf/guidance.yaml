@@ -1,0 +1,122 @@
+title: "RLHF from Scratch"
+pattern: "Alignment"
+difficulty: "hard"
+
+why_this_matters: |
+  RLHF is how ChatGPT, Claude, and other aligned LLMs are trained.
+  Understanding RLHF deeply is essential for AI safety because:
+  
+  - It's the main production alignment technique
+  - It has known failure modes (reward hacking, sycophancy)
+  - Improving on RLHF is active research
+
+hints:
+  key_concepts:
+    - text: |
+        THE RLHF PIPELINE:
+        
+        1. SFT (Supervised Fine-Tuning)
+           - Train on (prompt, good_response) pairs
+           - Creates a starting point that can follow instructions
+        
+        2. Reward Model Training
+           - Collect human comparisons: "Is A or B better?"
+           - Train to predict: P(A > B) = σ(r_A - r_B)
+        
+        3. PPO Fine-Tuning
+           - Generate responses
+           - Score with reward model
+           - Update policy to get higher rewards
+           - BUT: Add KL penalty to stay close to SFT model!
+    
+    - text: |
+        KL PENALTY is crucial:
+        
+        reward_rlhf = reward_model(response) - β * KL(policy || reference)
+        
+        Without KL penalty: Policy will "hack" reward model
+        - Find weird outputs that get high reward
+        - But are actually nonsense or harmful
+        
+        With KL penalty: Can't deviate too far from sensible SFT model
+    
+    - text: |
+        REWARD MODEL uses Bradley-Terry:
+        
+        P(A > B) = σ(r_A - r_B)
+        
+        Loss = -log(σ(r_chosen - r_rejected))
+        
+        This learns a latent "quality score" for responses.
+    
+    - text: |
+        Why not just use reward model directly?
+        
+        Reward model is trained on COMPARISONS, not absolute scores.
+        - It can tell A > B
+        - But the absolute value of r_A is meaningless
+        
+        This is why we need RL: to find responses that the reward model prefers.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Not freezing reference model:
+        The reference model (SFT) must be FROZEN during PPO.
+        If it updates, KL penalty becomes meaningless.
+    
+    - text: |
+        ⚠️ KL coefficient too low:
+        β too low → reward hacking
+        β too high → can't improve from SFT
+        Start with β = 0.1, tune based on KL statistics.
+    
+    - text: |
+        ⚠️ Reward model overfitting:
+        RM can memorize training data → terrible PPO results.
+        Use held-out validation, early stopping.
+
+  real_world:
+    - text: |
+        🤖 InstructGPT (2022)
+        The original RLHF paper from OpenAI.
+        Showed RLHF makes GPT-3 much more helpful.
+        
+        🤖 Claude (Anthropic)
+        Uses Constitutional AI which builds on RLHF.
+        
+        🔬 Known Issues
+        - Sycophancy: Model learns to agree with user
+        - Reward hacking: Model exploits RM weaknesses
+        - Distribution shift: RM trained on different distribution
+
+  solution_approach:
+    overview: |
+      Three-phase training: SFT → RM → PPO
+    
+    steps:
+      - "Phase 1 - SFT:"
+      - "  1. Collect demonstration data (prompts + ideal responses)"
+      - "  2. Fine-tune base LM with cross-entropy loss"
+      - "  3. This is now the 'reference model'"
+      - ""
+      - "Phase 2 - Reward Model:"
+      - "  1. Collect comparison data (prompt, response_A, response_B, preference)"
+      - "  2. Train RM: Loss = -log(σ(r_chosen - r_rejected))"
+      - "  3. Validate: Accuracy on held-out comparisons"
+      - ""
+      - "Phase 3 - PPO:"
+      - "  1. Generate responses from policy"
+      - "  2. Score with reward model"
+      - "  3. Compute KL divergence from reference"
+      - "  4. total_reward = reward - β * KL"
+      - "  5. PPO update on total_reward"
+      - "  6. Repeat"
+
+complexity:
+  time: "O(generate_time + forward_passes)"
+  space: "Need 3 models in memory (policy, ref, RM)"
+
+next_steps:
+  - "Constitutional AI - self-critique loop"
+  - "DPO - Direct Preference Optimization (no RL!)"
+  - "Reward hacking detection"

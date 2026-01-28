@@ -1,0 +1,62 @@
+title: "KL Divergence"
+pattern: "Information Theory"
+difficulty: "medium"
+
+why_this_matters: |
+  KL divergence is EVERYWHERE in modern ML:
+  - RLHF: Keeps fine-tuned models close to base model
+  - VAEs: Regularizes latent space
+  - Knowledge Distillation: Transfers knowledge between models
+
+hints:
+  key_concepts:
+    - text: |
+        KL(P || Q) = Σ P(x) * log(P(x) / Q(x))
+        
+        Read as: "KL divergence FROM Q TO P"
+        Or: "How surprised is Q by samples from P?"
+    
+    - text: |
+        KL is NOT symmetric: KL(P || Q) ≠ KL(Q || P)
+        
+        - KL(P || Q): P is "truth", Q is "model"
+        - Forward KL: mode-covering (Q spreads out)
+        - Reverse KL: mode-seeking (Q focuses on modes)
+    
+    - text: |
+        In RLHF, we minimize:
+        reward - β * KL(π_new || π_base)
+        
+        β controls how much we trust human feedback vs staying close to base.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Division by zero when Q(x) = 0 but P(x) > 0:
+        KL becomes infinite! Use epsilon smoothing.
+    
+    - text: |
+        ⚠️ Confusing the order P || Q:
+        The first argument is the "true" distribution.
+
+  real_world:
+    - text: |
+        🤖 RLHF (ChatGPT, Claude)
+        KL penalty prevents reward hacking by keeping model close to base.
+        
+        🤖 Constitutional AI
+        Uses KL to measure deviation during self-improvement.
+        
+        🔬 InstructGPT Paper
+        "We add a KL penalty from the SFT model to mitigate overoptimization"
+
+  solution_approach:
+    steps:
+      - "1. Initialize kl = 0"
+      - "2. For each (p, q) pair:"
+      - "3.   If p > 0: kl += p * log(p / q)"
+      - "4.   (Handle p=0 case: contributes 0)"
+      - "5. Return kl"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"

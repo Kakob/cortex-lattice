@@ -1,0 +1,19 @@
+id: "adversarial-prompt-detector"
+title: "Adversarial Prompt Detector - Defense Against Jailbreaks"
+difficulty: "hard"
+tags: ["adversarial", "security", "nlp", "classification"]
+
+description: |
+  Build a defense system against prompt injection and jailbreak attempts.
+  
+  Implements:
+  1. Prompt classification (safe/adversarial)
+  2. Embedding-based anomaly detection
+  3. Pattern matching for known attacks
+
+prerequisites:
+  dsa: ["15-cosine-similarity", "10-binary-search-threshold"]
+
+papers:
+  - title: "Red Teaming Language Models"
+    url: "https://arxiv.org/abs/2209.07858"

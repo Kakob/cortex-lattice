@@ -1,0 +1,17 @@
+title: "Multi-Objective RLHF"
+pattern: "Multi-Objective Optimization"
+difficulty: "expert"
+
+why_this_matters: |
+  Real AI systems must balance multiple objectives.
+  Being helpful AND harmless requires careful trade-offs.
+
+hints:
+  key_concepts:
+    - text: "Pareto optimality: can't improve one objective without hurting another"
+    - text: "Scalarization: convert multi-objective to single weighted sum"
+    - text: "Adaptive weights: adjust based on current performance"
+  
+  common_mistakes:
+    - text: "Fixed weights ignore dynamics during training"
+    - text: "Objectives may conflict more than expected"

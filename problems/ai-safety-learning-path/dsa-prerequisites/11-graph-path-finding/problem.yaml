@@ -1,0 +1,57 @@
+id: "graph-path-finding"
+title: "Attention Graph Analysis - Finding Information Flow"
+difficulty: "medium"
+pattern: "Graph Traversal"
+tags: ["graphs", "bfs", "interpretability", "transformers"]
+
+description: |
+  🚀 MISSION: Trace Information Flow in Neural Networks
+  
+  In transformer interpretability, we analyze how information flows
+  through attention layers as a GRAPH problem.
+  
+  Given attention weights as an adjacency matrix, find all paths
+  from input token to output token with weight above threshold.
+  
+  This is how we identify "circuits" in transformer models!
+
+examples:
+  - input:
+      attention: [[0, 0.9, 0.1], [0, 0, 0.8], [0, 0, 0]]
+      start: 0
+      end: 2
+      threshold: 0.5
+    output: [[0, 1, 2]]
+    explanation: |
+      Path 0→1→2 has weights 0.9 * 0.8 = 0.72 > threshold
+      Direct path 0→2 has weight 0.1 < threshold
+
+constraints:
+  - "attention is square matrix (n × n)"
+  - "0 <= attention[i][j] <= 1"
+  - "0 < threshold < 1"
+
+starter_code:
+  python: |
+    from typing import List
+    
+    def find_attention_paths(
+        attention: List[List[float]], 
+        start: int, 
+        end: int,
+        threshold: float
+    ) -> List[List[int]]:
+        """
+        Find all paths from start to end with combined weight >= threshold.
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(V + E) for BFS/DFS"
+  space: "O(V) for path storage"
+
+papers:
+  - title: "A Mathematical Framework for Transformer Circuits"
+    authors: "Anthropic"
+    year: 2021

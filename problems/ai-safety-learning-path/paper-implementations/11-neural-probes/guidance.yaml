@@ -1,0 +1,17 @@
+title: "Neural Network Probes"
+pattern: "Interpretability"
+difficulty: "hard"
+
+why_this_matters: |
+  Probing reveals what information is encoded in model representations.
+  Helps understand what the model "knows" at each layer.
+
+hints:
+  key_concepts:
+    - text: "Linear probes test if information is linearly separable"
+    - text: "Different layers encode different types of information"
+    - text: "High probe accuracy = information is present"
+  
+  common_mistakes:
+    - text: "Overfitting probe to small datasets"
+    - text: "Not controlling for probe complexity"

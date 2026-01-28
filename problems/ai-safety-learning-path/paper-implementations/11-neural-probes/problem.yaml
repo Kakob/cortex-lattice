@@ -1,0 +1,19 @@
+id: "neural-probes"
+title: "Neural Network Probes - Understanding Representations"
+difficulty: "hard"
+tags: ["interpretability", "probing", "linear-algebra"]
+
+description: |
+  Build probing classifiers to understand what neural networks represent.
+  
+  Implements:
+  1. Linear probes on hidden representations
+  2. Probing for concepts, facts, and features
+  3. Layer-wise analysis
+
+prerequisites:
+  dsa: ["15-cosine-similarity", "01-matrix-multiplication"]
+
+papers:
+  - title: "Probing Classifiers"
+    url: "https://nlp.stanford.edu/~johnhew/probing-classifiers.html"

@@ -1,0 +1,60 @@
+title: "Running Statistics (Welford's Algorithm)"
+pattern: "Online Algorithms"
+difficulty: "medium"
+
+why_this_matters: |
+  Online statistics are essential for RL:
+  - PPO normalizes observations using running mean/std
+  - Reward scaling uses running statistics
+  - Can't store all samples - need O(1) memory!
+
+hints:
+  key_concepts:
+    - text: |
+        Welford's algorithm tracks:
+        - n: count
+        - mean: running mean
+        - M2: Σ(x - mean)²
+        
+        Variance = M2 / n
+    
+    - text: |
+        Update formula:
+        delta = x - old_mean
+        new_mean = old_mean + delta/n
+        delta2 = x - new_mean  # Use NEW mean!
+        M2 += delta * delta2
+        
+        The trick: use both old and new mean!
+    
+    - text: |
+        Numerical stability: Welford's avoids catastrophic cancellation
+        that occurs with naive Σx² - (Σx)²/n formula.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Using same delta for both updates:
+        delta2 must use the UPDATED mean, not the old one!
+    
+    - text: |
+        ⚠️ Forgetting n<2 edge case:
+        Variance undefined for n=0, n=1 returns 0.
+
+  real_world:
+    - text: |
+        🤖 PPO Observation Normalization
+        Stable-baselines3 uses this exact algorithm.
+        
+        🤖 Reward Scaling
+        Normalize rewards to unit variance for stable learning.
+
+  solution_approach:
+    steps:
+      - "1. __init__: n=0, mean=0, M2=0"
+      - "2. update(x): n++, compute delta, update mean, compute delta2, update M2"
+      - "3. variance(): return M2/n (or M2/(n-1) for sample variance)"
+      - "4. normalize(x): return (x - mean) / std"
+
+complexity:
+  time: "O(1) per update"
+  space: "O(1)"

@@ -1,0 +1,17 @@
+title: "Transformer Circuit Analysis"
+pattern: "Mechanistic Interpretability"
+difficulty: "expert"
+
+why_this_matters: |
+  Understanding circuits helps us know WHY models behave certain ways.
+  Critical for identifying potential failure modes.
+
+hints:
+  key_concepts:
+    - text: "Circuits are subgraphs of the full computation"
+    - text: "Path patching measures causal importance"
+    - text: "Induction heads copy patterns from context"
+  
+  common_mistakes:
+    - text: "Confusing correlation with causation"
+    - text: "Not accounting for attention head composition"

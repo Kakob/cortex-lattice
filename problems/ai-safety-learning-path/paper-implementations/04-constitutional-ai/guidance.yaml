@@ -1,0 +1,20 @@
+title: "Constitutional AI"
+pattern: "AI Safety"
+difficulty: "expert"
+
+why_this_matters: |
+  Constitutional AI enables models to improve themselves using principles.
+  This reduces reliance on human feedback while maintaining safety.
+
+hints:
+  key_concepts:
+    - text: "CAI uses self-critique and revision based on constitutional principles"
+    - text: "RLAIF replaces human preferences with AI preferences"
+    - text: "The constitution defines what behaviors are acceptable"
+  
+  common_mistakes:
+    - text: "Not iterating through all principles"
+    - text: "Weak or vague constitutional principles"
+
+  real_world:
+    - text: "Claude uses Constitutional AI for safety alignment"

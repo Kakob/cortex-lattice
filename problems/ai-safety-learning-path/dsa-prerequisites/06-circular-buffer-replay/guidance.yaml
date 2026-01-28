@@ -1,0 +1,55 @@
+title: "Experience Replay Buffer"
+pattern: "Circular Buffer"
+difficulty: "medium"
+
+why_this_matters: |
+  Experience replay is fundamental to modern RL:
+  - Breaks correlation between consecutive samples
+  - Enables sample-efficient learning
+  - Used in DQN, PPO, SAC, DDPG, and more
+
+hints:
+  key_concepts:
+    - text: |
+        Circular buffer uses modular arithmetic:
+        position = (position + 1) % capacity
+        
+        When full, new experiences overwrite oldest.
+    
+    - text: |
+        Why random sampling?
+        
+        Consecutive experiences are correlated (same trajectory).
+        Random sampling breaks this correlation, stabilizing learning.
+    
+    - text: |
+        The 5-tuple: (state, action, reward, next_state, done)
+        This is everything needed to compute TD-error for learning.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Not handling the "not full yet" case:
+        When buffer isn't full, don't overwrite at position 0!
+        Append first, then switch to circular overwriting.
+    
+    - text: |
+        ⚠️ Sampling more than buffer size:
+        sample(batch_size) when len(buffer) < batch_size → crash!
+        Use min(batch_size, len(buffer)).
+
+  real_world:
+    - text: |
+        🤖 DQN (2015): Made deep RL work with replay buffers
+        🤖 PPO: Uses buffer for on-policy, but still batched
+        🤖 Prioritized Experience Replay: Sample important transitions more
+
+  solution_approach:
+    steps:
+      - "1. __init__: Create empty list and position counter"
+      - "2. push: If not full, append. If full, overwrite at position"
+      - "3. Update position = (position + 1) % capacity"
+      - "4. sample: Use random.sample() for uniform random batch"
+
+complexity:
+  time: "O(1) push, O(batch_size) sample"
+  space: "O(capacity)"

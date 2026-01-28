@@ -1,0 +1,19 @@
+id: "kv-cache"
+title: "KV Cache System - Efficient Transformer Inference"
+difficulty: "hard"
+tags: ["optimization", "inference", "memory"]
+
+description: |
+  Implement key-value caching for efficient autoregressive generation.
+  
+  Implements:
+  1. Cache management for K, V tensors
+  2. Incremental generation with cached context
+  3. Memory-efficient techniques
+
+prerequisites:
+  dsa: ["12-lru-cache", "01-matrix-multiplication"]
+
+papers:
+  - title: "Efficient Memory Management for Large Language Model Inference"
+    url: "https://arxiv.org/abs/2309.06180"

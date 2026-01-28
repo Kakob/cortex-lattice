@@ -1,0 +1,51 @@
+id: "cumulative-discounted-sums"
+title: "Discounted Cumulative Sums - Computing Returns in RL"
+difficulty: "medium"
+pattern: "Dynamic Programming / Scan"
+tags: ["reinforcement-learning", "ppo", "gae", "rewards"]
+
+description: |
+  🚀 MISSION: Compute Mission Returns
+  
+  Your spacecraft completes missions that earn rewards over time.
+  The total "return" discounts future rewards by factor γ (gamma):
+  
+  G_t = r_t + γ*r_{t+1} + γ²*r_{t+2} + ...
+  
+  For a trajectory of rewards [r_0, r_1, r_2, ...], compute returns
+  [G_0, G_1, G_2, ...] efficiently.
+  
+  This is THE core computation in policy gradient methods like PPO!
+
+examples:
+  - input:
+      rewards: [1, 2, 3, 4]
+      gamma: 0.99
+    output: [9.8506, 8.9400, 6.96, 4.0]
+    explanation: |
+      Working backwards:
+      G_3 = 4
+      G_2 = 3 + 0.99*4 = 6.96
+      G_1 = 2 + 0.99*6.96 = 8.89
+      G_0 = 1 + 0.99*8.89 = 9.80
+
+constraints:
+  - "1 <= len(rewards) <= 10000"
+  - "0 <= gamma <= 1"
+
+starter_code:
+  python: |
+    from typing import List
+    
+    def discount_cumsum(rewards: List[float], gamma: float) -> List[float]:
+        """
+        Compute discounted cumulative sums (returns).
+        
+        G_t = r_t + γ*G_{t+1}
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n) - single backward pass"
+  space: "O(n) for output"

@@ -1,0 +1,61 @@
+id: "clipping-functions"
+title: "PPO Clipping - Stable Policy Updates"
+difficulty: "medium"
+pattern: "Optimization Constraints"
+tags: ["reinforcement-learning", "ppo", "optimization"]
+
+description: |
+  🚀 MISSION: Stabilize Autopilot Policy Updates
+  
+  Your spacecraft's autopilot learns by updating its policy based on
+  experience. But large updates can be catastrophic!
+  
+  Implement the PPO clipping objective that constrains policy updates:
+  
+  L_CLIP = min(r(θ)A, clip(r(θ), 1-ε, 1+ε)A)
+  
+  Where:
+  - r(θ) = π_new(a|s) / π_old(a|s) (probability ratio)
+  - A = advantage (how much better this action was than expected)
+  - ε = clipping parameter (typically 0.2)
+
+examples:
+  - input:
+      ratio: 1.5
+      advantage: 1.0
+      epsilon: 0.2
+    output: 1.2
+    explanation: |
+      ratio=1.5 > 1+ε=1.2, so clipped to 1.2
+      Since advantage > 0, we take min(1.5*1, 1.2*1) = 1.2
+
+constraints:
+  - "ratio > 0"
+  - "0 < epsilon < 1 (typically 0.1-0.3)"
+  - "advantage can be positive or negative"
+
+starter_code:
+  python: |
+    from typing import List
+    
+    def ppo_clip_objective(
+        ratios: List[float], 
+        advantages: List[float], 
+        epsilon: float
+    ) -> List[float]:
+        """
+        Compute PPO clipped objective for each sample.
+        
+        L_CLIP = min(r*A, clip(r, 1-ε, 1+ε)*A)
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n)"
+  space: "O(n)"
+
+papers:
+  - title: "Proximal Policy Optimization Algorithms"
+    authors: "Schulman et al."
+    year: 2017

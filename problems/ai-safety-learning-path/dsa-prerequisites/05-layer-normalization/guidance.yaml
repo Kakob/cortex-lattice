@@ -1,0 +1,58 @@
+title: "Layer Normalization"
+pattern: "Normalization"
+difficulty: "medium"
+
+why_this_matters: |
+  Layer normalization is in EVERY transformer layer!
+  It keeps activations in a stable range, enabling deep networks.
+
+hints:
+  key_concepts:
+    - text: |
+        Layer Norm normalizes across features (last dimension).
+        Each sample is normalized independently.
+        
+        BatchNorm normalizes across batch (problematic for NLP).
+        LayerNorm works with any batch size, even batch_size=1.
+    
+    - text: |
+        The epsilon (ε ≈ 1e-5) prevents division by zero
+        when variance is very small.
+    
+    - text: |
+        γ (gamma) and β (beta) are learned parameters.
+        - γ: scales the normalized output
+        - β: shifts the normalized output
+        
+        This allows the network to "undo" normalization if needed.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Normalizing over wrong dimension:
+        LayerNorm: normalize over FEATURES (last dim)
+        BatchNorm: normalize over BATCH (first dim)
+    
+    - text: |
+        ⚠️ Forgetting epsilon in sqrt:
+        √(σ² + ε), NOT √σ²
+        Zero variance → division by zero!
+
+  real_world:
+    - text: |
+        🤖 Transformer Architecture
+        - Pre-LN: LayerNorm before attention/FFN (GPT-2)
+        - Post-LN: LayerNorm after attention/FFN (original)
+        
+        Pre-LN is more stable for training deep networks.
+
+  solution_approach:
+    steps:
+      - "1. For each row in x:"
+      - "2.   Compute mean: μ = mean(row)"
+      - "3.   Compute variance: σ² = mean((row - μ)²)"
+      - "4.   Normalize: normalized = (row - μ) / √(σ² + ε)"
+      - "5.   Scale and shift: output = γ × normalized + β"
+
+complexity:
+  time: "O(n × d)"
+  space: "O(n × d)"

@@ -1,0 +1,118 @@
+title: "Softmax with Numerical Stability"
+pattern: "Numerical Stability"
+difficulty: "medium"
+
+why_this_matters: |
+  Softmax is everywhere in deep learning:
+  - Converting attention scores to probabilities
+  - Final layer of classification networks
+  - Sampling from language models
+  
+  But naive softmax BREAKS with large numbers - causing NaN in your gradients
+  and crashed training runs. This is a MUST-KNOW trick for production ML.
+
+hints:
+  key_concepts:
+    - text: |
+        The key insight: softmax(x) = softmax(x - c) for ANY constant c.
+        
+        Proof: Subtracting c multiplies numerator and denominator by exp(-c),
+        which cancels out! Softmax is "translation invariant".
+    
+    - text: |
+        Choose c = max(x). Now all values in exp(x - c) are ≤ 0,
+        so exp() outputs are in range (0, 1]. No overflow possible!
+    
+    - text: |
+        The algorithm is two passes:
+        1. Find max (O(n))
+        2. Compute exp(x_i - max) / sum(exp(x_j - max)) (O(n))
+        Total: O(n) time, O(n) space
+    
+    - text: |
+        For even more stability (in loss computation), use LOG-SOFTMAX:
+        log_softmax(x)_i = x_i - max - log(sum(exp(x_j - max)))
+        
+        This avoids computing softmax then log (which can underflow).
+
+  common_mistakes:
+    - text: |
+        ⚠️ Computing exp() before subtracting max:
+        exp(1000) = Inf immediately!
+        Always subtract max FIRST, then compute exp().
+    
+    - text: |
+        ⚠️ Subtracting mean instead of max:
+        Mean doesn't guarantee all values are ≤ 0.
+        exp(x - mean) can still overflow if x > mean significantly.
+    
+    - text: |
+        ⚠️ Forgetting that softmax returns PROBABILITIES:
+        Output must sum to 1.0 (within floating point tolerance).
+        If your sum is off, you have a bug.
+
+  real_world:
+    - text: |
+        🤖 Transformer Attention
+        Attention(Q, K, V) = softmax(Q @ K^T / √d_k) @ V
+        Without stable softmax, attention weights become NaN!
+        
+        🤖 LLM Token Sampling
+        When GPT generates text, it computes softmax over 50,000+ tokens.
+        Logits can be huge - stability is critical.
+        
+        🤖 Classification Networks
+        The final layer converts raw scores to class probabilities.
+        
+        🔬 Training Crashes
+        Many mysterious "loss is NaN" bugs trace back to unstable softmax.
+        This trick has saved countless debugging hours!
+
+  solution_approach:
+    overview: |
+      Use the "max subtraction trick" to prevent overflow.
+      This works because softmax is translation-invariant.
+    
+    steps:
+      - "1. Find max_val = max(logits)"
+      - "2. Subtract max from all logits: shifted = [x - max_val for x in logits]"
+      - "3. Compute exponentials: exp_vals = [exp(x) for x in shifted]"
+      - "4. Sum the exponentials: total = sum(exp_vals)"
+      - "5. Normalize: probabilities = [e / total for e in exp_vals]"
+      - "6. Return probabilities"
+    
+    key_insight: |
+      After step 2, all values are ≤ 0, so exp() outputs are in (0, 1].
+      This guarantees no overflow!
+
+complexity:
+  time: "O(n) - two linear passes"
+  space: "O(n) for output array"
+
+pattern_connections:
+  - pattern: "Normalization"
+    connection: "Dividing by sum to get probabilities"
+  
+  - pattern: "Max Finding"
+    connection: "Single pass to find maximum"
+  
+  - pattern: "Numerical Stability"
+    connection: "Preventing overflow through algebraic manipulation"
+
+debugging_tips:
+  - symptom: "NaN in output"
+    likely_cause: "Overflow in exp() before subtracting max"
+    fix: "Subtract max FIRST, then compute exp()"
+  
+  - symptom: "Sum not equal to 1"
+    likely_cause: "Numerical precision issues or bug in normalization"
+    fix: "Check that you're dividing each element by the SAME sum"
+  
+  - symptom: "All zeros or all ones"
+    likely_cause: "Extreme values with insufficient precision"
+    fix: "Use float64 for intermediate computations"
+
+next_problems:
+  - "Log-Softmax (more stable for cross-entropy)"
+  - "Temperature-Scaled Softmax (for sampling control)"
+  - "Top-K Softmax (sparse attention)"

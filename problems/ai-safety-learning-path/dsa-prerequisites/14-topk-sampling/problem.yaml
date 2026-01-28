@@ -1,0 +1,51 @@
+id: "topk-sampling"
+title: "Top-K / Top-P Sampling - LLM Text Generation"
+difficulty: "medium"
+pattern: "Sampling Algorithms"
+tags: ["sampling", "llm", "generation", "probability"]
+
+description: |
+  🚀 MISSION: Generate Coherent Text from Your AI
+  
+  Your spacecraft's AI communicator needs to generate natural language.
+  Pure greedy decoding is boring; pure random sampling is incoherent.
+  
+  Implement top-k and top-p (nucleus) sampling for the sweet spot!
+  
+  Top-K: Sample from the k most probable tokens.
+  Top-P: Sample from the smallest set of tokens with cumulative prob >= p.
+
+examples:
+  - input:
+      logits: [0.1, 0.2, 0.3, 0.15, 0.25]
+      k: 3
+    output: "Samples from indices [2, 4, 1] (top 3 by probability)"
+  
+  - input:
+      logits: [0.5, 0.3, 0.1, 0.05, 0.05]
+      p: 0.9
+    output: "Samples from indices [0, 1, 2] (smallest set with cumprob >= 0.9)"
+
+constraints:
+  - "Logits are raw scores (not probabilities)"
+  - "k >= 1"
+  - "0 < p <= 1"
+
+starter_code:
+  python: |
+    from typing import List
+    import random
+    
+    def top_k_sample(logits: List[float], k: int, temperature: float = 1.0) -> int:
+        """Sample from the top-k most probable tokens."""
+        # Your code here
+        pass
+    
+    def top_p_sample(logits: List[float], p: float, temperature: float = 1.0) -> int:
+        """Sample from smallest set with cumulative probability >= p."""
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n log n) for sorting"
+  space: "O(n)"

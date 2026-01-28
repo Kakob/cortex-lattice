@@ -1,0 +1,49 @@
+id: "lru-cache"
+title: "KV Cache for Transformers - Efficient Inference"
+difficulty: "medium"
+pattern: "LRU Cache"
+tags: ["caching", "transformers", "inference", "optimization"]
+
+description: |
+  🚀 MISSION: Optimize Transformer Inference
+  
+  During autoregressive generation, we recompute K and V for all previous
+  tokens at each step - wasteful! The KV cache stores previous computations.
+  
+  Implement an LRU cache for KV pairs with:
+  - O(1) get and put operations
+  - Eviction of least recently used when at capacity
+
+examples:
+  - input:
+      capacity: 2
+      operations:
+        - put: {key: 1, value: "K1,V1"}
+        - put: {key: 2, value: "K2,V2"}
+        - get: 1
+        - put: {key: 3, value: "K3,V3"}  # Evicts key 2 (least recent)
+        - get: 2
+    output: ["K1,V1", null]  # Key 2 was evicted!
+
+constraints:
+  - "1 <= capacity <= 10000"
+  - "Keys are integers"
+
+starter_code:
+  python: |
+    class LRUCache:
+        def __init__(self, capacity: int):
+            # Your code here
+            pass
+        
+        def get(self, key: int):
+            # Your code here
+            pass
+        
+        def put(self, key: int, value):
+            # Your code here
+            pass
+
+complexity:
+  time: "O(1) for get and put"
+  space: "O(capacity)"

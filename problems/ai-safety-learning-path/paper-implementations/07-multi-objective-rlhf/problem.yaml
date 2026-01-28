@@ -1,0 +1,19 @@
+id: "multi-objective-rlhf"
+title: "Multi-Objective RLHF - Balancing Helpfulness and Harmlessness"
+difficulty: "expert"
+tags: ["rlhf", "multi-objective", "pareto", "optimization"]
+
+description: |
+  Balance competing objectives in RLHF: helpfulness vs harmlessness.
+  
+  Implements:
+  1. Multiple reward models (one per objective)
+  2. Pareto-optimal policy learning
+  3. Preference-weighted scalarization
+
+prerequisites:
+  papers: ["03-rlhf"]
+
+papers:
+  - title: "Training a Helpful and Harmless Assistant"
+    url: "https://arxiv.org/abs/2204.05862"

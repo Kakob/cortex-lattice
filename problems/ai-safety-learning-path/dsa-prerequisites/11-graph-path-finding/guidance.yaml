@@ -1,0 +1,57 @@
+title: "Attention Graph Analysis"
+pattern: "Graph Traversal"
+difficulty: "medium"
+
+why_this_matters: |
+  Mechanistic interpretability treats attention as a graph problem:
+  - Nodes = token positions
+  - Edges = attention weights
+  - Finding circuits = finding paths with high attention flow
+
+hints:
+  key_concepts:
+    - text: |
+        Attention weights form a weighted directed graph.
+        attention[i][j] = "how much token i attends to token j"
+        
+        Multi-layer attention = graph composition!
+    
+    - text: |
+        Path strength = product of edge weights (not sum!).
+        Why? Information flows through multiple attentions multiplicatively.
+    
+    - text: |
+        To find strongest path: use log transform.
+        max(∏ weights) = max(Σ log(weights))
+        
+        This converts to standard shortest path!
+
+  common_mistakes:
+    - text: |
+        ⚠️ Summing weights instead of multiplying:
+        Attention flow is multiplicative through layers!
+    
+    - text: |
+        ⚠️ Not handling cycles:
+        Self-attention graphs can have cycles (position attends to itself).
+
+  real_world:
+    - text: |
+        🔬 Anthropic's Circuits Work
+        "A Mathematical Framework for Transformer Circuits" uses
+        exactly this graph analysis to find meaningful circuits.
+        
+        🔬 Induction Heads
+        Discovered by finding paths: previous_token → current_token
+
+  solution_approach:
+    steps:
+      - "1. Treat attention matrix as adjacency matrix"
+      - "2. Use BFS/DFS with path tracking"
+      - "3. Track cumulative weight (product)"
+      - "4. Prune paths below threshold"
+      - "5. Return all valid paths"
+
+complexity:
+  time: "O(V * paths) - depends on graph structure"
+  space: "O(V) per path"

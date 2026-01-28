@@ -1,0 +1,56 @@
+title: "Binary Search for Threshold"
+pattern: "Binary Search"
+difficulty: "easy"
+
+why_this_matters: |
+  Finding optimal thresholds is crucial for:
+  - Anomaly detection
+  - Spam classification
+  - Medical diagnostics
+  - Safety classifiers (adversarial prompt detection!)
+
+hints:
+  key_concepts:
+    - text: |
+        F1 = 2 * precision * recall / (precision + recall)
+        
+        Threshold affects precision/recall trade-off:
+        - High threshold: High precision, low recall
+        - Low threshold: Low precision, high recall
+    
+    - text: |
+        The optimal threshold is usually at one of the score values.
+        This reduces the search space from infinite to n possibilities!
+    
+    - text: |
+        Ternary search works if F1 is unimodal (one peak).
+        But sometimes F1 has multiple peaks - then exhaustive search is safer.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Using 0.5 as default threshold:
+        Optimal threshold depends on class balance and costs!
+    
+    - text: |
+        ⚠️ Not handling edge cases:
+        What if TP + FP = 0? Precision is undefined!
+
+  real_world:
+    - text: |
+        🤖 Adversarial Prompt Detection
+        Need to find threshold that catches attacks without too many false positives.
+        
+        🤖 Content Moderation
+        Threshold determines what gets flagged for human review.
+
+  solution_approach:
+    steps:
+      - "1. Collect all unique score values as candidate thresholds"
+      - "2. For each threshold:"
+      - "3.   Compute TP, FP, FN"
+      - "4.   Compute F1 score"
+      - "5. Return threshold with highest F1"
+
+complexity:
+  time: "O(n) for linear scan"
+  space: "O(1)"

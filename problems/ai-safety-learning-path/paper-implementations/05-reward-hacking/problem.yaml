@@ -1,0 +1,20 @@
+id: "reward-hacking-detector"
+title: "Reward Hacking Detector - Detecting Specification Gaming"
+difficulty: "hard"
+tags: ["reward-hacking", "safety", "anomaly-detection"]
+
+description: |
+  Build a system to detect when RL agents exploit reward function weaknesses.
+  
+  Implements:
+  1. Anomaly detection in reward patterns
+  2. Behavior distribution monitoring
+  3. Out-of-distribution detection
+
+prerequisites:
+  papers: ["02-ppo"]
+  dsa: ["16-running-statistics"]
+
+papers:
+  - title: "Specification gaming: the flip side of AI ingenuity"
+    url: "https://deepmind.com/blog/article/Specification-gaming-the-flip-side-of-AI-ingenuity"

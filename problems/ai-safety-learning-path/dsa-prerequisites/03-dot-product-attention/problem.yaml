@@ -1,0 +1,68 @@
+id: "dot-product-attention"
+title: "Scaled Dot-Product Attention - The Heart of Transformers"
+difficulty: "medium"
+pattern: "Attention Mechanism"
+tags: ["attention", "transformers", "deep-learning", "pytorch"]
+
+description: |
+  🚀 MISSION: Implement the Core Attention Mechanism
+  
+  You're building the brain of your spacecraft's AI. The attention mechanism
+  allows it to focus on relevant sensor data while ignoring noise.
+  
+  Implement scaled dot-product attention:
+  
+  Attention(Q, K, V) = softmax(Q @ K^T / √d_k) @ V
+  
+  Where:
+  - Q: Queries (what we're looking for)
+  - K: Keys (what we match against)
+  - V: Values (what we retrieve)
+  - d_k: Dimension of keys (for scaling)
+
+examples:
+  - input:
+      Q: [[1, 0], [0, 1]]
+      K: [[1, 0], [0, 1]]
+      V: [[1, 2], [3, 4]]
+      d_k: 2
+    output: [[1.46, 2.46], [2.54, 3.54]]
+    explanation: |
+      1. Compute Q @ K^T = [[1, 0], [0, 1]]
+      2. Scale by √2 ≈ 1.414: [[0.71, 0], [0, 0.71]]
+      3. Softmax each row: [[0.73, 0.27], [0.27, 0.73]]
+      4. Multiply by V to get weighted sum of values
+
+constraints:
+  - "Q, K, V have compatible dimensions"
+  - "1 <= sequence_length <= 512"
+  - "1 <= d_k <= 128"
+
+starter_code:
+  python: |
+    from typing import List
+    import math
+    
+    def scaled_dot_product_attention(
+        Q: List[List[float]], 
+        K: List[List[float]], 
+        V: List[List[float]],
+        d_k: int
+    ) -> List[List[float]]:
+        """
+        Compute scaled dot-product attention.
+        
+        Attention(Q, K, V) = softmax(Q @ K^T / √d_k) @ V
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n² × d) where n is sequence length"
+  space: "O(n²) for attention weights"
+
+papers:
+  - title: "Attention Is All You Need"
+    authors: "Vaswani et al."
+    year: 2017
+    relevance: "This is THE attention mechanism from the paper"

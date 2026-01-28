@@ -1,0 +1,57 @@
+title: "Discounted Cumulative Sums"
+pattern: "Dynamic Programming / Backward Scan"
+difficulty: "medium"
+
+why_this_matters: |
+  This is THE computation in policy gradient RL:
+  - PPO, A2C, REINFORCE all need returns
+  - GAE uses a variant with TD errors
+  - Understanding this is essential for implementing RL from scratch
+
+hints:
+  key_concepts:
+    - text: |
+        The key recurrence: G_t = r_t + γ*G_{t+1}
+        
+        This means we can compute returns in O(n) with a backward pass,
+        not O(n²) with the naive formula!
+    
+    - text: |
+        Why discount? γ < 1 means:
+        - Future rewards matter less
+        - Returns stay bounded
+        - Agent prefers rewards sooner
+    
+    - text: |
+        γ = 0: Only immediate reward matters (myopic)
+        γ = 1: All rewards equally weighted (may not converge)
+        γ = 0.99: Standard choice, ~100 step horizon
+
+  common_mistakes:
+    - text: |
+        ⚠️ Going forward instead of backward:
+        G_t depends on G_{t+1}. Must compute from the END!
+    
+    - text: |
+        ⚠️ Off-by-one at the boundary:
+        The last return G_{n-1} = r_{n-1} (no future rewards)
+
+  real_world:
+    - text: |
+        🤖 PPO (Proximal Policy Optimization)
+        Uses GAE which is a generalization of this formula.
+        
+        🤖 TD(λ)
+        Same idea but bootstrapping from value estimates.
+
+  solution_approach:
+    steps:
+      - "1. Initialize returns array of size n"
+      - "2. Set returns[-1] = rewards[-1]"
+      - "3. For t from n-2 down to 0:"
+      - "4.   returns[t] = rewards[t] + gamma * returns[t+1]"
+      - "5. Return returns array"
+
+complexity:
+  time: "O(n)"
+  space: "O(n)"

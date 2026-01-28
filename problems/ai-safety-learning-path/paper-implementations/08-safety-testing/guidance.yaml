@@ -1,0 +1,17 @@
+title: "Safety Testing Framework"
+pattern: "Testing / Evaluation"
+difficulty: "hard"
+
+why_this_matters: |
+  Systematic testing is essential before deploying AI systems.
+  Need to verify safety properties hold across many scenarios.
+
+hints:
+  key_concepts:
+    - text: "Categorize tests by risk level and type"
+    - text: "Use statistical tests to detect regressions"
+    - text: "Track metrics over time for trend analysis"
+  
+  common_mistakes:
+    - text: "Not enough test cases for statistical power"
+    - text: "Missing edge cases in test coverage"

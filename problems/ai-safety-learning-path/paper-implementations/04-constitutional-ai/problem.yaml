@@ -1,0 +1,15 @@
+id: "constitutional-ai"
+title: "Constitutional AI - Self-Improving Safety"
+difficulty: "expert"
+tags: ["constitutional-ai", "rlhf", "safety"]
+
+description: |
+  Build a self-improving AI safety system using Constitutional AI.
+  Implements self-critique, self-revision, and RL from AI feedback.
+
+prerequisites:
+  papers: ["03-rlhf"]
+
+papers:
+  - title: "Constitutional AI: Harmlessness from AI Feedback"
+    url: "https://arxiv.org/abs/2212.08073"

@@ -1,0 +1,60 @@
+title: "Cosine Similarity"
+pattern: "Vector Operations"
+difficulty: "easy"
+
+why_this_matters: |
+  Cosine similarity is THE metric for comparing embeddings:
+  - Semantic search
+  - Similarity-based retrieval
+  - Clustering embeddings
+  - Detecting duplicate content
+
+hints:
+  key_concepts:
+    - text: |
+        cos_sim(A, B) = (A · B) / (||A|| × ||B||)
+        
+        Measures angle, not magnitude!
+        [1, 2, 3] and [2, 4, 6] have similarity 1.0 (same direction).
+    
+    - text: |
+        Range: [-1, 1]
+        - 1: Same direction (most similar)
+        - 0: Orthogonal (unrelated)
+        - -1: Opposite direction (most different)
+    
+    - text: |
+        For normalized vectors (||v|| = 1):
+        cos_sim(A, B) = A · B
+        
+        This is why we often L2-normalize embeddings first!
+
+  common_mistakes:
+    - text: |
+        ⚠️ Division by zero for zero vectors:
+        Handle ||A|| = 0 or ||B|| = 0 explicitly.
+    
+    - text: |
+        ⚠️ Confusing with Euclidean distance:
+        Euclidean measures magnitude; cosine measures direction.
+
+  real_world:
+    - text: |
+        🤖 Semantic Search
+        Embed query and documents, find highest cosine similarity.
+        
+        🤖 Adversarial Prompt Detection
+        Compare prompt embedding to known attack embeddings.
+        
+        🔬 BERT Similarity
+        sentence-transformers library uses cosine similarity extensively.
+
+  solution_approach:
+    steps:
+      - "1. Compute dot product: A · B = Σ(a_i × b_i)"
+      - "2. Compute norms: ||A|| = √(Σa_i²), ||B|| = √(Σb_i²)"
+      - "3. Return (A · B) / (||A|| × ||B||)"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"

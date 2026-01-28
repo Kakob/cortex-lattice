@@ -1,0 +1,63 @@
+title: "Top-K / Top-P Sampling"
+pattern: "Sampling Algorithms"
+difficulty: "medium"
+
+why_this_matters: |
+  This is how ChatGPT, Claude, and all LLMs generate text!
+  Understanding sampling is key to controlling model outputs.
+
+hints:
+  key_concepts:
+    - text: |
+        Greedy decoding: Always pick highest probability token.
+        - Pros: Deterministic, fast
+        - Cons: Boring, repetitive outputs
+    
+    - text: |
+        Top-K: Sample uniformly from top k tokens.
+        - Pros: Simple, prevents gibberish
+        - Cons: Fixed k ignores distribution shape
+    
+    - text: |
+        Top-P (nucleus): Sample from smallest set with cumprob >= p.
+        - Pros: Adaptive to distribution shape
+        - Cons: Slightly more complex
+        
+        p=0.9 is common: "most likely 90% of the mass"
+    
+    - text: |
+        Temperature controls sharpness:
+        - T < 1: Sharper (more greedy)
+        - T = 1: Original distribution
+        - T > 1: Softer (more random)
+
+  common_mistakes:
+    - text: |
+        ⚠️ Not renormalizing after filtering:
+        After removing tokens, remaining probs don't sum to 1!
+    
+    - text: |
+        ⚠️ Applying temperature AFTER filtering:
+        Temperature should be applied to logits BEFORE softmax.
+
+  real_world:
+    - text: |
+        🤖 ChatGPT/Claude Generation
+        Uses combination of top-k, top-p, and temperature.
+        
+        🤖 API Parameters
+        OpenAI API: top_p, temperature
+        Anthropic API: top_k, top_p, temperature
+
+  solution_approach:
+    steps:
+      - "1. Apply temperature scaling to logits"
+      - "2. Compute softmax to get probabilities"
+      - "3. Sort by probability descending"
+      - "4. Select top-k OR smallest set with cumprob >= p"
+      - "5. Renormalize selected probabilities"
+      - "6. Sample from renormalized distribution"
+
+complexity:
+  time: "O(n log n) for sorting"
+  space: "O(n)"

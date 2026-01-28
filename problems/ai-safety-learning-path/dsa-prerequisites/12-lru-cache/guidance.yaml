@@ -1,0 +1,57 @@
+title: "KV Cache / LRU Cache"
+pattern: "LRU Cache"
+difficulty: "medium"
+
+why_this_matters: |
+  KV caching is critical for efficient LLM inference:
+  - Without cache: O(n²) per token (recompute all K,V)
+  - With cache: O(n) per token (only compute new K,V)
+  
+  This is why ChatGPT can stream responses quickly!
+
+hints:
+  key_concepts:
+    - text: |
+        LRU = Least Recently Used.
+        When cache is full, evict the item that was accessed longest ago.
+    
+    - text: |
+        Need O(1) for both:
+        - Access by key: Use hashmap
+        - Track recency order: Use linked list
+        
+        Combine them: hashmap of key -> linked list node
+    
+    - text: |
+        Python shortcut: OrderedDict has move_to_end() in O(1)!
+
+  common_mistakes:
+    - text: |
+        ⚠️ O(n) eviction by scanning all items:
+        Must use doubly linked list for O(1) removal.
+    
+    - text: |
+        ⚠️ Forgetting to update recency on get():
+        get() makes an item "recently used" - must update order!
+
+  real_world:
+    - text: |
+        🤖 Transformer KV Cache
+        Stores K, V tensors for all previous positions.
+        Critical for fast autoregressive generation.
+        
+        🤖 Memory Management
+        GPU memory is limited - must evict old KV when generating long sequences.
+
+  solution_approach:
+    steps:
+      - "1. Use hashmap: key -> node"
+      - "2. Use doubly linked list for recency order"
+      - "3. get(): Move node to end, return value"
+      - "4. put(): If exists, update and move to end"
+      - "5. put(): If new and full, evict from front"
+      - "6. put(): Add new node to end"
+
+complexity:
+  time: "O(1) for get and put"
+  space: "O(capacity)"

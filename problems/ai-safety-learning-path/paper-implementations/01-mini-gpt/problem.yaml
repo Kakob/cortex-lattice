@@ -1,0 +1,174 @@
+id: "mini-gpt-from-scratch"
+title: "Mini-GPT from Scratch - Building a Transformer Language Model"
+difficulty: "hard"
+pattern: "Transformer Architecture"
+tags: ["transformers", "attention", "language-models", "pytorch", "deep-learning"]
+status: "in-progress"
+
+description: |
+  🚀 MISSION: Build the Brain of Your AI
+  
+  Before you can make AI safe, you need to understand how it works.
+  Build a complete GPT-style transformer from scratch!
+  
+  This project teaches you:
+  - Multi-head self-attention
+  - Positional encoding
+  - Layer normalization
+  - Causal masking for autoregressive generation
+  - Token embeddings and the full forward pass
+  
+  By the end, you'll have a working language model that can generate text!
+
+key_learnings:
+  - "Attention mechanism: Q, K, V and how they create contextual understanding"
+  - "Why transformers replaced RNNs (parallelization + long-range dependencies)"
+  - "Causal masking prevents looking at future tokens during training"
+  - "Residual connections and layer norm are crucial for training deep networks"
+
+milestones:
+  - name: "Token Embedding Layer"
+    description: "Convert token IDs to dense vectors"
+    time_estimate: "30 min"
+  
+  - name: "Positional Encoding"
+    description: "Add position information (sinusoidal or learned)"
+    time_estimate: "30 min"
+  
+  - name: "Single-Head Attention"
+    description: "Implement Q, K, V computation and attention weights"
+    time_estimate: "1 hour"
+  
+  - name: "Multi-Head Attention"
+    description: "Split into multiple heads, concatenate outputs"
+    time_estimate: "45 min"
+  
+  - name: "Feed-Forward Network"
+    description: "Two linear layers with GELU activation"
+    time_estimate: "20 min"
+  
+  - name: "Transformer Block"
+    description: "Combine attention + FFN with residuals and layer norm"
+    time_estimate: "30 min"
+  
+  - name: "Full GPT Model"
+    description: "Stack blocks, add output projection"
+    time_estimate: "45 min"
+  
+  - name: "Training Loop"
+    description: "Cross-entropy loss, AdamW optimizer, gradient clipping"
+    time_estimate: "1 hour"
+  
+  - name: "Text Generation"
+    description: "Autoregressive sampling with temperature"
+    time_estimate: "30 min"
+
+starter_code:
+  python: |
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    import math
+    
+    class MultiHeadAttention(nn.Module):
+        """Multi-head self-attention mechanism."""
+        
+        def __init__(self, d_model: int, n_heads: int, dropout: float = 0.1):
+            super().__init__()
+            # Your code here
+            pass
+        
+        def forward(self, x: torch.Tensor, mask: torch.Tensor = None) -> torch.Tensor:
+            """
+            Args:
+                x: Input tensor of shape (batch, seq_len, d_model)
+                mask: Optional causal mask
+            Returns:
+                Output tensor of shape (batch, seq_len, d_model)
+            """
+            # Your code here
+            pass
+    
+    class TransformerBlock(nn.Module):
+        """Single transformer block with attention and feed-forward."""
+        
+        def __init__(self, d_model: int, n_heads: int, d_ff: int, dropout: float = 0.1):
+            super().__init__()
+            # Your code here
+            pass
+        
+        def forward(self, x: torch.Tensor, mask: torch.Tensor = None) -> torch.Tensor:
+            # Your code here
+            pass
+    
+    class MiniGPT(nn.Module):
+        """Complete GPT-style language model."""
+        
+        def __init__(
+            self, 
+            vocab_size: int,
+            d_model: int = 256,
+            n_heads: int = 4,
+            n_layers: int = 4,
+            d_ff: int = 1024,
+            max_seq_len: int = 512,
+            dropout: float = 0.1
+        ):
+            super().__init__()
+            # Your code here
+            pass
+        
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            """
+            Args:
+                x: Token IDs of shape (batch, seq_len)
+            Returns:
+                Logits of shape (batch, seq_len, vocab_size)
+            """
+            # Your code here
+            pass
+        
+        def generate(self, prompt: torch.Tensor, max_new_tokens: int, temperature: float = 1.0):
+            """Autoregressive text generation."""
+            # Your code here
+            pass
+
+test_cases:
+  - name: "Attention shape test"
+    input:
+      batch_size: 2
+      seq_len: 10
+      d_model: 64
+      n_heads: 4
+    expected_output_shape: [2, 10, 64]
+  
+  - name: "Full model forward pass"
+    input:
+      batch_size: 2
+      seq_len: 20
+      vocab_size: 1000
+    expected_output_shape: [2, 20, 1000]
+
+complexity:
+  time: "O(n² × d) per layer, where n=seq_len, d=d_model"
+  space: "O(n² × h) for attention weights per head"
+
+papers:
+  - title: "Attention Is All You Need"
+    authors: "Vaswani et al."
+    year: 2017
+    url: "https://arxiv.org/abs/1706.03762"
+    relevance: "The original transformer paper"
+  
+  - title: "Language Models are Unsupervised Multitask Learners"
+    authors: "Radford et al. (OpenAI)"
+    year: 2019
+    url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
+    relevance: "GPT-2 paper showing scale and capabilities"
+
+prerequisites:
+  - "01-matrix-multiplication"
+  - "02-softmax-numerical-stability"
+  - "03-dot-product-attention"
+  - "04-positional-encoding"
+  - "05-layer-normalization"

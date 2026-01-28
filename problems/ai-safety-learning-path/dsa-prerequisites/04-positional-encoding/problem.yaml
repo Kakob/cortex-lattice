@@ -1,0 +1,62 @@
+id: "positional-encoding"
+title: "Sinusoidal Positional Encoding - Teaching Position to Attention"
+difficulty: "medium"
+pattern: "Feature Engineering"
+tags: ["transformers", "positional-encoding", "trigonometry"]
+
+description: |
+  🚀 MISSION: Add Position Awareness to Your AI
+  
+  Your spacecraft's attention system has a critical flaw: it treats all
+  sensor readings as an unordered set! It doesn't know which reading came
+  first, second, third...
+  
+  Implement sinusoidal positional encoding to inject position information:
+  
+  PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+  PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+  
+  This creates unique position "signatures" that the model can learn from.
+
+examples:
+  - input:
+      seq_len: 3
+      d_model: 4
+    output: |
+      [[0.0000, 1.0000, 0.0000, 1.0000],
+       [0.8415, 0.5403, 0.0100, 0.9999],
+       [0.9093, -0.4161, 0.0200, 0.9998]]
+    explanation: |
+      For each position, alternate sin/cos with different frequencies.
+      Position 0: [sin(0), cos(0), sin(0), cos(0)] = [0, 1, 0, 1]
+      Position 1: [sin(1), cos(1), sin(0.01), cos(0.01)] ≈ [0.84, 0.54, 0.01, 1.0]
+
+constraints:
+  - "1 <= seq_len <= 5000"
+  - "d_model is even"
+  - "2 <= d_model <= 512"
+
+starter_code:
+  python: |
+    from typing import List
+    import math
+    
+    def positional_encoding(seq_len: int, d_model: int) -> List[List[float]]:
+        """
+        Generate sinusoidal positional encodings.
+        
+        PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+        PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(seq_len × d_model)"
+  space: "O(seq_len × d_model)"
+
+papers:
+  - title: "Attention Is All You Need"
+    authors: "Vaswani et al."
+    year: 2017
+    section: "3.5 Positional Encoding"

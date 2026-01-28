@@ -1,0 +1,59 @@
+title: "Parallel Prefix Sum (Scan)"
+pattern: "Parallel Algorithms"
+difficulty: "hard"
+
+why_this_matters: |
+  Parallel scan is fundamental to GPU programming:
+  - PyTorch cumsum() uses this
+  - CUDA parallel reductions
+  - Enables parallelizing "sequential" RL computations
+
+hints:
+  key_concepts:
+    - text: |
+        Key insight: Associative operations can be parallelized!
+        (a + b) + c = a + (b + c)
+        
+        This lets us compute partial sums in a tree structure.
+    
+    - text: |
+        Two-phase algorithm:
+        1. Up-sweep: Build tree of partial sums (like tournament)
+        2. Down-sweep: Distribute sums back down
+        
+        Each phase: O(log n) parallel steps
+    
+    - text: |
+        Total work is O(n), but span (parallel depth) is O(log n).
+        With n processors, this runs in O(log n) time!
+
+  common_mistakes:
+    - text: |
+        ⚠️ Exclusive vs inclusive scan:
+        - Exclusive: prefix[i] = sum(values[0:i])
+        - Inclusive: prefix[i] = sum(values[0:i+1])
+        
+        Most papers describe exclusive; convert at the end.
+    
+    - text: |
+        ⚠️ Non-power-of-2 lengths:
+        Basic algorithm assumes power of 2. Need padding for general case.
+
+  real_world:
+    - text: |
+        🤖 CUDA thrust::inclusive_scan
+        Uses exactly this algorithm on GPU.
+        
+        🤖 GAE in PPO
+        Discounted cumulative sums can use parallel scan!
+
+  solution_approach:
+    steps:
+      - "1. Up-sweep: Build partial sum tree (log n steps)"
+      - "2. Save last element, set to identity"
+      - "3. Down-sweep: Distribute sums (log n steps)"
+      - "4. Convert to inclusive scan"
+
+complexity:
+  time: "O(n) work, O(log n) depth"
+  space: "O(n)"

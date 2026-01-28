@@ -1,0 +1,17 @@
+title: "KV Cache System"
+pattern: "Systems Optimization"
+difficulty: "hard"
+
+why_this_matters: |
+  KV caching is essential for practical LLM inference.
+  Without it, generation would be O(n^2) instead of O(n).
+
+hints:
+  key_concepts:
+    - text: "Cache K, V from previous tokens to avoid recomputation"
+    - text: "Only compute attention for new tokens, attend to cached context"
+    - text: "Memory vs speed tradeoff"
+  
+  common_mistakes:
+    - text: "Not preallocating cache tensors"
+    - text: "Cache size overflow for long sequences"

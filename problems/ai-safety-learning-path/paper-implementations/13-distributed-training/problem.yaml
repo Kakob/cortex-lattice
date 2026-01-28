@@ -1,0 +1,19 @@
+id: "distributed-training"
+title: "Distributed Training System - Scaling Model Training"
+difficulty: "expert"
+tags: ["distributed", "training", "parallelism", "systems"]
+
+description: |
+  Scale model training across multiple GPUs.
+  
+  Implements:
+  1. Data parallelism (simple)
+  2. Model parallelism (tensor/pipeline)
+  3. Gradient synchronization
+
+prerequisites:
+  dsa: ["13-parallel-prefix-sum"]
+
+papers:
+  - title: "Megatron-LM: Training Multi-Billion Parameter Language Models"
+    url: "https://arxiv.org/abs/1909.08053"

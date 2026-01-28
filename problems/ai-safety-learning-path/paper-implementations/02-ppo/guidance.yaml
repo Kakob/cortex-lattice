@@ -1,0 +1,112 @@
+title: "PPO from Scratch"
+pattern: "Policy Gradient RL"
+difficulty: "hard"
+
+why_this_matters: |
+  PPO is the algorithm that powers RLHF - the technique that makes
+  ChatGPT, Claude, and other LLMs helpful and safe.
+  
+  Understanding PPO deeply is essential for:
+  - Implementing RLHF
+  - Understanding reward hacking risks
+  - Developing safer training methods
+
+hints:
+  key_concepts:
+    - text: |
+        POLICY GRADIENT intuition:
+        
+        ∇J(θ) = E[∇log π(a|s) × A]
+        
+        "Move policy in direction of good actions"
+        
+        - A > 0: Make action more likely
+        - A < 0: Make action less likely
+    
+    - text: |
+        CLIPPING prevents catastrophic updates:
+        
+        L_CLIP = min(r*A, clip(r, 1-ε, 1+ε)*A)
+        
+        where r = π_new / π_old (probability ratio)
+        
+        If r > 1+ε and A > 0: Don't increase more
+        If r < 1-ε and A < 0: Don't decrease more
+    
+    - text: |
+        GAE balances bias vs variance:
+        
+        λ = 0: High bias (just use TD error)
+        λ = 1: High variance (full Monte Carlo)
+        λ = 0.95: Good balance (default)
+        
+        A_t = δ_t + (γλ)δ_{t+1} + (γλ)²δ_{t+2} + ...
+    
+    - text: |
+        ADVANTAGE tells us "how much better":
+        
+        A(s, a) = Q(s, a) - V(s)
+        
+        - Q: Value of taking action a in state s
+        - V: Value of state s (expected value over actions)
+        - A > 0: Better than average
+        - A < 0: Worse than average
+
+  common_mistakes:
+    - text: |
+        ⚠️ Not normalizing advantages:
+        Advantages should be normalized (mean=0, std=1) per batch.
+        Raw advantages can have very different scales.
+    
+    - text: |
+        ⚠️ Forgetting to stop gradient through old log probs:
+        Old log probs should be detached - they're from the old policy!
+    
+    - text: |
+        ⚠️ Using too large clip epsilon:
+        ε = 0.2 is standard. Larger = more instability.
+
+  real_world:
+    - text: |
+        🤖 ChatGPT / InstructGPT
+        Uses PPO for RLHF fine-tuning after SFT.
+        
+        🤖 OpenAI Five (Dota 2)
+        Massive-scale PPO for game playing.
+        
+        🤖 Robotics
+        Standard algorithm for continuous control.
+
+  solution_approach:
+    steps:
+      - "1. Collect trajectory: Run policy, store (s, a, r, done, log_prob, value)"
+      - "2. Compute GAE: δ_t = r + γV_{t+1} - V_t, then discount sum"
+      - "3. Normalize advantages: (A - mean) / std"
+      - "4. Multiple epochs: For each batch in trajectory:"
+      - "5.   Compute ratio: r = exp(log_prob_new - log_prob_old)"
+      - "6.   Clipped objective: min(r*A, clip(r)*A)"
+      - "7.   Value loss: MSE(V_pred, returns)"
+      - "8.   Total loss: -policy_loss + c1*value_loss - c2*entropy"
+      - "9. Update with gradient clipping"
+
+complexity:
+  time: "O(T × K) per update cycle"
+  space: "O(T) for trajectory"
+
+debugging_tips:
+  - symptom: "Policy doesn't improve"
+    likely_cause: "Learning rate too high/low, or advantage computation bug"
+    fix: "Try lr=3e-4, check GAE computation, verify normalization"
+  
+  - symptom: "Policy collapses to single action"
+    likely_cause: "Entropy too low, or clip too aggressive"
+    fix: "Add entropy bonus (0.01), check clip is working correctly"
+  
+  - symptom: "High variance in rewards"
+    likely_cause: "λ too high in GAE, or not enough training"
+    fix: "Try λ=0.95, run more timesteps"
+
+next_steps:
+  - "Apply PPO to language model fine-tuning"
+  - "Add KL penalty for RLHF-style training"
+  - "Implement reward modeling"

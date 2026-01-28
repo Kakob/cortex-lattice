@@ -1,0 +1,52 @@
+id: "kl-divergence"
+title: "KL Divergence - Measuring Distribution Distance"
+difficulty: "medium"
+pattern: "Information Theory"
+tags: ["information-theory", "rlhf", "kl-divergence", "probability"]
+
+description: |
+  🚀 MISSION: Measure Policy Drift
+  
+  Your spacecraft's AI policy is being fine-tuned with human feedback.
+  But you need to ensure it doesn't drift too far from the original!
+  
+  Implement KL divergence to measure how different two distributions are:
+  
+  KL(P || Q) = Σ P(x) * log(P(x) / Q(x))
+  
+  This is THE key regularizer in RLHF that keeps models helpful AND safe!
+
+examples:
+  - input:
+      P: [0.5, 0.5]
+      Q: [0.5, 0.5]
+    output: 0.0
+    explanation: "Identical distributions have zero KL divergence"
+  
+  - input:
+      P: [0.9, 0.1]
+      Q: [0.5, 0.5]
+    output: 0.368
+    explanation: "P is more peaked than Q, positive KL"
+
+constraints:
+  - "P and Q must be valid probability distributions (sum to 1)"
+  - "Q(x) > 0 wherever P(x) > 0 (otherwise KL is infinite)"
+
+starter_code:
+  python: |
+    from typing import List
+    import math
+    
+    def kl_divergence(P: List[float], Q: List[float]) -> float:
+        """
+        Compute KL divergence KL(P || Q).
+        
+        KL(P || Q) = Σ P(x) * log(P(x) / Q(x))
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"

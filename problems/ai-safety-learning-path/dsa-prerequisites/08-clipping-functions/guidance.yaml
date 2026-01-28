@@ -1,0 +1,59 @@
+title: "PPO Clipping"
+pattern: "Optimization Constraints"
+difficulty: "medium"
+
+why_this_matters: |
+  PPO is THE most popular deep RL algorithm today.
+  The clipping mechanism is what makes it stable and practical.
+
+hints:
+  key_concepts:
+    - text: |
+        The ratio r(θ) = π_new(a|s) / π_old(a|s) measures policy change.
+        
+        r = 1: No change
+        r > 1: New policy more likely to take this action
+        r < 1: New policy less likely to take this action
+    
+    - text: |
+        Why min()?
+        
+        If advantage > 0 (good action), we want to increase probability.
+        But we don't want to increase too much! Clip at 1+ε.
+        
+        If advantage < 0 (bad action), we want to decrease probability.
+        But we don't want to decrease too much! Clip at 1-ε.
+    
+    - text: |
+        ε (epsilon) controls the "trust region" size.
+        - ε = 0.1: Conservative updates
+        - ε = 0.2: Standard (default in most implementations)
+        - ε = 0.3: Aggressive updates
+
+  common_mistakes:
+    - text: |
+        ⚠️ Forgetting to handle both positive AND negative advantages:
+        The clipping works differently depending on sign of A!
+    
+    - text: |
+        ⚠️ Using max instead of min:
+        We want the PESSIMISTIC bound (min) to be conservative.
+
+  real_world:
+    - text: |
+        🤖 OpenAI Five (Dota 2): PPO at massive scale
+        🤖 ChatGPT: RLHF uses PPO for fine-tuning!
+        🤖 Robotics: PPO is default for continuous control
+
+  solution_approach:
+    steps:
+      - "1. For each (ratio, advantage) pair:"
+      - "2.   unclipped = ratio * advantage"
+      - "3.   clipped_ratio = clip(ratio, 1-ε, 1+ε)"
+      - "4.   clipped = clipped_ratio * advantage"
+      - "5.   objective = min(unclipped, clipped)"
+      - "6. Return mean of objectives (or sum for loss)"
+
+complexity:
+  time: "O(n)"
+  space: "O(n)"

@@ -1,0 +1,19 @@
+id: "activation-steering"
+title: "Activation Steering - Controlling Model Behavior"
+difficulty: "hard"
+tags: ["interpretability", "steering", "linear-algebra"]
+
+description: |
+  Control model behavior by modifying internal activations.
+  
+  Implements:
+  1. Find "steering vectors" for concepts (helpful, honest, etc.)
+  2. Add steering vectors during inference
+  3. Measure behavior change
+
+prerequisites:
+  dsa: ["15-cosine-similarity", "01-matrix-multiplication"]
+
+papers:
+  - title: "Activation Addition: Steering Language Models Without Optimization"
+    url: "https://arxiv.org/abs/2308.10248"

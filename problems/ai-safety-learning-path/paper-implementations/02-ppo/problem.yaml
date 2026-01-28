@@ -1,0 +1,142 @@
+id: "ppo-from-scratch"
+title: "PPO from Scratch - Proximal Policy Optimization"
+difficulty: "hard"
+pattern: "Policy Gradient RL"
+tags: ["reinforcement-learning", "ppo", "rlhf", "pytorch", "gym"]
+status: "in-progress"
+
+description: |
+  🚀 MISSION: Train Your AI to Make Decisions
+  
+  PPO is THE algorithm that powers RLHF. Before you can align AI with
+  human preferences, you need to understand how to optimize policies.
+  
+  Build PPO from scratch:
+  - Actor-Critic architecture
+  - Generalized Advantage Estimation (GAE)
+  - Clipped objective for stable updates
+  - Value function loss
+  
+  Test on CartPole, then scale to language models!
+
+key_learnings:
+  - "Policy gradient: Update policy in direction of higher reward"
+  - "Advantage: How much better was this action than expected?"
+  - "Clipping: Prevents policy from changing too much (trust region)"
+  - "Actor-Critic: Separate networks for action selection and value estimation"
+
+milestones:
+  - name: "Experience Buffer"
+    description: "Collect trajectories with states, actions, rewards, log_probs"
+    time_estimate: "30 min"
+  
+  - name: "GAE Computation"
+    description: "Compute advantages using TD errors and lambda decay"
+    time_estimate: "45 min"
+  
+  - name: "Actor Network"
+    description: "Policy network that outputs action distributions"
+    time_estimate: "30 min"
+  
+  - name: "Critic Network"
+    description: "Value network that estimates state values"
+    time_estimate: "30 min"
+  
+  - name: "PPO Clipped Objective"
+    description: "Implement the clipped surrogate objective"
+    time_estimate: "45 min"
+  
+  - name: "Training Loop"
+    description: "Collect experience, compute advantages, update policy"
+    time_estimate: "1 hour"
+  
+  - name: "CartPole Success"
+    description: "Solve CartPole-v1 (500 steps sustained)"
+    time_estimate: "1 hour"
+
+starter_code:
+  python: |
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    import numpy as np
+    import gymnasium as gym
+    from typing import List, Tuple
+    
+    class Actor(nn.Module):
+        """Policy network that outputs action probabilities."""
+        
+        def __init__(self, state_dim: int, action_dim: int, hidden_dim: int = 64):
+            super().__init__()
+            # Your code here
+            pass
+        
+        def forward(self, state: torch.Tensor) -> torch.distributions.Categorical:
+            """Return action distribution."""
+            # Your code here
+            pass
+    
+    class Critic(nn.Module):
+        """Value network that estimates state values."""
+        
+        def __init__(self, state_dim: int, hidden_dim: int = 64):
+            super().__init__()
+            # Your code here
+            pass
+        
+        def forward(self, state: torch.Tensor) -> torch.Tensor:
+            """Return state value estimate."""
+            # Your code here
+            pass
+    
+    class PPO:
+        """Proximal Policy Optimization agent."""
+        
+        def __init__(
+            self,
+            state_dim: int,
+            action_dim: int,
+            lr: float = 3e-4,
+            gamma: float = 0.99,
+            gae_lambda: float = 0.95,
+            clip_epsilon: float = 0.2,
+            epochs: int = 10
+        ):
+            # Your code here
+            pass
+        
+        def compute_gae(
+            self, 
+            rewards: List[float], 
+            values: List[float], 
+            dones: List[bool]
+        ) -> Tuple[torch.Tensor, torch.Tensor]:
+            """Compute GAE advantages and returns."""
+            # Your code here
+            pass
+        
+        def update(self, trajectories):
+            """Update policy using collected trajectories."""
+            # Your code here
+            pass
+
+complexity:
+  time: "O(T × K) per update, T=trajectory length, K=epochs"
+  space: "O(T) for trajectory storage"
+
+papers:
+  - title: "Proximal Policy Optimization Algorithms"
+    authors: "Schulman et al."
+    year: 2017
+    url: "https://arxiv.org/abs/1707.06347"
+  
+  - title: "High-Dimensional Continuous Control Using GAE"
+    authors: "Schulman et al."
+    year: 2015
+    url: "https://arxiv.org/abs/1506.02438"
+
+prerequisites:
+  - "06-circular-buffer-replay"
+  - "07-cumulative-discounted-sums"
+  - "08-clipping-functions"
+  - "16-running-statistics"

@@ -1,0 +1,48 @@
+id: "cosine-similarity"
+title: "Cosine Similarity - Measuring Embedding Similarity"
+difficulty: "easy"
+pattern: "Vector Operations"
+tags: ["embeddings", "similarity", "nlp", "retrieval"]
+
+description: |
+  🚀 MISSION: Find Similar Embeddings
+  
+  Your spacecraft's semantic search needs to find documents similar to a query.
+  Cosine similarity measures the angle between embedding vectors:
+  
+  cos_sim(A, B) = (A · B) / (||A|| × ||B||)
+  
+  Result is in [-1, 1]: 1 = identical direction, 0 = orthogonal, -1 = opposite
+
+examples:
+  - input:
+      A: [1, 0, 0]
+      B: [1, 0, 0]
+    output: 1.0
+    explanation: "Identical vectors have cosine similarity 1"
+  
+  - input:
+      A: [1, 0]
+      B: [0, 1]
+    output: 0.0
+    explanation: "Orthogonal vectors have cosine similarity 0"
+
+constraints:
+  - "Vectors have same dimension"
+  - "At least one vector must be non-zero"
+
+starter_code:
+  python: |
+    from typing import List
+    import math
+    
+    def cosine_similarity(A: List[float], B: List[float]) -> float:
+        """
+        Compute cosine similarity between two vectors.
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"

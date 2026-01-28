@@ -1,0 +1,17 @@
+title: "Adversarial Prompt Detector"
+pattern: "Security / Classification"
+difficulty: "hard"
+
+why_this_matters: |
+  Defending against jailbreaks and prompt injection is critical for AI safety.
+  Adversarial prompts can make models produce harmful outputs.
+
+hints:
+  key_concepts:
+    - text: "Combine pattern matching with embedding similarity"
+    - text: "Keep database of known attack vectors"
+    - text: "Monitor for suspicious prompt characteristics"
+  
+  common_mistakes:
+    - text: "Relying only on pattern matching (misses novel attacks)"
+    - text: "Threshold too low (too many false positives)"

@@ -1,0 +1,21 @@
+id: "end-to-end-safety"
+title: "End-to-End Safety System - Complete AI Safety Pipeline"
+difficulty: "expert"
+tags: ["safety", "integration", "production"]
+
+description: |
+  Integrate all safety techniques into a complete system.
+  
+  Combines:
+  1. Adversarial prompt detection
+  2. Output filtering/steering
+  3. Reward hacking monitoring
+  4. Safety testing suite
+  5. Constitutional principles
+
+prerequisites:
+  papers: ["04-constitutional-ai", "05-reward-hacking", "06-adversarial-prompts", "08-safety-testing"]
+
+papers:
+  - title: "Concrete Problems in AI Safety"
+    url: "https://arxiv.org/abs/1606.06565"

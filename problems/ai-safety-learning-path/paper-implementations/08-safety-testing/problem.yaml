@@ -1,0 +1,20 @@
+id: "safety-testing-framework"
+title: "Safety Testing Framework - Systematic AI Evaluation"
+difficulty: "hard"
+tags: ["testing", "safety", "evaluation", "benchmarks"]
+
+description: |
+  Build a comprehensive framework for testing AI safety properties.
+  
+  Implements:
+  1. Test case generation for safety scenarios
+  2. Metric computation (toxicity, bias, refusal rate)
+  3. Statistical significance testing
+  4. Regression detection
+
+prerequisites:
+  dsa: ["10-binary-search-threshold", "16-running-statistics"]
+
+papers:
+  - title: "Evaluating Large Language Models Trained on Code"
+    url: "https://arxiv.org/abs/2107.03374"

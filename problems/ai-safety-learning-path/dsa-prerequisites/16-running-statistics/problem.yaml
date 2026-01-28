@@ -1,0 +1,60 @@
+id: "running-statistics"
+title: "Running Statistics - Online Mean and Variance"
+difficulty: "medium"
+pattern: "Online Algorithms"
+tags: ["statistics", "normalization", "rl", "streaming"]
+
+description: |
+  🚀 MISSION: Track Statistics in Real-Time
+  
+  Your spacecraft's RL agent needs to normalize observations on-the-fly.
+  But you can't store all past observations!
+  
+  Implement Welford's algorithm for online mean and variance computation:
+  - Update with each new sample in O(1)
+  - Use O(1) memory regardless of how many samples seen
+
+examples:
+  - input:
+      samples: [10, 20, 30]
+    output:
+      mean: 20.0
+      variance: 66.67
+      std: 8.16
+
+constraints:
+  - "Samples arrive one at a time (streaming)"
+  - "Cannot store all samples"
+
+starter_code:
+  python: |
+    class RunningStats:
+        def __init__(self):
+            # Your code here
+            pass
+        
+        def update(self, x: float):
+            """Update statistics with new sample."""
+            # Your code here
+            pass
+        
+        def mean(self) -> float:
+            # Your code here
+            pass
+        
+        def variance(self) -> float:
+            # Your code here
+            pass
+        
+        def std(self) -> float:
+            # Your code here
+            pass
+        
+        def normalize(self, x: float) -> float:
+            """Normalize x using running statistics."""
+            # Your code here
+            pass
+
+complexity:
+  time: "O(1) per update"
+  space: "O(1)"

@@ -1,0 +1,118 @@
+title: "Matrix Multiplication - Attention Weight Computation"
+pattern: "Matrix Operations"
+difficulty: "medium"
+
+why_this_matters: |
+  Matrix multiplication is THE fundamental operation in deep learning.
+  In transformers specifically, Q @ K^T computes how much each query
+  should "attend" to each key - the heart of the attention mechanism.
+  
+  Understanding this deeply will make everything else in transformers click.
+
+hints:
+  key_concepts:
+    - text: |
+        For matrix multiplication A @ B, the inner dimensions must match.
+        If A is (m x n), B must be (n x p), giving result (m x p).
+        
+        For Q @ K^T: Q is (seq_q x d_k), K^T is (d_k x seq_k)
+        Result is (seq_q x seq_k) - attention from each query to each key!
+    
+    - text: |
+        Each element in the result is a DOT PRODUCT:
+        result[i][j] = sum(Q[i][k] * K[j][k] for k in range(d_k))
+        
+        This dot product measures SIMILARITY between query i and key j.
+    
+    - text: |
+        The transpose operation K^T swaps rows and columns:
+        K[i][j] becomes K^T[j][i]
+        
+        This aligns the dimensions so Q's rows can dot-product with K's rows.
+    
+    - text: |
+        Time complexity is O(n * m * k) - you're doing n*m dot products,
+        each of length k. This is why attention is O(n²) in sequence length!
+
+  common_mistakes:
+    - text: |
+        ⚠️ Forgetting to transpose K!
+        Q @ K won't work if dimensions don't match.
+        You need Q @ K.T (K transposed).
+    
+    - text: |
+        ⚠️ Wrong loop order - make sure you're iterating:
+        - Outer: rows of Q (queries)
+        - Middle: rows of K (keys, but columns after transpose)
+        - Inner: the dimension d_k (for dot product)
+    
+    - text: |
+        ⚠️ Off-by-one in dimensions:
+        Q is (seq_len_q, d_k) not (d_k, seq_len_q)
+        The LAST dimension of Q must equal the LAST dimension of K.
+
+  real_world:
+    - text: |
+        🤖 Transformer Attention (GPT, BERT, etc.)
+        Every transformer computes Q @ K^T to determine which tokens
+        should attend to which other tokens. This is done millions of
+        times per forward pass!
+        
+        🔬 In "Attention Is All You Need" (2017):
+        Attention(Q, K, V) = softmax(Q @ K^T / √d_k) @ V
+        
+        You're implementing the first matrix multiplication in this formula!
+        
+        🚀 Real Scale:
+        GPT-4 might have d_k = 128, seq_len = 8192
+        That's 8192 × 8192 = 67M attention weights per head per layer!
+
+  solution_approach:
+    overview: |
+      We need to compute Q @ K^T. Since we're given K (not K^T),
+      we can either transpose first, or cleverly index during multiplication.
+    
+    steps:
+      - "1. Get dimensions: seq_len_q = len(Q), seq_len_k = len(K), d_k = len(Q[0])"
+      - "2. Initialize result matrix of zeros with shape (seq_len_q, seq_len_k)"
+      - "3. For each query position i (0 to seq_len_q-1):"
+      - "4.   For each key position j (0 to seq_len_k-1):"
+      - "5.     Compute dot product: sum(Q[i][d] * K[j][d] for d in range(d_k))"
+      - "6.     Store in result[i][j]"
+      - "7. Return result matrix"
+    
+    key_insight: |
+      The clever trick: Instead of explicitly transposing K,
+      we access K[j][d] instead of K_T[d][j] - same values!
+
+complexity:
+  time: "O(seq_len_q × seq_len_k × d_k)"
+  space: "O(seq_len_q × seq_len_k) for output"
+
+pattern_connections:
+  - pattern: "Dot Product"
+    connection: "Each element is a dot product - similarity measure"
+  
+  - pattern: "Nested Loops"
+    connection: "Classic triple-nested loop for matrix multiply"
+  
+  - pattern: "Accumulator"
+    connection: "Sum up products in inner loop"
+
+next_problems:
+  - "Scaled Dot-Product Attention (add scaling and softmax)"
+  - "Batch Matrix Multiplication (add batch dimension)"
+  - "Multi-Head Attention (split into multiple heads)"
+
+debugging_tips:
+  - symptom: "Dimension mismatch error"
+    likely_cause: "Forgot to transpose K, or using wrong dimension"
+    fix: "Check that Q's columns == K's columns (d_k)"
+  
+  - symptom: "Wrong output shape"
+    likely_cause: "Swapped row/column iteration"
+    fix: "Output should be (seq_len_q, seq_len_k), not (seq_len_k, seq_len_q)"
+  
+  - symptom: "Zeros everywhere"
+    likely_cause: "Not accumulating dot product correctly"
+    fix: "Make sure you're summing Q[i][d] * K[j][d], not overwriting"

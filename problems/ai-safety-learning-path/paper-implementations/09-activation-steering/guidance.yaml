@@ -1,0 +1,17 @@
+title: "Activation Steering"
+pattern: "Interpretability / Control"
+difficulty: "hard"
+
+why_this_matters: |
+  Activation steering allows fine-grained control over model behavior
+  without retraining. Important for runtime safety interventions.
+
+hints:
+  key_concepts:
+    - text: "Steering vectors are differences between concept activations"
+    - text: "Adding vectors during inference changes behavior"
+    - text: "Strength parameter controls effect magnitude"
+  
+  common_mistakes:
+    - text: "Wrong layer selection (early vs late layers)"
+    - text: "Steering strength too high causes incoherence"

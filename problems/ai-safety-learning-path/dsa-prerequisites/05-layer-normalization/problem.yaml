@@ -1,0 +1,58 @@
+id: "layer-normalization"
+title: "Layer Normalization - Stabilizing Deep Networks"
+difficulty: "medium"
+pattern: "Normalization"
+tags: ["transformers", "normalization", "deep-learning"]
+
+description: |
+  🚀 MISSION: Stabilize Your Deep Neural Network
+  
+  Your spacecraft's 100-layer deep network is suffering from unstable gradients!
+  Internal activations grow or shrink exponentially through layers.
+  
+  Implement Layer Normalization to stabilize training:
+  
+  LayerNorm(x) = γ × (x - μ) / √(σ² + ε) + β
+  
+  Where:
+  - μ = mean of x over the last dimension
+  - σ² = variance of x over the last dimension
+  - γ, β = learnable scale and shift parameters
+  - ε = small constant for numerical stability
+
+examples:
+  - input:
+      x: [[1, 2, 3], [4, 5, 6]]
+      gamma: [1, 1, 1]
+      beta: [0, 0, 0]
+      eps: 1e-5
+    output: [[-1.2247, 0, 1.2247], [-1.2247, 0, 1.2247]]
+    explanation: |
+      Row 1: mean=2, std≈0.816, normalized = [-1.22, 0, 1.22]
+      Row 2: mean=5, std≈0.816, normalized = [-1.22, 0, 1.22]
+
+constraints:
+  - "Input can be any shape, normalize over last dimension"
+  - "gamma and beta have same size as last dimension"
+  - "eps > 0 (typically 1e-5 or 1e-6)"
+
+starter_code:
+  python: |
+    from typing import List
+    import math
+    
+    def layer_norm(
+        x: List[List[float]], 
+        gamma: List[float], 
+        beta: List[float],
+        eps: float = 1e-5
+    ) -> List[List[float]]:
+        """
+        Apply layer normalization to input x.
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n × d) where n=batch, d=dimension"
+  space: "O(n × d)"

@@ -1,0 +1,17 @@
+title: "Distributed Training"
+pattern: "Systems / Parallelism"
+difficulty: "expert"
+
+why_this_matters: |
+  Training large models requires distributed systems.
+  Understanding parallelism strategies is key for scaling.
+
+hints:
+  key_concepts:
+    - text: "Data parallelism: same model, different data"
+    - text: "Model parallelism: split model across devices"
+    - text: "All-reduce: synchronize gradients across workers"
+  
+  common_mistakes:
+    - text: "Not synchronizing gradients properly"
+    - text: "Load imbalance across devices"

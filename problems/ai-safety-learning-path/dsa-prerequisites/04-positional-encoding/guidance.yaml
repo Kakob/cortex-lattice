@@ -1,0 +1,91 @@
+title: "Sinusoidal Positional Encoding"
+pattern: "Feature Engineering"
+difficulty: "medium"
+
+why_this_matters: |
+  Attention is permutation-invariant - it treats sequences as sets!
+  Without positional info, "dog bites man" = "man bites dog" to the model.
+  
+  Positional encodings solve this by injecting position information.
+
+hints:
+  key_concepts:
+    - text: |
+        The formula alternates sin and cos:
+        PE(pos, 2i) = sin(pos / 10000^(2i/d_model))    # even indices
+        PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))  # odd indices
+        
+        Each dimension i has a different frequency.
+    
+    - text: |
+        Why 10000? It's chosen so that:
+        - Dimension 0: wavelength = 2π (fastest oscillation)
+        - Dimension d_model-2: wavelength = 2π × 10000 (slowest)
+        
+        This gives a wide range of frequencies to represent position.
+    
+    - text: |
+        Why sin AND cos?
+        
+        They form an orthogonal basis, and crucially:
+        PE(pos+k) can be represented as a linear function of PE(pos)!
+        This helps the model learn relative positions.
+    
+    - text: |
+        Alternative: Learned positional embeddings
+        
+        GPT-2/3 use learned embeddings instead of sinusoidal.
+        Trade-off: Can't extrapolate to longer sequences, but more flexible.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Wrong frequency formula:
+        It's 10000^(2i/d_model), NOT 10000^(i/d_model)
+        The 2i ensures pairs of (sin, cos) share the same frequency.
+    
+    - text: |
+        ⚠️ Adding instead of concatenating:
+        Positional encodings are ADDED to token embeddings:
+        input = token_embedding + positional_encoding
+        
+        Don't concatenate them!
+    
+    - text: |
+        ⚠️ Off-by-one in dimension indexing:
+        Dimension indices go 0, 1, 2, ... d_model-1
+        Even = sin, Odd = cos
+
+  real_world:
+    - text: |
+        🤖 Original Transformer (2017)
+        Used these exact sinusoidal encodings in both encoder and decoder.
+        
+        🤖 BERT, GPT-2, GPT-3
+        Switched to learned positional embeddings. More parameters,
+        but can adapt to the specific task.
+        
+        🤖 Modern Variants
+        - RoPE (Rotary Position Embedding): Used in Llama
+        - ALiBi: Relative attention bias
+        - Relative position encodings: T5 style
+        
+        All solve the same problem: teaching position to attention!
+
+  solution_approach:
+    steps:
+      - "1. Initialize PE matrix of shape (seq_len, d_model)"
+      - "2. For each position pos in 0..seq_len-1:"
+      - "3.   For each dimension pair i in 0, 2, 4, ... d_model-2:"
+      - "4.     angle = pos / (10000 ^ (i / d_model))"
+      - "5.     PE[pos][i] = sin(angle)"
+      - "6.     PE[pos][i+1] = cos(angle)"
+      - "7. Return PE matrix"
+
+complexity:
+  time: "O(seq_len × d_model)"
+  space: "O(seq_len × d_model)"
+
+next_problems:
+  - "Rotary Position Embedding (RoPE)"
+  - "Relative Position Bias (T5 style)"
+  - "Full Transformer Encoder"

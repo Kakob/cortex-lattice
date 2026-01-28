@@ -1,0 +1,44 @@
+id: "binary-search-threshold"
+title: "Binary Search for Threshold - Finding Decision Boundaries"
+difficulty: "easy"
+pattern: "Binary Search"
+tags: ["binary-search", "classification", "threshold", "optimization"]
+
+description: |
+  🚀 MISSION: Find Optimal Detection Threshold
+  
+  Your spacecraft's anomaly detector outputs confidence scores [0, 1].
+  You need to find the threshold that maximizes F1 score!
+  
+  Given sorted predictions and true labels, use binary search to
+  efficiently find the optimal classification threshold.
+
+examples:
+  - input:
+      scores: [0.1, 0.3, 0.5, 0.7, 0.9]
+      labels: [0, 0, 1, 1, 1]
+    output: 0.4
+    explanation: "Threshold 0.4 gives best F1 (all predictions correct)"
+
+constraints:
+  - "Scores are sorted in ascending order"
+  - "Labels are 0 or 1"
+  - "1 <= len(scores) <= 10000"
+
+starter_code:
+  python: |
+    from typing import List
+    
+    def find_optimal_threshold(
+        scores: List[float], 
+        labels: List[int]
+    ) -> float:
+        """
+        Find threshold that maximizes F1 score using binary search.
+        """
+        # Your code here
+        pass
+
+complexity:
+  time: "O(n log n)"
+  space: "O(1)"

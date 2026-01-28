@@ -1,0 +1,17 @@
+title: "Reward Hacking Detector"
+pattern: "Anomaly Detection"
+difficulty: "hard"
+
+why_this_matters: |
+  Reward hacking is a key AI safety concern.
+  Agents may find unintended ways to maximize reward without solving the task.
+
+hints:
+  key_concepts:
+    - text: "Monitor reward distributions for anomalies"
+    - text: "Track behavior diversity - low diversity suggests exploitation"
+    - text: "Compare behavior to baseline expectations"
+  
+  common_mistakes:
+    - text: "Setting thresholds too tight (false positives)"
+    - text: "Not having enough baseline data"

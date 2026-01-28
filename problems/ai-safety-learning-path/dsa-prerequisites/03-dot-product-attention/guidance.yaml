@@ -1,0 +1,89 @@
+title: "Scaled Dot-Product Attention"
+pattern: "Attention Mechanism"
+difficulty: "medium"
+
+why_this_matters: |
+  This IS the attention mechanism that powers ChatGPT, Claude, and all modern LLMs.
+  Understanding this deeply is essential for any AI safety work.
+
+hints:
+  key_concepts:
+    - text: |
+        The formula: Attention(Q, K, V) = softmax(Q @ K^T / √d_k) @ V
+        
+        Break it down:
+        1. Q @ K^T: Compute similarity between all query-key pairs
+        2. / √d_k: Scale to prevent softmax saturation
+        3. softmax: Convert to probability distribution
+        4. @ V: Weighted sum of values
+    
+    - text: |
+        Why scale by √d_k? 
+        
+        As d_k grows, dot products get larger (variance ~ d_k).
+        Large values → softmax outputs extreme (0.99, 0.01, ...)
+        This causes vanishing gradients. Scaling keeps variance ~1.
+    
+    - text: |
+        Q, K, V intuition:
+        - Query: "What am I looking for?"
+        - Key: "What do I contain?"
+        - Value: "What do I offer if matched?"
+        
+        High Q·K similarity → high attention weight → more of that V in output
+    
+    - text: |
+        Output shape analysis:
+        - Q: (seq_len_q, d_k)
+        - K: (seq_len_k, d_k)
+        - V: (seq_len_k, d_v)
+        - Output: (seq_len_q, d_v)
+        
+        Each query position gets a weighted combination of all values.
+
+  common_mistakes:
+    - text: |
+        ⚠️ Forgetting to scale by √d_k!
+        Without scaling, attention becomes too "sharp" (one-hot-like).
+        This kills gradient flow during training.
+    
+    - text: |
+        ⚠️ Applying softmax to wrong dimension:
+        Softmax goes over the KEY dimension (columns of QK^T).
+        Each query should produce a probability distribution over keys.
+    
+    - text: |
+        ⚠️ Numerical instability in softmax:
+        Always use the max-subtraction trick in softmax!
+        See the softmax problem for details.
+
+  real_world:
+    - text: |
+        🤖 Every Transformer Layer
+        GPT-4, Claude, Llama - they all use this exact computation.
+        A 175B parameter model does this billions of times per forward pass!
+        
+        🤖 Self-Attention vs Cross-Attention
+        - Self: Q, K, V all from same sequence (understanding context)
+        - Cross: Q from one sequence, K/V from another (translation, QA)
+        
+        🔬 The Paper
+        "Attention Is All You Need" (Vaswani et al., 2017) introduced this.
+        It replaced RNNs/LSTMs and revolutionized NLP.
+
+  solution_approach:
+    steps:
+      - "1. Compute attention scores: scores = Q @ K^T"
+      - "2. Scale: scores = scores / √d_k"
+      - "3. Apply softmax to each row: weights = softmax(scores, dim=-1)"
+      - "4. Compute output: output = weights @ V"
+      - "5. Return output"
+
+complexity:
+  time: "O(n² × d) - quadratic in sequence length"
+  space: "O(n²) for attention weight matrix"
+
+next_problems:
+  - "Multi-Head Attention (parallel attention heads)"
+  - "Causal/Masked Attention (for autoregressive models)"
+  - "Flash Attention (memory-efficient implementation)"

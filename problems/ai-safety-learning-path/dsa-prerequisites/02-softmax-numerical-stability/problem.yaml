@@ -1,0 +1,107 @@
+id: "softmax-numerical-stability"
+title: "Softmax with Numerical Stability - Preventing Attention Overflow"
+difficulty: "medium"
+pattern: "Numerical Stability"
+tags: ["softmax", "transformers", "overflow", "numerical-methods"]
+
+description: |
+  🚀 MISSION: Stabilize the Attention Probability Computer
+  
+  Your spacecraft's attention module is experiencing OVERFLOW ERRORS!
+  The naive softmax implementation explodes when attention scores are large.
+  
+  Implement a numerically stable softmax that works even with extreme values.
+  
+  The naive formula: softmax(x)_i = exp(x_i) / sum(exp(x_j))
+  
+  Problem: exp(1000) = Infinity, causing NaN outputs!
+  
+  Your mission: Implement softmax that handles ANY input range safely.
+
+examples:
+  - input:
+      logits: [1.0, 2.0, 3.0]
+    output: [0.0900, 0.2447, 0.6652]
+    explanation: |
+      Standard softmax case.
+      exp([1,2,3]) = [2.718, 7.389, 20.086]
+      sum = 30.193
+      softmax = [0.090, 0.245, 0.665]
+  
+  - input:
+      logits: [1000.0, 1001.0, 1002.0]
+    output: [0.0900, 0.2447, 0.6652]
+    explanation: |
+      SAME OUTPUT as [1,2,3]! The trick: subtract max first.
+      [1000, 1001, 1002] - 1002 = [-2, -1, 0]
+      Then apply standard softmax to [-2, -1, 0]
+  
+  - input:
+      logits: [-1000.0, -999.0, -998.0]
+    output: [0.0900, 0.2447, 0.6652]
+    explanation: |
+      Even extreme negatives work with the max subtraction trick!
+
+constraints:
+  - "1 <= len(logits) <= 10000"
+  - "All values are floats, can be ANY real number"
+  - "Output must sum to 1.0 (within floating point tolerance)"
+  - "No NaN or Inf in output"
+
+starter_code:
+  python: |
+    from typing import List
+    import math
+    
+    def stable_softmax(logits: List[float]) -> List[float]:
+        """
+        Compute softmax with numerical stability.
+        
+        Args:
+            logits: Raw attention scores (can be any real numbers)
+        
+        Returns:
+            Probability distribution that sums to 1.0
+        """
+        # Your code here
+        pass
+
+test_cases:
+  - input:
+      logits: [1.0, 2.0, 3.0]
+    output: [0.0900, 0.2447, 0.6652]
+    tolerance: 0.001
+  
+  - input:
+      logits: [1000.0, 1001.0, 1002.0]
+    output: [0.0900, 0.2447, 0.6652]
+    tolerance: 0.001
+  
+  - input:
+      logits: [0.0, 0.0, 0.0]
+    output: [0.3333, 0.3333, 0.3333]
+    tolerance: 0.001
+  
+  - input:
+      logits: [100.0]
+    output: [1.0]
+  
+  - input:
+      logits: [-1000.0, 0.0]
+    output: [0.0, 1.0]
+    tolerance: 0.001
+
+complexity:
+  time: "O(n) - two passes: find max, then compute"
+  space: "O(n) for output"
+
+related_problems:
+  - "Log-Softmax (even more stable for loss computation)"
+  - "Temperature Scaling in Softmax"
+  - "Sparse Softmax / Top-K Softmax"
+
+papers:
+  - title: "Attention Is All You Need"
+    authors: "Vaswani et al."
+    year: 2017
+    relevance: "Softmax converts attention scores to probabilities"

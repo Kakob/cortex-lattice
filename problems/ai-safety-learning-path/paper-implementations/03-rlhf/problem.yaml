@@ -1,0 +1,120 @@
+id: "rlhf-from-scratch"
+title: "RLHF from Scratch - Reinforcement Learning from Human Feedback"
+difficulty: "hard"
+pattern: "Alignment"
+tags: ["rlhf", "alignment", "reward-modeling", "ppo", "instructgpt"]
+status: "planned"
+
+description: |
+  🚀 MISSION: Align Your AI with Human Preferences
+  
+  RLHF is the technique that transformed GPT-3 into ChatGPT.
+  Build the complete pipeline:
+  
+  1. Supervised Fine-Tuning (SFT) - Train on demonstrations
+  2. Reward Modeling - Learn human preferences
+  3. PPO Fine-Tuning - Optimize policy with KL constraint
+  
+  This is THE core alignment technique used in production AI systems!
+
+key_learnings:
+  - "SFT creates a good starting point for RLHF"
+  - "Reward models predict human preferences from comparisons"
+  - "KL penalty prevents reward hacking / distribution shift"
+  - "RLHF combines supervised learning, preference learning, and RL"
+
+milestones:
+  - name: "SFT Dataset Preparation"
+    description: "Format instruction-response pairs for fine-tuning"
+    time_estimate: "30 min"
+  
+  - name: "SFT Training Loop"
+    description: "Fine-tune base LM on demonstrations"
+    time_estimate: "1 hour"
+  
+  - name: "Comparison Dataset"
+    description: "Create pairs of (prompt, response_a, response_b, preference)"
+    time_estimate: "30 min"
+  
+  - name: "Reward Model Architecture"
+    description: "LM backbone + scalar head"
+    time_estimate: "45 min"
+  
+  - name: "Reward Model Training"
+    description: "Bradley-Terry model on comparison data"
+    time_estimate: "1 hour"
+  
+  - name: "PPO with KL Penalty"
+    description: "Optimize policy while staying close to SFT model"
+    time_estimate: "2 hours"
+  
+  - name: "Full Pipeline Integration"
+    description: "End-to-end RLHF training run"
+    time_estimate: "1 hour"
+
+starter_code:
+  python: |
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    
+    class RewardModel(nn.Module):
+        """
+        Reward model that predicts human preferences.
+        
+        Takes a (prompt, response) and outputs a scalar reward.
+        """
+        
+        def __init__(self, base_model):
+            super().__init__()
+            # Your code here
+            pass
+        
+        def forward(self, input_ids, attention_mask):
+            """Return scalar reward for each input."""
+            # Your code here
+            pass
+    
+    def reward_model_loss(rewards_chosen, rewards_rejected):
+        """
+        Bradley-Terry loss for preference learning.
+        
+        Loss = -log(σ(r_chosen - r_rejected))
+        """
+        # Your code here
+        pass
+    
+    class RLHFTrainer:
+        """
+        Full RLHF training pipeline.
+        """
+        
+        def __init__(self, policy_model, ref_model, reward_model, kl_coef=0.1):
+            # Your code here
+            pass
+        
+        def compute_rewards(self, prompts, responses):
+            """Compute rewards with KL penalty."""
+            # Your code here
+            pass
+        
+        def ppo_step(self, batch):
+            """Single PPO update step."""
+            # Your code here
+            pass
+
+papers:
+  - title: "Training language models to follow instructions (InstructGPT)"
+    authors: "Ouyang et al. (OpenAI)"
+    year: 2022
+    url: "https://arxiv.org/abs/2203.02155"
+  
+  - title: "Learning to summarize from human feedback"
+    authors: "Stiennon et al. (OpenAI)"
+    year: 2020
+    url: "https://arxiv.org/abs/2009.01325"
+
+prerequisites:
+  - "01-mini-gpt"
+  - "02-ppo"
+  - "09-kl-divergence"
