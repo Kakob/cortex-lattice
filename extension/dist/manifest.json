@@ -1,0 +1,74 @@
+{
+  "manifest_version": 3,
+  "name": "Cortex Lattice",
+  "version": "1.0.0",
+  "description": "Track your problem-solving progress on LeetCode and Grokking with spaced repetition",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "tabs",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://www.designgurus.io/*",
+    "https://designgurus.io/*",
+    "http://localhost:3001/*"
+  ],
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "assets/index.ts-DgmjdKMJ.js"
+      ],
+      "matches": [
+        "https://leetcode.com/problems/*",
+        "https://www.designgurus.io/course/*",
+        "https://www.designgurus.io/course-play/*",
+        "https://designgurus.io/course/*",
+        "https://designgurus.io/course-play/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "src/components/popup/index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "commands": {
+    "quick-log": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Open quick log modal"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "https://designgurus.io/*",
+        "https://designgurus.io/*",
+        "https://leetcode.com/*",
+        "https://www.designgurus.io/*",
+        "https://www.designgurus.io/*"
+      ],
+      "resources": [
+        "assets/index.ts-DgmjdKMJ.js"
+      ],
+      "use_dynamic_url": false
+    }
+  ]
+}

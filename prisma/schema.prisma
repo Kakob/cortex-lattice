@@ -1,5 +1,39 @@
-// Cortex Lattice - Prisma Schema
-// Database models for inline contributions (slash commands)
+// =============================================================================
+// CORTEX LATTICE - PRISMA DATABASE SCHEMA
+// =============================================================================
+//
+// This file defines the PostgreSQL database structure for Cortex Lattice.
+// The database stores two main categories of data:
+//
+// 1. INLINE CONTRIBUTIONS (Web App Feature)
+//    - User-submitted problems, solutions, and guidance via slash commands
+//    - Links between contributions (e.g., "this solution solves this problem")
+//    - Used by the in-browser problem-solving interface
+//
+// 2. STUDY LOG (Chrome Extension Feature)
+//    - Problems tracked from LeetCode/DesignGurus
+//    - Attempt history with code snapshots
+//    - Stuck points and reflections
+//    - Spaced repetition scheduling
+//
+// AUTHENTICATION:
+// Uses NextAuth.js with OAuth (Google) and optional credentials.
+// User, Account, Session, and VerificationToken are NextAuth standard models.
+//
+// ID SYNCHRONIZATION:
+// The extension uses IndexedDB locally and syncs to this PostgreSQL database.
+// Each Study* model has an 'odl' field (Original Device Local ID) to prevent
+// duplicate entries when the same data is synced multiple times.
+//
+// RELATIONSHIPS:
+// User ─┬─► InlineContribution ─► ContributionLink
+//       ├─► StudyProblem ─┬─► StudyAttempt ─┬─► StudySnapshot
+//       │                 │                  ├─► StudyStuckPoint
+//       │                 │                  └─► StudyReflection
+//       │                 └─► StudySpacedRepetition
+//       └─► Account/Session (NextAuth)
+//
+// =============================================================================
 
 generator client {
   provider = "prisma-client-js"
@@ -10,7 +44,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// NextAuth.js User model
+// =============================================================================
+// AUTHENTICATION MODELS (NextAuth.js Standard)
+// =============================================================================
+//
+// These models follow the NextAuth.js Prisma adapter schema.
+// See: https://authjs.dev/getting-started/adapters/prisma
+//
+// User: The core user account (created on first sign-in)
+// Account: OAuth provider connections (Google, GitHub, etc.)
+// Session: Active sessions (server-side session management)
+// VerificationToken: Email verification tokens
+// =============================================================================
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -21,9 +67,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // NextAuth relations
   accounts      Account[]
   sessions      Session[]
-  contributions InlineContribution[]
+
+  // App-specific relations
+  contributions InlineContribution[]  // Slash command contributions
+  studyProblems StudyProblem[]        // Extension-tracked problems
 }
 
 // NextAuth.js Account model (OAuth providers)
@@ -66,7 +116,26 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Inline contributions from /problem, /solution, /guidance commands
+// =============================================================================
+// INLINE CONTRIBUTIONS (Web App Slash Command System)
+// =============================================================================
+//
+// When users solve problems in the web app, they can create "contributions"
+// using slash commands in the code editor:
+//
+//   /problem new "My problem description"     - Define a new problem
+//   /solution new "My solution approach"      - Share a solution
+//   /guidance new "Helpful tip"               - Add learning guidance
+//
+// These contributions are linked together:
+//   - A solution "solves" a problem
+//   - Guidance "references" problems or solutions
+//   - Solutions can "extend" other solutions
+//
+// The system captures rich context (code state, cursor position, test results)
+// to help understand when and how the contribution was made.
+// =============================================================================
+
 model InlineContribution {
   id              String   @id @default(cuid())
   sessionId       String
@@ -117,4 +186,213 @@ model ContributionLink {
   @@unique([fromContributionId, toContributionId, linkType])
   @@index([fromContributionId])
   @@index([toContributionId])
+}
+
+// =============================================================================
+// EXTENSION STUDY LOG MODELS
+// =============================================================================
+//
+// These models store data from the Chrome extension, which tracks:
+// - Which problems the user attempts on LeetCode/DesignGurus
+// - Every Run/Submit click (code snapshots)
+// - When the user gets stuck and what they do about it
+// - Reflections and "aha moments" during problem-solving
+// - Spaced repetition scheduling for review
+//
+// DATA FLOW:
+// 1. User navigates to LeetCode problem
+// 2. Extension content script detects the problem
+// 3. Extension sends data to these API endpoints
+// 4. Data is stored here (PostgreSQL is source of truth)
+// 5. Extension caches locally in IndexedDB for offline access
+//
+// IDEMPOTENCY:
+// All Study* models have an 'odl' (Original Device Local ID) field.
+// This allows the extension to retry syncs without creating duplicates.
+// If a record with the same 'odl' exists, the API returns the existing record.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// StudyProblem: A coding problem the user has attempted
+// -----------------------------------------------------------------------------
+// Created when user first navigates to a problem page.
+// Linked to all attempts, snapshots, and spaced repetition data.
+model StudyProblem {
+  id              String   @id @default(cuid())
+  odl             String   @unique // Original ID from extension
+  userId          String
+  platform        String   // 'leetcode' | 'grokking'
+  url             String
+  title           String
+  normalizedTitle String
+  pattern         String?  // e.g., 'two-pointers', 'sliding-window'
+  difficulty      String?  // 'easy' | 'medium' | 'hard'
+  curriculumTrack String?  // e.g., 'gtci'
+  curriculumIndex Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attempts        StudyAttempt[]
+  spacedRepetition StudySpacedRepetition?
+
+  @@index([userId])
+  @@index([platform])
+  @@index([normalizedTitle])
+}
+
+// -----------------------------------------------------------------------------
+// StudyAttempt: A single problem-solving session
+// -----------------------------------------------------------------------------
+// Created when user starts working on a problem.
+// Tracks duration, pass/fail status, and contains all snapshots/reflections.
+// A problem can have multiple attempts (user may retry days later).
+model StudyAttempt {
+  id            String   @id @default(cuid())
+  odl           String   @unique // Original ID from extension
+  problemId     String
+  startedAt     DateTime
+  completedAt   DateTime?
+  status        String   // 'in_progress' | 'completed' | 'abandoned'
+  passed        Boolean  @default(false)
+  snapshotCount Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  problem     StudyProblem    @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  snapshots   StudySnapshot[]
+  stuckPoints StudyStuckPoint[]
+  reflections StudyReflection[]
+
+  @@index([problemId])
+}
+
+// -----------------------------------------------------------------------------
+// StudySnapshot: Code captured on each Run/Submit click
+// -----------------------------------------------------------------------------
+// Every time the user clicks Run or Submit, we capture:
+// - The exact code at that moment
+// - Whether it was a Run (local test) or Submit (full test)
+// - The result (pass/fail/error)
+//
+// This creates a detailed history of the problem-solving process,
+// useful for analyzing learning patterns and debugging approaches.
+model StudySnapshot {
+  id         String   @id @default(cuid())
+  odl        String   @unique // Original ID from extension
+  attemptId  String
+  timestamp  DateTime
+  trigger    String   // 'run' | 'submit'
+  code       String   @db.Text
+  testResult String?  // 'pass' | 'fail' | 'error'
+  createdAt  DateTime @default(now())
+
+  attempt StudyAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+}
+
+// -----------------------------------------------------------------------------
+// StudyStuckPoint: When the user gets stuck and asks for help
+// -----------------------------------------------------------------------------
+// Users can press Ctrl+Shift+L to log when they're stuck.
+// This captures:
+// - What they're stuck on (description)
+// - What they plan to do next (think more, check hint, ask AI, view solution)
+//
+// This data helps identify common sticking points across problems
+// and informs the spaced repetition algorithm (using hints = shorter interval).
+model StudyStuckPoint {
+  id             String   @id @default(cuid())
+  odl            String   @unique // Original ID from extension
+  attemptId      String
+  timestamp      DateTime
+  description    String   @db.Text
+  codeSnapshot   String?  @db.Text // Code at the time of this stuck point
+  intendedAction String   // 'think_more' | 'check_hint' | 'ask_ai' | 'view_solution'
+  createdAt      DateTime @default(now())
+
+  attempt StudyAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+}
+
+// -----------------------------------------------------------------------------
+// StudyReflection: User's thoughts and insights during problem-solving
+// -----------------------------------------------------------------------------
+// Types of reflections:
+// - 'thought': General observation or approach idea
+// - 'aha': Breakthrough moment ("Oh, I need to use a hashmap!")
+// - 'stuck': What they're struggling with
+// - 'post_solve': Reflection after completing the problem
+//
+// The 'coldHint' field stores a hint the user writes for their future self,
+// to be shown when reviewing this problem later (spaced repetition).
+model StudyReflection {
+  id           String   @id @default(cuid())
+  odl          String   @unique // Original ID from extension
+  attemptId    String
+  timestamp    DateTime
+  type         String   // 'thought' | 'aha' | 'stuck' | 'post_solve'
+  content      String   @db.Text
+  codeSnapshot String?  @db.Text // Code at the time of this reflection
+  coldHint     String?  @db.Text // Hint for future review
+  confidence   String?  // 'easy' | 'moderate' | 'lucky'
+  createdAt    DateTime @default(now())
+
+  attempt StudyAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+}
+
+// -----------------------------------------------------------------------------
+// StudySpacedRepetition: Scheduling data for problem review
+// -----------------------------------------------------------------------------
+// Implements a modified SM-2 algorithm:
+// - nextReview: When the user should review this problem
+// - intervalDays: Current interval (grows on success, resets on failure)
+// - easeFactor: Multiplier that affects interval growth (1.3 to 2.5)
+// - reviewCount: Total number of reviews completed
+//
+// After each review:
+// - Cold solve (no help): interval × 2.0
+// - Used hint: interval × 1.5
+// - Used AI: interval × 1.2
+// - Failed/viewed solution: reset to 4 hours
+model StudySpacedRepetition {
+  id           String   @id @default(cuid())
+  problemId    String   @unique
+  nextReview   DateTime
+  intervalDays Float
+  easeFactor   Float    @default(2.5)
+  reviewCount  Int      @default(0)
+  lastReviewed DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  problem StudyProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+}
+
+// -----------------------------------------------------------------------------
+// StudyReviewResult: Historical record of each review session
+// -----------------------------------------------------------------------------
+// Every time a user reviews a problem (during spaced repetition),
+// we record the outcome. This provides:
+// - Analytics on learning progress over time
+// - Data for tuning the spaced repetition algorithm
+// - Insight into which problems are consistently difficult
+model StudyReviewResult {
+  id               String   @id @default(cuid())
+  odl              String   @unique // Original ID from extension
+  problemId        String
+  userId           String
+  timestamp        DateTime
+  passed           Boolean
+  wasMultiAttempt  Boolean
+  previousInterval Float
+  newInterval      Float
+  createdAt        DateTime @default(now())
+
+  @@index([problemId])
+  @@index([userId])
 }

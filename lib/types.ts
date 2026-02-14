@@ -1,12 +1,48 @@
 /**
- * Cortex Lattice - TypeScript Type Definitions
+ * =============================================================================
+ * CORTEX LATTICE - TYPESCRIPT TYPE DEFINITIONS
+ * =============================================================================
  *
- * Core types for problems, hints, test results, and execution.
+ * This file contains all TypeScript interfaces and types for the web app.
+ *
+ * ORGANIZATION:
+ * -------------
+ * 1. PROBLEM TYPES - Problem definitions from YAML files
+ * 2. SOLUTION TYPES - Solution code, traces, and explanations
+ * 3. MISTAKES TYPES - Common errors and teaching moments
+ * 4. INVARIANTS TYPES - Algorithm correctness invariants
+ * 5. PAUSE POINTS TYPES - Interactive learning checkpoints
+ * 6. LEARNING GUIDE TYPES - Comprehensive guidance structure
+ * 7. EXECUTION TYPES - Code execution and test results
+ * 8. UI STATE TYPES - React component state
+ * 9. SLASH COMMAND TYPES - Inline contribution system
+ *
+ * DATA SOURCES:
+ * -------------
+ * Many of these types mirror the structure of YAML files in /problems/:
+ * - problem.yaml → Problem, ProblemExample, TestCase
+ * - solution.yaml → Solution, ReferenceTrace, TraceStep
+ * - mistakes.yaml → MistakesFile, CommonMistake
+ * - invariants.yaml → InvariantsFile, Invariant
+ * - pause-points.yaml → PausePointsFile, PausePoint
+ * - guidance.yaml → LearningGuide, guidance section
+ *
+ * The YAML uses snake_case, TypeScript uses camelCase.
+ * Conversion happens in lib/problems.ts when loading files.
+ *
+ * USAGE:
+ * ------
+ * import type { Problem, TestResult, ExecutionResult } from '@/lib/types';
  */
 
-// ============================================================================
-// Problem Types
-// ============================================================================
+// =============================================================================
+// PROBLEM TYPES
+// =============================================================================
+//
+// These types represent coding problems loaded from YAML files.
+// Each problem has a title, description, examples, constraints, test cases,
+// and metadata for categorization (pattern, difficulty, theme).
+// =============================================================================
 
 export interface Problem {
   id: string;

@@ -1,7 +1,48 @@
 /**
- * Cortex Lattice - Problem Loading Utilities
+ * =============================================================================
+ * CORTEX LATTICE - PROBLEM LOADING UTILITIES
+ * =============================================================================
  *
- * Server-side utilities for loading problem definitions and hints from YAML files.
+ * Server-side utilities for loading problem definitions from YAML files.
+ * These functions are used by API routes and Server Components.
+ *
+ * PROBLEM DIRECTORY STRUCTURE:
+ * ----------------------------
+ * problems/
+ * ├── _template/           # Template for creating new problems (ignored)
+ * ├── two-sum/
+ * │   ├── problem.yaml     # Problem definition, test cases, starter code
+ * │   ├── solution.yaml    # Reference solution, complexity analysis
+ * │   ├── guidance.yaml    # Hints, key concepts, pattern transfer
+ * │   ├── mistakes.yaml    # Common errors and teaching moments
+ * │   ├── invariants.yaml  # Algorithm correctness invariants
+ * │   └── pause-points.yaml # Interactive checkpoints for guided learning
+ * ├── sliding-window-max/
+ * │   └── ...
+ * └── ...
+ *
+ * YAML TO TYPESCRIPT CONVERSION:
+ * ------------------------------
+ * YAML files use snake_case (e.g., starter_code_python)
+ * TypeScript interfaces use camelCase (e.g., starterCodePython)
+ *
+ * The conversion happens in the load* functions below:
+ * - loadProblem() manually maps snake_case to camelCase
+ * - Other loaders return raw YAML or do basic transformation
+ *
+ * KEY FUNCTIONS:
+ * --------------
+ * - loadProblem(id): Load a problem by ID
+ * - loadSolution(id): Load the solution for a problem
+ * - buildLearningGuide(id): Build comprehensive guidance from all YAML files
+ * - buildCategorizedHints(id): Build hint system for progressive disclosure
+ * - getAllProblems(): List all available problems
+ * - getProblemsByTheme(): Group problems by curriculum theme
+ *
+ * SECURITY:
+ * ---------
+ * All functions validate the problemId to prevent path traversal attacks.
+ * IDs containing ".." or "/" are rejected.
  */
 
 import fs from "fs/promises";

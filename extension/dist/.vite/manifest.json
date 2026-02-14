@@ -1,0 +1,57 @@
+{
+  "../../../../@crx/manifest": {
+    "file": "assets/crx-manifest.js-CER9CcQP.js",
+    "name": "crx-manifest.js",
+    "src": "../../../../@crx/manifest",
+    "isEntry": true
+  },
+  "_globals-!~{003}~.js": {
+    "file": "assets/globals-FX2lidc_.css",
+    "src": "_globals-!~{003}~.js"
+  },
+  "_globals-2cAt5PPc.js": {
+    "file": "assets/globals-2cAt5PPc.js",
+    "name": "globals",
+    "css": [
+      "assets/globals-FX2lidc_.css"
+    ]
+  },
+  "_spaced-repetition-BOW8Q9lu.js": {
+    "file": "assets/spaced-repetition-BOW8Q9lu.js",
+    "name": "spaced-repetition"
+  },
+  "src/background/service-worker.ts": {
+    "file": "assets/service-worker.ts-BbK84_7u.js",
+    "name": "service-worker.ts",
+    "src": "src/background/service-worker.ts",
+    "isEntry": true,
+    "imports": [
+      "_spaced-repetition-BOW8Q9lu.js"
+    ]
+  },
+  "src/components/dashboard/index.html": {
+    "file": "assets/dashboard-BFNmkAXP.js",
+    "name": "dashboard",
+    "src": "src/components/dashboard/index.html",
+    "isEntry": true,
+    "imports": [
+      "_globals-2cAt5PPc.js",
+      "_spaced-repetition-BOW8Q9lu.js"
+    ]
+  },
+  "src/components/popup/index.html": {
+    "file": "assets/index.html-B0mkqW8Z.js",
+    "name": "index.html",
+    "src": "src/components/popup/index.html",
+    "isEntry": true,
+    "imports": [
+      "_globals-2cAt5PPc.js"
+    ]
+  },
+  "src/content/index.ts": {
+    "file": "assets/index.ts-DgmjdKMJ.js",
+    "name": "index.ts",
+    "src": "src/content/index.ts",
+    "isEntry": true
+  }
+}

@@ -26,7 +26,21 @@ export default async function HomePage() {
           <Brain className="h-6 w-6 text-accent-primary" />
           <span className="font-semibold text-gray-100">Cortex Lattice</span>
         </Link>
-        <UserMenu />
+        <div className="flex items-center gap-4">
+          <Link
+            href="/study-log/problems"
+            className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+          >
+            DSA Study Log
+          </Link>
+          <Link
+            href="/study-log"
+            className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+          >
+            Progress
+          </Link>
+          <UserMenu />
+        </div>
       </nav>
 
       {/* Hero Section */}

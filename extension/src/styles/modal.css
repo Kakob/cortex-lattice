@@ -1,0 +1,288 @@
+/* Modal styles for content script injection */
+/* These styles are isolated in Shadow DOM */
+
+.cortex-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cortex-modal {
+  background: #1e293b;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.2s ease-out;
+}
+
+.cortex-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #334155;
+}
+
+.cortex-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.cortex-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.cortex-modal-close:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.cortex-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(90vh - 140px);
+}
+
+.cortex-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #334155;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Form elements */
+.cortex-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.cortex-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.cortex-input::placeholder {
+  color: #64748b;
+}
+
+.cortex-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.cortex-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.cortex-form-group {
+  margin-bottom: 16px;
+}
+
+/* Buttons */
+.cortex-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.cortex-btn-primary {
+  background: #6366f1;
+  color: white;
+}
+
+.cortex-btn-primary:hover {
+  background: #4f46e5;
+}
+
+.cortex-btn-secondary {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.cortex-btn-secondary:hover {
+  background: #475569;
+}
+
+.cortex-btn-accent {
+  background: #10b981;
+  color: white;
+}
+
+.cortex-btn-accent:hover {
+  background: #059669;
+}
+
+/* Option buttons (for multi-select) */
+.cortex-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.cortex-option-btn {
+  padding: 12px;
+  background: #0f172a;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.cortex-option-btn:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.cortex-option-btn.selected {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.cortex-option-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.cortex-option-desc {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* Entry type selector */
+.cortex-entry-types {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.cortex-entry-type {
+  flex: 1;
+  padding: 10px;
+  background: #0f172a;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.cortex-entry-type:hover {
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+.cortex-entry-type.active {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  color: #f1f5f9;
+}
+
+/* Confidence selector */
+.cortex-confidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.cortex-confidence-btn {
+  padding: 16px 12px;
+  background: #0f172a;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.cortex-confidence-btn:hover {
+  border-color: #6366f1;
+}
+
+.cortex-confidence-btn.selected {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.cortex-confidence-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.cortex-confidence-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f1f5f9;
+}
+
+.cortex-confidence-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+/* Helper text */
+.cortex-helper {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 8px;
+}
