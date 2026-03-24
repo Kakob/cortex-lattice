@@ -1,0 +1,340 @@
+pattern: two-pointers
+problem_id: two-pointers-squaring-a-sorted-array-wizard
+
+# Catalog of common mistakes with detection and teaching moments
+# Themed for the Wizard's Dungeon narrative
+
+common_mistakes:
+  - id: "square-then-sort"
+    severity: high
+    category: "suboptimal-pattern"
+
+    description: "Squaring each rune then sorting the result -- correct but O(n log n) instead of O(n)"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - A loop that squares each element
+        - Followed by a sort() or sorted() call on the squared values
+        - No two-pointer logic
+
+      complexity_analysis:
+        time: "O(n log n)"
+        space: "O(n)"
+
+      code_pattern:
+        - "sorted() or .sort() called on squared values"
+        - "No left/right pointer variables"
+        - "Single-pass squaring followed by sorting"
+
+    why_students_do_this: |
+      This is the obvious approach: square everything, then sort. It works
+      correctly and is easy to write. Students reach for it because it
+      does not require understanding the Two Pointers pattern. But it
+      wastes the sorted-input property that makes O(n) possible.
+
+    teaching_moment:
+      title: "The Apprentice's Shortcut -- Square Then Sort"
+
+      explanation: |
+        Your spell works, but you are ignoring the gift the arithmancer-monks
+        left you: the runes are already sorted!
+
+        For a rack of 100,000 runes:
+        - Your approach: ~1,700,000 operations (O(n log n) sorting)
+        - Two Pointers: 100,000 operations (O(n) single sweep)
+
+        The sorted rack tells you exactly where the largest squared values
+        are: at the two ends. You never need to sort at all.
+
+      hint: |
+        Think about where the largest square must come from. In a sorted
+        array [-7, -3, 2, 3, 11], the largest squared value is either
+        (-7)^2 = 49 or 11^2 = 121. It is always at one of the two ends!
+
+      next_step: |
+        Try the Two Pointers approach:
+        1. Start with left=0 and right=n-1
+        2. Compare nums[left]^2 vs nums[right]^2
+        3. Place the larger square at the END of the result array
+        4. Move the pointer that produced the larger square
+        5. Repeat, filling the result from back to front
+
+  - id: "filling-front-to-back"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Filling the result array from the front instead of the back -- produces reverse-sorted output"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - pos starts at 0 and increments
+        - Largest squares are placed at the beginning
+        - Result is in descending order instead of ascending
+
+      code_pattern:
+        - "pos = 0 at start"
+        - "pos += 1 (or pos++) after each placement"
+        - "result[0] contains the largest square"
+
+    why_students_do_this: |
+      Students instinctively fill arrays from position 0 upward. But since
+      we identify the LARGEST squares first (from the ends), placing them
+      at the front produces a reverse-sorted result.
+
+    teaching_moment:
+      title: "You Placed the Biggest Rune First!"
+
+      explanation: |
+        You are finding the LARGEST squared values first (from the ends
+        of the rack), but placing them at the START of the result.
+        This fills the trophy shelf backwards!
+
+        Your result:  [121, 49, 9, 9, 4]  (descending -- WRONG)
+        Correct:      [4, 9, 9, 49, 121]  (ascending -- CORRECT)
+
+        Since you discover largest-to-smallest, you must fill the result
+        from position n-1 down to 0.
+
+      hint: |
+        Change your position variable:
+        - Initialize: pos = n - 1 (last position)
+        - After each placement: pos -= 1 (move left)
+
+        This fills the shelf from right to left, placing each square
+        in its correct ascending position.
+
+      next_step: |
+        Change:
+          pos = 0          -> pos = n - 1
+          pos += 1         -> pos -= 1
+
+  - id: "wrong-loop-condition"
+    severity: high
+    category: "logic-error"
+
+    description: "Using left < right instead of left <= right -- skips the last element"
+
+    detection:
+      code_analysis:
+        - "Loop condition is 'while left < right' instead of 'while left <= right'"
+
+      execution_trace:
+        - "Result array has one unfilled position (still 0 or undefined)"
+        - "Result has n-1 correct values and one missing value"
+
+    why_students_do_this: |
+      In other Two Pointers problems (like Pair with Target Sum), the loop
+      condition is left < right because when pointers meet, there is only
+      one element and you cannot form a pair. But here, when left == right,
+      there is still one rune that needs to be squared and placed.
+
+    teaching_moment:
+      title: "You Forgot the Last Rune!"
+
+      explanation: |
+        Your loop stops when left == right, but that means there is still
+        one rune on the rack that has not been squared and placed.
+
+        In Pair with Target Sum: left < right is correct (a pair needs two).
+        In Squaring a Sorted Array: left <= right is correct (every single
+        rune must be processed).
+
+        Example:
+        nums = [-2, 0, 3]
+        After two iterations: left = 1, right = 1 (pointing to 0)
+        With left < right: loop exits, 0 is never squared!
+        With left <= right: one more iteration places 0^2 = 0
+
+      fix: |
+        Change:
+          while left < right:     # Skips the last rune
+        To:
+          while left <= right:    # Processes every rune
+
+  - id: "comparing-raw-values-not-squares"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Comparing nums[left] vs nums[right] directly instead of their squares or absolute values"
+
+    detection:
+      code_analysis:
+        - "Comparison uses nums[left] > nums[right] or similar without abs() or squaring"
+
+      execution_trace:
+        - "A negative left value is always considered smaller than a positive right value"
+        - "Cursed runes with large magnitude are never chosen, even when their square is largest"
+
+    why_students_do_this: |
+      Students forget that negative numbers have large absolute values.
+      Comparing -7 vs 3 directly says 3 is bigger, but (-7)^2 = 49 > 9 = 3^2.
+      The comparison must be on squared values (or absolute values).
+
+    teaching_moment:
+      title: "A Cursed Rune Can Be More Powerful Than a Blessed One!"
+
+      explanation: |
+        You compared the raw power values: nums[left] = -7 vs nums[right] = 3.
+        Since -7 < 3, you assumed the right rune was stronger.
+
+        But when amplified (squared):
+        - (-7)^2 = 49
+        - (3)^2  = 9
+
+        The cursed rune is far more powerful! You must compare SQUARES
+        (or absolute values), not the raw inscriptions.
+
+      fix: |
+        Change:
+          if nums[left] > nums[right]:   # WRONG -- ignores sign
+        To:
+          if nums[left] * nums[left] > nums[right] * nums[right]:  # CORRECT
+
+        Or equivalently:
+          if abs(nums[left]) > abs(nums[right]):
+
+      next_step: |
+        Remember: in the Amplification Chamber, curse and blessing are
+        equally potent. Always compare magnitudes, never raw values.
+
+  - id: "modifying-input-in-place"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Squaring values in the original array instead of creating a new result array"
+
+    detection:
+      code_analysis:
+        - "No separate result array created"
+        - "nums[i] = nums[i] * nums[i] or similar in-place modification"
+
+      execution_trace:
+        - "Original values are overwritten before they are compared"
+        - "Subsequent comparisons use already-squared values, producing wrong results"
+
+    why_students_do_this: |
+      Students try to save space by modifying the input array directly.
+      But this overwrites values that are still needed for comparison,
+      corrupting the algorithm.
+
+    teaching_moment:
+      title: "You Overwrote Runes That Had Not Been Read Yet!"
+
+      explanation: |
+        By modifying nums in place, you overwrote values that later
+        comparisons still need.
+
+        Example:
+        nums = [-3, -1, 0, 1, 2]
+        If you square nums[0] in place: nums becomes [9, -1, 0, 1, 2]
+        Now when you compare nums[0] and nums[4]:
+        You compare 9 vs 2 -- but 9 is already a squared value!
+        The comparison is between a square and a raw value.
+
+      fix: |
+        Create a separate result array:
+          result = [0] * n      # Python
+          const result = new Array(n)  // JavaScript
+
+        Write squared values into result, not back into nums.
+
+  - id: "off-by-one-in-position"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Starting pos at n instead of n-1, or decrementing before placing"
+
+    detection:
+      code_analysis:
+        - "pos = n (out of bounds) instead of pos = n - 1"
+        - "Or: pos -= 1 before result[pos] = ... (skips last position)"
+
+      execution_trace:
+        - "IndexError or ArrayIndexOutOfBoundsException"
+        - "Or: result[n-1] is never filled"
+
+    why_students_do_this: |
+      Off-by-one errors are common when indexing from the back of an array.
+      The last valid index is n-1, not n.
+
+    teaching_moment:
+      title: "Your Trophy Shelf Has One Fewer Slot Than You Think!"
+
+      explanation: |
+        Array indices go from 0 to n-1. The last position is n-1, not n.
+
+        If you start pos at n:
+        - result[n] is out of bounds -- crash!
+
+        If you decrement pos before placing:
+        - result[n-1] is skipped, leaving the last position empty
+
+      fix: |
+        Ensure:
+          pos = n - 1           # Start at the last valid index
+          result[pos] = ...     # Place the value FIRST
+          pos -= 1              # THEN decrement
+
+# Categorise mistakes for analysis
+mistake_categories:
+  suboptimal_pattern:
+    - square-then-sort
+
+  pattern_misunderstanding:
+    - filling-front-to-back
+    - comparing-raw-values-not-squares
+
+  logic_error:
+    - wrong-loop-condition
+
+  implementation_error:
+    - modifying-input-in-place
+    - off-by-one-in-position
+
+# Expected learning progression
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "square-then-sort"
+      teaching: "Introduce Two Pointers -- the sorted rack tells you where the largest squares are"
+
+    - stage: 2
+      mistake: "comparing-raw-values-not-squares"
+      teaching: "Explain that cursed runes have large absolute values -- compare squares, not raw values"
+
+    - stage: 3
+      mistake: "filling-front-to-back"
+      teaching: "Since we find the largest squares first, fill the result from the back"
+
+    - stage: 4
+      mistake: "wrong-loop-condition"
+      teaching: "Use left <= right to process every rune, including the last one"
+
+    - stage: 5
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try Pair with Target Difference or Three Sum"
+
+# Teaching strategies by mistake type
+teaching_strategies:
+  for_square_then_sort_users:
+    - "Acknowledge that their spell works correctly"
+    - "Show complexity comparison: 1,700,000 vs 100,000 operations for n=100,000"
+    - "Explain how the sorted order reveals where the largest squares are"
+    - "Provide the hint about starting at opposite ends of the rack"
+
+  for_wrong_comparison_users:
+    - "Walk through an example with negative numbers: -7 vs 3"
+    - "Show that (-7)^2 = 49 > 9 = 3^2"
+    - "Emphasize: compare squares or absolute values, never raw values"
+
+  for_wrong_fill_direction:
+    - "Show the reversed output vs correct output"
+    - "Explain: largest first means fill from the back"
+    - "Provide corrected pos initialization and decrement"
+
+  for_implementation_errors:
+    - "Point out the exact line with the error"
+    - "Show what they computed vs what they should have computed"
+    - "Provide the corrected code snippet"

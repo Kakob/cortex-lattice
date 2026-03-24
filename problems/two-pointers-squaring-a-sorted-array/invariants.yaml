@@ -1,0 +1,127 @@
+pattern: two-pointers
+problem_id: two-pointers-squaring-a-sorted-array
+
+core_invariants:
+  - id: "sorted-input-assumption"
+    description: "Input array must be sorted in non-decreasing order"
+    why_it_matters: |
+      Two Pointers relies on the sorted property to guarantee that the
+      largest absolute values are at the extremes (leftmost or rightmost).
+      Without sorting, you cannot know which end holds the next largest
+      square, and the entire reverse-fill strategy breaks down.
+    violation_detection:
+      - "Check if nums[i] <= nums[i+1] for all i"
+    teaching_moment_if_violated: |
+      Two Pointers for this problem requires sorted input. The key insight
+      is that in a sorted array with negatives, the largest absolute values
+      live at the two ends. If the input isn't sorted, sort it first
+      (O(n log n) preprocessing) or use a different approach entirely.
+
+  - id: "opposite-end-initialization"
+    description: "Left pointer must start at index 0, right at the last index"
+    why_it_matters: |
+      Because the input is sorted and may contain negatives, the largest
+      absolute value is always at one of the two ends. Starting pointers
+      at opposite ends lets us compare these two candidates and pick the
+      larger square first, working inward toward smaller values.
+    violation_detection:
+      - "left starts at 0, right starts at len(nums) - 1"
+      - "Pointers move inward (left increases, right decreases)"
+      - "Loop terminates when left > right"
+    teaching_moment_if_violated: |
+      For this problem, both pointers must start at opposite ends because
+      the largest squared value comes from whichever end has the greater
+      absolute value. Starting both from the same end means you cannot
+      compare the two extremes.
+
+  - id: "compare-absolute-values"
+    description: "Pointer movement must be based on comparing absolute values (or squares) of the elements at each end"
+    why_it_matters: |
+      The core decision at each step is: which end has the larger square?
+      - If |nums[left]| > |nums[right]|, then nums[left]^2 is bigger
+      - If |nums[right]| >= |nums[left]|, then nums[right]^2 is bigger
+      The larger square goes into the current (rightmost unfilled) position
+      of the result array, and that pointer moves inward.
+    violation_detection:
+      - "At each step: compare abs(nums[left]) vs abs(nums[right])"
+      - "Or equivalently: compare nums[left]^2 vs nums[right]^2"
+      - "The pointer at the larger absolute value moves inward"
+    teaching_moment_if_violated: |
+      You must compare which end has the larger absolute value (or larger
+      square). This determines which square to place next. Remember:
+      - nums[left] might be a large negative (e.g., -7), meaning |nums[left]| = 7
+      - nums[right] might be a smaller positive (e.g., 3), meaning |nums[right]| = 3
+      In this case, (-7)^2 = 49 > 3^2 = 9, so the left pointer's square goes first.
+
+  - id: "reverse-fill-result"
+    description: "The result array must be filled from the end (largest index) to the start (index 0)"
+    why_it_matters: |
+      Since we identify the largest square first (from the ends of the
+      sorted input), we must place it at the end of the result array and
+      work backward. Filling from the front would place the largest values
+      first, producing a reverse-sorted result.
+    violation_detection:
+      - "Result array position starts at len(nums) - 1 and decreases"
+      - "Or: result is built in reverse order and then reversed"
+    teaching_moment_if_violated: |
+      You are finding the LARGEST squares first (from the ends of the
+      sorted array). These largest values belong at the END of the result.
+      Fill the result from right to left: position n-1, then n-2, and so on.
+
+algorithm_correctness_invariants:
+  - id: "new-array-returned"
+    description: "A new array of squares must be returned, not an in-place modification"
+    why_it_matters: |
+      The problem requires returning a NEW sorted array of squares. The
+      result has different values than the input (squares, not originals),
+      so an in-place approach would overwrite values still needed for
+      comparison.
+    violation_detection:
+      - "A new result array is created"
+      - "Original nums array is not modified"
+    teaching_moment_if_violated: |
+      You need to create a new result array. If you try to modify nums
+      in-place, you will overwrite values that have not been compared yet,
+      producing incorrect results.
+
+  - id: "all-elements-processed"
+    description: "Every element in the input must be squared and placed in the result"
+    why_it_matters: |
+      The loop must continue until left > right, ensuring every element
+      is processed. If the loop exits early (e.g., left >= right instead
+      of left > right), the element at the crossing point is skipped.
+    violation_detection:
+      - "Loop condition: while left <= right"
+      - "Result array has exactly n elements"
+    teaching_moment_if_violated: |
+      Your loop must use left <= right (not left < right). When left == right,
+      there is still one element remaining that needs to be squared and placed.
+      Using left < right would skip that last element.
+
+efficiency_invariants:
+  - id: "linear-time"
+    description: "Algorithm must run in O(n) time"
+    why_it_matters: |
+      Each pointer moves at most n times total, and each iteration
+      processes one element. Total operations: exactly n. This is better
+      than the naive O(n log n) approach of squaring then sorting.
+    violation_detection:
+      - "No nested loops"
+      - "No sorting step on the result"
+      - "Each iteration places exactly one element and advances one pointer"
+    teaching_moment_if_violated: |
+      If you are sorting the squared values, you are doing O(n log n) work.
+      Two Pointers avoids the sort entirely by placing elements in the
+      correct position from the start. Each element is touched exactly once.
+
+  - id: "linear-space"
+    description: "Should use O(n) space for the output array only"
+    why_it_matters: |
+      The only additional space needed is the result array of size n.
+      No extra data structures (hash maps, heaps, etc.) are required.
+    violation_detection:
+      - "Only a result array of size n is allocated"
+      - "No additional data structures"
+    teaching_moment_if_violated: |
+      The only extra space you need is the output array. Two Pointers
+      fills it directly -- no intermediate data structures required.

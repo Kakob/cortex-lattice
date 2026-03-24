@@ -1,0 +1,85 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Clinical Medicine theme for Two Pointers - Pair with Target Sum
+
+title: "Two Pointers - Drug Combination Therapy Lookup"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "For finding a SUM, pointers start at opposite ends of the sorted array"
+    - text: "Move the left pointer right to increase the combined dose"
+    - text: "Move the right pointer left to decrease the combined dose"
+    - text: "The sorted formulary is what makes O(n) possible — without it, you would need O(n^2) or a hash map"
+    - text: "Time complexity: O(n) vs brute force O(n^2)"
+    - text: "Only one pointer moves per iteration — like adjusting one drug at a time during titration"
+
+  common_mistakes:
+    - text: "Don't start both pointers from the same end — that pattern is for DIFFERENCE problems, not SUM"
+    - text: "Don't move both pointers in one iteration — adjust only one dosage at a time"
+    - text: "Don't use nested loops — scanning every possible pair is O(n^2) brute force"
+    - text: "Don't confuse indices with dosage values: sum = nums[left] + nums[right], not left + right"
+    - text: "Don't use left <= right as the loop condition — when left == right you'd be adding a dosage to itself"
+
+  real_world:
+    - text: |
+        Pharmaceutical Formulary Systems
+
+        Hospital electronic formulary systems store thousands of available
+        drug strengths sorted by dosage. When a clinician orders a combination
+        regimen, the pharmacy information system must quickly determine whether
+        two available strengths can meet the prescribed total dose. Two Pointers
+        on the sorted formulary provides an O(n) lookup — critical when
+        formularies contain tens of thousands of entries and real-time
+        decision support is required at the point of care.
+
+    - text: |
+        Therapeutic Drug Monitoring (TDM)
+
+        In TDM, pharmacokinetic models produce sorted lists of predicted
+        drug concentrations at various dosage levels. Clinicians need to
+        identify two dosage adjustments whose combined effect reaches a
+        target plasma concentration. The Two Pointers technique mirrors
+        the clinical process of titration: systematically adjusting one
+        parameter at a time based on whether the current result is above
+        or below the therapeutic range.
+
+    - text: |
+        Clinical Laboratory Diagnostics
+
+        Lab analyzers produce sorted arrays of calibration points.
+        Quality-control checks sometimes require finding two calibrator
+        values whose sum matches a reference standard. The same
+        algorithmic pattern applies: binary narrowing on a sorted
+        dataset to find a matching pair in linear time.
+
+  solution_approach:
+    steps:
+      - "Initialize: left = 0 (lowest dosage), right = len(nums) - 1 (highest dosage)"
+      - "While left < right:"
+      - "  Calculate: current_sum = nums[left] + nums[right]"
+      - "  If current_sum == target: return [nums[left], nums[right]] (exact therapeutic match)"
+      - "  If current_sum < target: left++ (subtherapeutic — increase the lower dosage)"
+      - "  If current_sum > target: right-- (supratherapeutic — decrease the higher dosage)"
+      - "If loop ends without finding a pair: return None (no valid combination in formulary)"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Pair with Target Difference (sorted array)"
+      invariants_shared: ["sorted input", "pointer movement based on comparison"]
+      difference: "Both pointers start from the left for DIFFERENCE; opposite ends for SUM"
+
+    - name: "Container With Most Water"
+      invariants_shared: ["opposite-end initialization", "single-direction movement"]
+      difference: "Move pointer at shorter side instead of sum-based comparison"
+
+    - name: "Three Sum"
+      invariants_shared: ["sorted array enables elimination", "sum-based comparison"]
+      modification: "Fix one element, run Two Pointers on the remainder — O(n^2) total"
+
+    - name: "Trapping Rain Water"
+      invariants_shared: ["opposite-end pointers", "sorted/ordered reasoning"]
+      difference: "Track running max from each side rather than a target sum"

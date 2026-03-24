@@ -21,7 +21,7 @@ export function formDataToYaml(data: ProblemFormData): Record<string, unknown> {
   };
 
   // Add optional basic fields
-  if (data.theme) yamlObj.theme = data.theme;
+  if (data.category) yamlObj.category = data.category;
   if (data.estimatedTime) yamlObj.estimated_time = data.estimatedTime;
 
   // Add description

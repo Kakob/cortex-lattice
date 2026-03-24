@@ -12,7 +12,7 @@ import { promisify } from "util";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { auth } from "@/auth";
-import { problemExists, getProblemDir } from "@/lib/problems";
+import { problemExists, getProblemDir, buildMergedProblemYaml } from "@/lib/problems";
 import type { ExecutionRequest, ExecutionResult } from "@/lib/types";
 
 const execAsync = promisify(exec);
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body: ExecutionRequest = await request.json();
-    const { problemId, code, language = "python" } = body;
+    const { problemId, code, language = "python", themeId } = body;
 
     // Validate inputs
     if (!problemId || !code) {
@@ -150,6 +150,21 @@ export async function POST(request: NextRequest) {
       const solutionPath = path.join(tempDir, "solution.py");
       await writeFile(solutionPath, code, "utf-8");
 
+      // For themed problems (core.yaml exists), build a merged problem.yaml
+      // so the test runner sees the same schema it always has.
+      let mountProblemDir = problemDir;
+      const mergedYaml = await buildMergedProblemYaml(problemId, themeId);
+      if (mergedYaml) {
+        const mergedProblemDir = path.join(tempDir, "problem");
+        await mkdir(mergedProblemDir, { recursive: true });
+        await writeFile(
+          path.join(mergedProblemDir, "problem.yaml"),
+          mergedYaml,
+          "utf-8"
+        );
+        mountProblemDir = mergedProblemDir;
+      }
+
       // Build Docker command
       const dockerCmd = [
         DOCKER_PATH,
@@ -161,7 +176,7 @@ export async function POST(request: NextRequest) {
         "--read-only", // Read-only filesystem
         "--tmpfs=/tmp:noexec,nosuid,size=64m", // Temp space
         "-v",
-        `${problemDir}:/code/problem:ro`, // Mount problem (read-only)
+        `${mountProblemDir}:/code/problem:ro`, // Mount problem (read-only)
         "-v",
         `${solutionPath}:/code/solution.py:ro`, // Mount solution (read-only)
         DOCKER_IMAGE,

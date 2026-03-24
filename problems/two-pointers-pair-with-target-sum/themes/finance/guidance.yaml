@@ -1,0 +1,100 @@
+# guidance.yaml - Finance & Trading Teaching Guide
+# Two Pointers: Pair with Target Sum
+
+title: "Two Pointers - Portfolio Pair Allocation"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "For finding a SUM, pointers start at opposite ends (cheapest and most expensive asset)"
+    - text: "If the combined cost is under budget, move the left pointer right to pick a pricier asset"
+    - text: "If the combined cost is over budget, move the right pointer left to pick a cheaper asset"
+    - text: "The sorted watchlist is what makes this O(n) -- without it, you'd need a hash map or brute force"
+    - text: "Time complexity: O(n) single pass vs O(n^2) brute force -- critical for real-time trading systems"
+    - text: "Space complexity: O(1) -- only two pointer variables, no auxiliary data structures"
+    - text: "Each pointer moves monotonically inward, so every asset is visited at most once"
+
+  common_mistakes:
+    - text: "Don't start both pointers from the same end -- that works for DIFFERENCE problems, not SUM"
+    - text: "Don't move both pointers in one iteration -- move exactly ONE per step based on the comparison"
+    - text: "Don't use nested loops -- scanning every pair is O(n^2), unacceptable for large watchlists"
+    - text: "Don't confuse indices with values: sum = nums[left] + nums[right], NOT left + right"
+    - text: "Don't use <= in the loop condition -- left < right prevents pairing an asset with itself"
+    - text: "Don't forget to return None after the loop -- not every budget can be filled with two positions"
+
+  real_world:
+    - text: |
+        Portfolio Construction & Risk Budgeting
+
+        In institutional asset management, portfolio managers routinely need to
+        allocate a fixed capital budget across positions. When the candidate
+        universe is sorted by price or risk-adjusted return, the two-pointer
+        technique maps directly: scan from the cheapest and most expensive ends
+        to find a pair that hits the exact allocation target. Firms like
+        Bridgewater and Two Sigma build sorted universes of instruments ranked
+        by various metrics, and efficient pair-finding algorithms are
+        foundational to their allocation engines.
+
+        The O(1) space guarantee is especially valuable in production trading
+        systems where memory allocation can trigger garbage collection pauses,
+        introducing unwanted latency during critical market moments.
+
+    - text: |
+        Order Book Matching Engines
+
+        Financial exchanges match buy and sell orders using sorted price
+        queues. The matching engine maintains a sorted bid book (buyers) and
+        a sorted ask book (sellers). Finding pairs of orders that can fill
+        at a target price uses the same converging-pointer logic: the highest
+        bid and lowest ask are compared, and pointers move inward until a
+        match is found or the spread is too wide.
+
+        This is why exchanges can process millions of orders per second --
+        O(n) algorithms on sorted data are at the core of every modern
+        matching engine (NYSE Arca, NASDAQ ITCH, CME Globex).
+
+    - text: |
+        Tax-Loss Harvesting
+
+        Robo-advisors like Betterment and Wealthfront use pair-finding
+        algorithms to identify positions that can be sold at a loss and
+        replaced with correlated assets. When positions are sorted by
+        unrealized P&L, finding a pair whose combined loss hits a specific
+        tax offset target is a direct application of two pointers. The
+        algorithm runs daily across millions of accounts, making O(n)
+        efficiency essential.
+
+  solution_approach:
+    steps:
+      - "Initialize: left = 0 (cheapest asset), right = len(nums) - 1 (most expensive asset)"
+      - "While left < right:"
+      - "  Calculate: current_sum = nums[left] + nums[right]"
+      - "  If current_sum == target: return [nums[left], nums[right]] -- budget deployed"
+      - "  If current_sum < target: left += 1 (upgrade to a pricier asset on the left)"
+      - "  If current_sum > target: right -= 1 (downgrade to a cheaper asset on the right)"
+      - "If loop ends without match: return None -- no valid pair, capital stays idle"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Pair with Target Difference (sorted array)"
+      invariants_shared: ["sorted input", "pointer movement based on comparison", "O(n) time"]
+      difference: "Both pointers start from the left and move forward (not from opposite ends)"
+      modification: "Compare difference instead of sum; both pointers advance rightward"
+
+    - name: "Three Sum"
+      invariants_shared: ["sorted array enables elimination", "pointer convergence"]
+      difference: "Fix one element, then run two pointers on the remaining subarray"
+      modification: "Outer loop O(n) x inner two-pointer O(n) = O(n^2) total"
+
+    - name: "Container With Most Water"
+      invariants_shared: ["opposite-end initialization", "single-direction pointer movement"]
+      difference: "Move the pointer at the shorter height, not based on sum comparison"
+      modification: "Maximize area instead of matching a target sum"
+
+    - name: "Squares of a Sorted Array"
+      invariants_shared: ["sorted input", "two pointers from opposite ends"]
+      difference: "Compare absolute values instead of sum; build result array from largest to smallest"

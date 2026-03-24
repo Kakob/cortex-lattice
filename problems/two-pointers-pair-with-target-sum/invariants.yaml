@@ -1,0 +1,100 @@
+pattern: two-pointers
+problem_id: two-pointers-pair-with-target-sum
+
+core_invariants:
+  - id: "sorted-input-assumption"
+    description: "Input array must be sorted in non-decreasing order"
+    why_it_matters: |
+      Two Pointers relies on the sorted property to make greedy decisions.
+      When the sum is too small, we know moving left pointer right will
+      increase the sum. When too large, moving right pointer left decreases it.
+      Without sorting, these guarantees break.
+    violation_detection:
+      - "Check if nums[i] <= nums[i+1] for all i"
+    teaching_moment_if_violated: |
+      Two Pointers requires sorted data. If your input isn't sorted, either:
+      1. Sort it first (O(n log n) preprocessing), or
+      2. Use a hash map approach (O(n) time, O(n) space — different tradeoff)
+
+  - id: "pointer-convergence"
+    description: "Left pointer must start at index 0, right at the last index, and they must move toward each other"
+    why_it_matters: |
+      Starting from opposite ends and converging ensures we consider all
+      possible pairs. Left only moves right, right only moves left.
+      When they meet, all pairs have been considered.
+    violation_detection:
+      - "left starts at 0, right starts at len(nums) - 1"
+      - "left only increases, right only decreases"
+      - "Loop terminates when left >= right"
+    teaching_moment_if_violated: |
+      For a SUM problem, pointers start at opposite ends and move inward.
+      This is different from DIFFERENCE problems where both pointers
+      start from the same end. The direction depends on the relationship
+      you're looking for.
+
+  - id: "move-based-on-sum-comparison"
+    description: "Pointer movement must be based on comparing current sum to target"
+    why_it_matters: |
+      This is the core of Two Pointers. The comparison tells us which
+      direction to search:
+      - sum < target: need larger values → move left pointer right
+      - sum > target: need smaller values → move right pointer left
+      - sum == target: found it!
+    violation_detection:
+      - "At each step: current_sum = nums[left] + nums[right]"
+      - "If current_sum < target, left should increase"
+      - "If current_sum > target, right should decrease"
+    teaching_moment_if_violated: |
+      You moved the wrong pointer! Think about it:
+      - nums[left] is the smaller value, nums[right] is the larger value
+      - To make the sum bigger, replace the smaller value → move left right
+      - To make the sum smaller, replace the larger value → move right left
+
+algorithm_correctness_invariants:
+  - id: "no-element-reuse"
+    description: "Each element can only be used once (left != right)"
+    why_it_matters: |
+      The pair must consist of two different positions in the array.
+      The condition left < right (not left <= right) ensures we never
+      use the same element twice.
+    violation_detection:
+      - "Loop condition must be left < right, not left <= right"
+    teaching_moment_if_violated: |
+      Using left <= right as the loop condition could pair an element
+      with itself. For a valid pair, ensure left < right.
+
+  - id: "complete-search"
+    description: "Algorithm must consider all possible pairs before returning null"
+    why_it_matters: |
+      Returning null early (before pointers meet) could miss valid pairs.
+      The algorithm is only done when left >= right.
+    violation_detection:
+      - "Null/None should only be returned after the while loop exits"
+    teaching_moment_if_violated: |
+      Don't give up too early! The two pointers only exhaust all
+      possibilities when they meet. Return null only after the loop.
+
+efficiency_invariants:
+  - id: "linear-time"
+    description: "Algorithm must run in O(n) time"
+    why_it_matters: |
+      Each pointer moves at most n times total, and each iteration
+      moves at least one pointer. Total operations: at most 2n = O(n).
+    violation_detection:
+      - "No nested loops"
+      - "Each iteration must advance at least one pointer"
+    teaching_moment_if_violated: |
+      If you're using nested loops, you've fallen back to O(n²) brute force.
+      Two Pointers achieves O(n) because each element is visited at most
+      once by each pointer.
+
+  - id: "constant-space"
+    description: "Should use O(1) extra space"
+    why_it_matters: |
+      Two Pointers only needs two index variables. No hash maps,
+      sets, or auxiliary arrays needed.
+    violation_detection:
+      - "No additional data structures allocated"
+    teaching_moment_if_violated: |
+      A hash map approach works but uses O(n) space. Two Pointers
+      achieves the same O(n) time with only O(1) space — just two variables.

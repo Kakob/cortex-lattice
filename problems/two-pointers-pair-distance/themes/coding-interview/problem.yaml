@@ -1,0 +1,88 @@
+# Coding Interview theme for Two Pointers - Pair Distance
+# Standard technical presentation, no narrative wrapper.
+
+title: "Pair with Target Distance"
+function_name: find_pair_with_distance
+
+description: |
+  Given a sorted array of integers and a target distance, find any pair of
+  elements that are exactly that distance apart.
+
+  If multiple pairs exist, return any one. If no such pair exists, return None.
+
+examples:
+  - input:
+      positions: [100, 250, 350, 500, 750]
+      target_distance: 250
+    output: [100, 350]
+    explanation: |
+      350 - 100 = 250. Another valid pair is [250, 500].
+
+  - input:
+      positions: [1, 5, 11, 15, 20]
+      target_distance: 9
+    output: [11, 20]
+    explanation: |
+      20 - 11 = 9. This is the only valid pair.
+
+  - input:
+      positions: [1, 2, 3, 4, 5]
+      target_distance: 10
+    output: null
+    explanation: |
+      No pair has a distance of 10. The maximum distance is 5 - 1 = 4.
+
+hints:
+  - level: 1
+    text: "The array is sorted. Can you use that property to avoid checking all pairs?"
+
+  - level: 2
+    text: "Use two pointers. If the distance between them is too small, advance the right pointer. If too large, advance the left."
+
+  - level: 3
+    text: "Both pointers start from the left. Move right to increase the gap, move left to decrease it. Make sure left stays behind right."
+
+starter_code_python: |
+  def find_pair_with_distance(positions, target_distance):
+      """
+      Find two elements exactly target_distance apart in a sorted array.
+
+      Args:
+          positions: List[int] - sorted list of integers
+          target_distance: int - required distance between elements
+
+      Returns:
+          List[int] - [val1, val2] where val2 - val1 == target_distance
+          None - if no such pair exists
+
+      Examples:
+          >>> find_pair_with_distance([100, 250, 350, 500, 750], 250)
+          [100, 350]
+
+          >>> find_pair_with_distance([1, 2, 3, 4, 5], 10)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two elements exactly targetDistance apart in a sorted array.
+   *
+   * @param {number[]} positions - sorted array of integers
+   * @param {number} targetDistance - required distance
+   * @return {number[]|null} - [val1, val2] or null if no pair exists
+   */
+  function findPairWithDistance(positions, targetDistance) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Two elements 250 apart"
+  single-pair: "Only one valid pair"
+  no-pair-exists: "No pair matches target distance"
+  minimum-input: "Minimum array size (2 elements)"
+  large-distance: "Wide gap between matching elements"
+  consecutive-positions: "Multiple valid pairs, any accepted"
+  distance-one: "Minimum distance of 1"
+  large-numbers: "Values near constraint limits"

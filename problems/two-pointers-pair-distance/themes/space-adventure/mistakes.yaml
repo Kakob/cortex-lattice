@@ -1,0 +1,412 @@
+pattern: two-pointers
+problem_id: two-pointers-asteroid-belt
+
+# This file catalogs common mistakes students make when solving this problem.
+# For each mistake, we define:
+# 1. How to detect it from execution trace
+# 2. What teaching moment to provide
+# 3. Visualizations to show the mistake vs correct approach
+
+common_mistakes:
+  - id: "brute-force-nested-loops"
+    severity: high
+    category: "wrong-pattern"
+    
+    description: "Using nested loops to check all pairs instead of Two Pointers"
+    
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Outer loop: for i in range(len(positions))
+        - Inner loop: for j in range(i+1, len(positions))
+        - Calculate distance for each pair
+        - Total iterations: n*(n-1)/2
+      
+      complexity_analysis:
+        time: "O(n²)"
+        space: "O(1)"
+      
+      code_pattern:
+        - "Nested for loops"
+        - "Both loops iterate over positions array"
+        - "No pointer variables named 'left' and 'right'"
+    
+    why_students_do_this: |
+      This is the intuitive first approach - "just check every pair".
+      It works correctly but misses the optimization opportunity that
+      the Two Pointers pattern provides.
+    
+    teaching_moment:
+      title: "Brute Force Works, But Two Pointers Is Faster"
+      
+      explanation: |
+        Your solution correctly checks all pairs, but it's O(n²).
+        
+        For n=1,000 asteroids:
+        - Your approach: ~500,000 comparisons
+        - Two Pointers: ~1,000 comparisons
+        
+        Two Pointers achieves this by using the sorted property to skip
+        impossible pairs without checking them.
+      
+      visualization:
+        type: "complexity-comparison"
+        
+        your_approach:
+          name: "Nested Loops (Brute Force)"
+          code_snippet: |
+            for i in range(len(positions)):
+                for j in range(i+1, len(positions)):
+                    if positions[j] - positions[i] == target:
+                        return [positions[i], positions[j]]
+          
+          complexity: "O(n²)"
+          comparisons_for_n10: 45
+          comparisons_for_n1000: "~500,000"
+          visual: "Show all pairs being checked (massive red grid)"
+        
+        optimal_approach:
+          name: "Two Pointers"
+          code_snippet: |
+            left, right = 0, len(positions) - 1
+            while left < right:
+                distance = positions[right] - positions[left]
+                if distance == target:
+                    return [positions[left], positions[right]]
+                elif distance < target:
+                    left += 1
+                else:
+                    right -= 1
+          
+          complexity: "O(n)"
+          comparisons_for_n10: 9
+          comparisons_for_n1000: "~1,000"
+          visual: "Show pointers converging (clean green path)"
+      
+      hint: |
+        Think about this: When distance is too large, do you really need to
+        check all pairs with the current right position? Or can you eliminate
+        them all at once by moving the right pointer?
+      
+      next_step: |
+        Try implementing Two Pointers:
+        1. Start with left=0, right=len-1
+        2. Compare current distance to target
+        3. Move ONE pointer based on that comparison
+        4. Repeat until pointers meet
+
+  - id: "moving-wrong-pointer"
+    severity: high
+    category: "pattern-misunderstanding"
+    
+    description: "Moving the wrong pointer based on distance comparison"
+    
+    detection:
+      logic: |
+        At each step:
+        1. Calculate current_distance = positions[right] - positions[left]
+        2. Determine what should happen:
+           - If current_distance < target → should move left RIGHT
+           - If current_distance > target → should move right LEFT
+        3. Check what actually happened in trace
+        4. If opposite move detected → FLAG this mistake
+      
+      specific_patterns:
+        - pattern: "distance < target AND right moved left"
+          explanation: "Should increase distance, but decreased it"
+        
+        - pattern: "distance > target AND left moved right"
+          explanation: "Should decrease distance, but increased it"
+    
+    why_students_do_this: |
+      Students often confuse which pointer to move. They might think:
+      "Distance is too small, so move the right pointer to make it smaller"
+      
+      But that's backwards! If distance is too small, we need to INCREASE it.
+    
+    teaching_moment:
+      title: "You Moved the Wrong Pointer!"
+      
+      explanation: |
+        Let's trace through what happened:
+        
+        Positions: {show_array}
+        Left pointer at index {left_idx}: value {left_val}
+        Right pointer at index {right_idx}: value {right_val}
+        
+        Current distance: {right_val} - {left_val} = {current_distance}
+        Target distance: {target}
+        
+        Current distance is {too_large_or_too_small} by {difference}.
+        
+        You moved: {pointer_you_moved} pointer
+        This made distance {increased_or_decreased}!
+        
+        You should have moved: {correct_pointer} pointer
+        This would make distance {correct_direction}.
+      
+      visualization:
+        type: "step-by-step-comparison"
+        
+        show_current_state:
+          array: "positions with left and right marked"
+          distance_bar: "Visual bar showing current vs target distance"
+          comparison: "Current < Target" or "Current > Target"
+        
+        your_move:
+          pointer_moved: "right" or "left"
+          new_distance: "Show new distance after your move"
+          arrow_direction: "Show distance got further from target"
+          result: "❌ Distance moved AWAY from target"
+        
+        correct_move:
+          pointer_to_move: "left" or "right"
+          new_distance: "Show distance after correct move"
+          arrow_direction: "Show distance got closer to target"
+          result: "✓ Distance moved TOWARD target"
+      
+      rule_to_remember: |
+        Simple rule:
+        
+        If current distance < target:
+          → Need LARGER distance
+          → Move LEFT pointer RIGHT (increases left value)
+          → Distance = right - left gets LARGER ✓
+        
+        If current distance > target:
+          → Need SMALLER distance
+          → Move RIGHT pointer LEFT (decreases right value)
+          → Distance = right - left gets SMALLER ✓
+      
+      practice_prompt: |
+        Let's practice: If current distance is 100 and target is 250,
+        which pointer should move and in which direction?
+        
+        [Interactive: Wait for answer, then explain]
+
+  - id: "wrong-distance-formula"
+    severity: medium
+    category: "implementation-error"
+    
+    description: "Calculating distance as left - right instead of right - left"
+    
+    detection:
+      code_analysis:
+        - "Look for: distance = positions[left] - positions[right]"
+        - "Or: distance = left - right (using indices instead of values)"
+      
+      execution_trace:
+        - "Distance values are negative"
+        - "Comparison logic fails because distance is backwards"
+    
+    teaching_moment:
+      title: "Distance Formula Is Backwards"
+      
+      explanation: |
+        You're calculating: distance = positions[left] - positions[right]
+        
+        But since the array is sorted and left < right, we have:
+        positions[left] < positions[right]
+        
+        So your distance is NEGATIVE!
+        
+        Example with your code:
+        positions[left] = 100
+        positions[right] = 350
+        Your calculation: 100 - 350 = -250 ❌
+        
+        Correct: distance = positions[right] - positions[left]
+        Correct calculation: 350 - 100 = 250 ✓
+      
+      visual:
+        type: "number-line"
+        show: |
+          [Number line with positions marked]
+          
+          positions[left]=100           positions[right]=350
+               ↓                                ↓
+          ─────●────────────────────────────────●─────→
+               
+          Distance = RIGHT - LEFT = 350 - 100 = 250 ✓
+          Not: LEFT - RIGHT = 100 - 350 = -250 ❌
+      
+      fix: |
+        Change:
+          distance = positions[left] - positions[right]
+        To:
+          distance = positions[right] - positions[left]
+
+  - id: "comparing-indices-instead-of-values"
+    severity: medium
+    category: "implementation-error"
+    
+    description: "Calculating distance using indices (right - left) instead of position values"
+    
+    detection:
+      code_analysis:
+        - "Look for: distance = right - left"
+        - "Instead of: distance = positions[right] - positions[left]"
+      
+      symptom:
+        - "Distance is always very small (index difference)"
+        - "Never finds pairs unless target happens to match index difference"
+    
+    teaching_moment:
+      title: "You're Using Indices, Not Position Values!"
+      
+      explanation: |
+        You calculated: distance = right - left
+        This is the difference between INDICES, not asteroid POSITIONS!
+        
+        Example:
+        positions = [100, 250, 350, 500, 750]
+        left = 0, right = 2
+        
+        Your calculation: right - left = 2 - 0 = 2
+        This is the index difference!
+        
+        Correct: positions[right] - positions[left] = 350 - 100 = 250
+        This is the actual distance between asteroids!
+      
+      visual:
+        type: "index-vs-value"
+        show: |
+          Index:     0    1    2    3    4
+          Value:   100  250  350  500  750
+                    ↑              ↑
+                  left=0       right=2
+          
+          Index difference: 2 - 0 = 2 ❌
+          Value difference: 350 - 100 = 250 ✓
+      
+      fix: |
+        Change:
+          distance = right - left
+        To:
+          distance = positions[right] - positions[left]
+
+  - id: "not-checking-all-pairs"
+    severity: low
+    category: "early-termination"
+    
+    description: "Returning null/None too early, before checking all pairs"
+    
+    detection:
+      execution_trace:
+        - "Pointers did not meet (left < right when terminated)"
+        - "Valid pair exists but was not found"
+        - "Loop terminated early"
+    
+    teaching_moment:
+      title: "You Stopped Searching Too Early"
+      
+      explanation: |
+        Your pointers stopped at:
+        left = {left_idx}, right = {right_idx}
+        
+        But left < right, meaning there are still pairs to check!
+        
+        A valid pair exists at positions [{solution_left}, {solution_right}]
+        but your code stopped before reaching it.
+      
+      rule: |
+        Continue until: left >= right
+        
+        When left >= right, you've checked all possible pairs.
+        Only then can you safely return None/null.
+      
+      fix: |
+        Check your loop condition:
+        while left < right:  ✓ Correct
+            # your code
+        
+        Don't exit early unless you've found the answer!
+
+  - id: "infinite-loop-both-pointers"
+    severity: high
+    category: "logic-error"
+    
+    description: "Moving both pointers in the same iteration, or not moving any pointer"
+    
+    detection:
+      execution_trace:
+        - "Both left and right changed in same iteration"
+        - "Or: Neither pointer changed (infinite loop)"
+        - "Number of iterations >> array length"
+    
+    teaching_moment:
+      title: "Move ONE Pointer Per Iteration"
+      
+      explanation: |
+        Two Pointers works by moving ONE pointer at a time, based on comparison.
+        
+        You're either:
+        1. Moving both pointers (skipping possible pairs), or
+        2. Moving neither pointer (infinite loop!)
+      
+      correct_pattern: |
+        if distance == target:
+            return found pair
+        elif distance < target:
+            left += 1         # Move ONLY left
+        else:
+            right -= 1        # Move ONLY right
+        
+        Exactly ONE pointer moves per iteration.
+      
+      why_this_matters: |
+        - Moving both: might skip over the answer
+        - Moving neither: infinite loop, program hangs
+        - Moving one: guarantees O(n) and checks all pairs
+
+mistake_categories:
+  wrong_pattern:
+    - brute-force-nested-loops
+  
+  pattern_misunderstanding:
+    - moving-wrong-pointer
+  
+  implementation_error:
+    - wrong-distance-formula
+    - comparing-indices-instead-of-values
+  
+  logic_error:
+    - not-checking-all-pairs
+    - infinite-loop-both-pointers
+
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-nested-loops"
+      teaching: "Introduce Two Pointers concept"
+    
+    - stage: 2
+      mistake: "moving-wrong-pointer"
+      teaching: "Explain distance comparison logic"
+    
+    - stage: 3
+      mistake: "wrong-distance-formula or comparing-indices-instead-of-values"
+      teaching: "Clarify position values vs indices"
+    
+    - stage: 4
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try harder Two Pointers problems"
+
+teaching_strategies:
+  for_brute_force_users:
+    - "Acknowledge correctness of their solution"
+    - "Show complexity comparison with visual"
+    - "Explain how sorting enables optimization"
+    - "Provide hint about starting at opposite ends"
+  
+  for_wrong_pointer_movers:
+    - "Walk through specific example step-by-step"
+    - "Show both moves side-by-side"
+    - "State the rule explicitly"
+    - "Provide practice question"
+  
+  for_implementation_errors:
+    - "Point out exact line with error"
+    - "Show what they calculated vs what they should calculate"
+    - "Provide visual (number line or index vs value table)"
+    - "Give corrected code snippet"

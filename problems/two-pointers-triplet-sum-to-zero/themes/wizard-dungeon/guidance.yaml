@@ -1,0 +1,97 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Wizard's Dungeon theme for Two Pointers: Triplet Sum to Zero (3Sum)
+
+title: "Two Pointers - The Null-Field Ward"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "Sort the spell components first -- this is the foundation for everything that follows"
+    - text: "3Sum reduces to 2Sum: fix one component (anchor), then find two others that cancel it"
+    - text: "For each anchor, the inner search is exactly Pair with Target Sum (target = -anchor)"
+    - text: "Two levels of duplicate skipping are essential: skip duplicate anchors AND skip duplicate pairs"
+    - text: "Time complexity: O(n^2) -- sorting is O(n log n), dominated by the nested loop structure"
+    - text: "Space complexity: O(n) for sorting + output storage"
+    - text: "Early termination: if the anchor charge is positive, no further wards are possible"
+
+  common_mistakes:
+    - text: "Don't use triple nested loops -- that's O(n^3) brute force and the traps won't wait"
+    - text: "Don't forget to sort first -- Two Pointers and duplicate skipping both depend on sorted order"
+    - text: "Don't skip only one level of duplicates -- you need to skip duplicate anchors AND duplicate pairs"
+    - text: "Don't return after the first triplet -- you must collect ALL valid wards"
+    - text: "Don't forget to advance BOTH pointers after finding a match -- advancing only one wastes iterations"
+    - text: "Don't use a set for deduplication instead of skip logic -- it works but is slower and obscures the pattern"
+
+  real_world:
+    - text: |
+        Game Development: Spell Combination Systems
+
+        In RPG and strategy games, players often need to combine items or
+        abilities that satisfy constraints (e.g., three enchantments that
+        balance elemental affinities). When the game's item database is sorted
+        by a numeric property, the sort + fix-one + Two Pointers pattern
+        provides an efficient way to enumerate all valid combinations.
+        This same approach powers combo-finding systems in card games like
+        Hearthstone and Magic: The Gathering's deck-builder tools.
+
+    - text: |
+        Computational Chemistry: Charge Neutralisation
+
+        In molecular simulation, finding sets of atoms or ions whose charges
+        cancel to zero is a fundamental task for building electrically neutral
+        unit cells. Crystallography software uses similar algorithms to
+        enumerate charge-balanced combinations from sorted lists of ionic
+        species. The O(n^2) complexity makes this feasible even for large
+        databases of candidate ions.
+
+    - text: |
+        Signal Processing: Destructive Interference
+
+        In audio engineering and telecommunications, finding frequency
+        components that destructively interfere (cancel to zero amplitude)
+        uses the same mathematical structure. Engineers search sorted
+        frequency tables for triplets that sum to zero -- enabling noise
+        cancellation, beam-forming, and interference mitigation.
+
+  solution_approach:
+    steps:
+      - "Sort the array of spell components by charge"
+      - "For each component i (the anchor), from index 0 to n-3:"
+      - "  Skip if nums[i] == nums[i-1] (duplicate anchor)"
+      - "  Break if nums[i] > 0 (early termination -- all positive)"
+      - "  Set left = i+1, right = n-1"
+      - "  While left < right:"
+      - "    Calculate sum = nums[i] + nums[left] + nums[right]"
+      - "    If sum == 0: record triplet, skip duplicate lefts and rights, advance both"
+      - "    If sum < 0: advance left (need more charge)"
+      - "    If sum > 0: retreat right (need less charge)"
+      - "Return all collected triplets"
+
+complexity:
+  time: "O(n^2)"
+  space: "O(n)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Pair with Target Sum (Two Pointers)"
+      invariants_shared: ["sorted input", "opposite-end pointers", "sum comparison"]
+      difference: "2Sum finds ONE pair; 3Sum fixes one element and runs 2Sum for every element"
+      modification: "Wrap the 2Sum logic in an outer loop with duplicate skipping"
+
+    - name: "Pair with Target Difference"
+      invariants_shared: ["sorted input", "two pointers"]
+      difference: "Difference uses same-end pointers; sum uses opposite-end pointers"
+
+    - name: "4Sum (Quadruple Sum)"
+      invariants_shared: ["sort first", "fix-and-reduce pattern", "duplicate skipping"]
+      modification: "Fix TWO elements in nested outer loops, then run Two Pointers -- O(n^3)"
+
+    - name: "3Sum Closest"
+      invariants_shared: ["sort first", "fix one + Two Pointers inner loop"]
+      difference: "Instead of finding exact zero sum, track the closest sum to a target"
+      modification: "Track min_diff and update when a closer sum is found"
+
+    - name: "3Sum Smaller"
+      invariants_shared: ["sort first", "fix one + Two Pointers"]
+      difference: "Count triplets with sum less than target instead of equal to zero"
+      modification: "When sum < target, all pairs between left and right are valid -- count them"

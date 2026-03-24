@@ -1,0 +1,412 @@
+# mistakes.yaml - Common Errors Catalog
+# Finance & Trading theme for Two Pointers: Pair with Target Sum
+
+pattern: two-pointers
+problem_id: two-pointers-pair-with-target-sum
+
+common_mistakes:
+  - id: "brute-force-nested-loops"
+    severity: high
+    category: "wrong-pattern"
+
+    description: "Using nested loops to check all pairs of assets instead of Two Pointers"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Outer loop: for i in range(len(nums))
+        - Inner loop: for j in range(i+1, len(nums))
+        - Calculate sum for each pair
+        - Total iterations: n*(n-1)/2
+
+      complexity_analysis:
+        time: "O(n^2)"
+        space: "O(1)"
+
+      code_pattern:
+        - "Nested for loops"
+        - "Both loops iterate over nums array"
+        - "No pointer variables named 'left' and 'right'"
+
+    why_students_do_this: |
+      This is the intuitive first approach -- "just check every pair of assets."
+      It works correctly but is far too slow for a production trading system
+      where the watchlist can have tens of thousands of instruments.
+
+    teaching_moment:
+      title: "Brute Force Works, But the Market Won't Wait"
+
+      explanation: |
+        Your solution correctly finds the pair, but it checks all possible
+        combinations -- that's O(n^2).
+
+        For a watchlist with 10,000 instruments:
+        - Your approach: ~50,000,000 comparisons
+        - Two Pointers: ~10,000 comparisons
+
+        In a live trading environment, that's the difference between
+        executing in microseconds vs. seconds. The sorted watchlist gives
+        you a massive shortcut -- use it.
+
+      hint: |
+        Think about this: if the cheapest asset plus the most expensive asset
+        is over budget, do you really need to check the most expensive asset
+        with every other asset? Or can you eliminate it entirely by moving
+        to the next cheapest option?
+
+      next_step: |
+        Try implementing Two Pointers:
+        1. Start with left = 0 (cheapest), right = len(nums) - 1 (most expensive)
+        2. Calculate nums[left] + nums[right]
+        3. Compare to target: too high? Move right down. Too low? Move left up.
+        4. Repeat until pointers meet.
+
+  - id: "pointers-same-direction"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Starting both pointers from the same end (left side) -- correct for DIFFERENCE but wrong for SUM"
+
+    detection:
+      code_analysis:
+        - "Look for: left = 0, right = 1"
+        - "Or: both pointers initialized at the start of the array"
+
+      execution_trace:
+        - "Both pointers move rightward"
+        - "Misses valid pairs where one element is near the start and the other near the end"
+
+    why_students_do_this: |
+      Students who have seen the Pair Distance problem (which uses two
+      pointers from the same end) apply the same initialization here.
+      But SUM and DIFFERENCE require different pointer setups.
+
+    teaching_moment:
+      title: "Sum vs. Difference: Different Starting Positions"
+
+      explanation: |
+        For DIFFERENCE (right - left): both pointers start from the left
+        because moving right forward increases the difference.
+
+        For SUM (left + right): pointers start at opposite ends because:
+        - Moving left right increases the sum (picks a bigger left value)
+        - Moving right left decreases the sum (picks a smaller right value)
+
+        Starting both from the left for a SUM problem means you begin with
+        the two smallest assets -- you can only increase the sum from there,
+        and you lose the ability to decrease it.
+
+      hint: |
+        Think of it like a budget dial. For SUM, you need two knobs going
+        in opposite directions: one increasing, one decreasing. Starting at
+        opposite ends gives you both controls.
+
+      next_step: |
+        Change your initialization:
+        - FROM: left = 0, right = 1
+        - TO:   left = 0, right = len(nums) - 1
+        Then adjust your pointer movement logic for sum comparison.
+
+  - id: "moving-wrong-pointer"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Moving the wrong pointer based on sum comparison -- e.g., moving right when sum is too small"
+
+    detection:
+      specific_patterns:
+        - pattern: "sum < target AND right moved left"
+          explanation: "Should increase sum, but decreased it by picking a cheaper right asset"
+
+        - pattern: "sum > target AND left moved right"
+          explanation: "Should decrease sum, but increased it by picking a pricier left asset"
+
+    why_students_do_this: |
+      Students often confuse which direction to adjust. They might think:
+      "Sum is too small, so I need to look at smaller numbers" -- but that's
+      backwards. If you're under budget, you need MORE expensive assets.
+
+    teaching_moment:
+      title: "You Adjusted the Wrong Side of the Trade"
+
+      explanation: |
+        Your portfolio allocation is under/over budget, but you moved the
+        wrong pointer, making it worse.
+
+        Simple rule for SUM problems:
+        - Sum < Target (under budget): Need MORE money in play.
+          Move LEFT pointer RIGHT to pick a pricier asset. (left += 1)
+        - Sum > Target (over budget): Need LESS money in play.
+          Move RIGHT pointer LEFT to pick a cheaper asset. (right -= 1)
+
+        Memory trick: "Under budget? Go up (left moves right to higher prices).
+        Over budget? Come down (right moves left to lower prices)."
+
+      hint: |
+        If nums[left] + nums[right] = $5M but your budget is $8M, you need
+        $3M more exposure. Moving left right picks the next higher-priced
+        asset, increasing the sum toward your target.
+
+      next_step: |
+        Review your if/elif/else block:
+        - sum == target --> return the pair
+        - sum < target --> left += 1 (need bigger sum)
+        - sum > target --> right -= 1 (need smaller sum)
+
+  - id: "using-indices-instead-of-values"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Computing left + right (index sum) instead of nums[left] + nums[right] (price sum)"
+
+    detection:
+      code_analysis:
+        - "Look for: current_sum = left + right"
+        - "Instead of: current_sum = nums[left] + nums[right]"
+
+      execution_trace:
+        - "Sum values are suspiciously small (index values, not asset prices)"
+        - "Comparison logic produces wrong results"
+
+    why_students_do_this: |
+      A common slip -- writing left + right when you mean nums[left] + nums[right].
+      Easy to do when you're thinking about pointer positions rather than
+      the asset values at those positions.
+
+    teaching_moment:
+      title: "You're Adding Index Positions, Not Asset Prices"
+
+      explanation: |
+        You calculated: sum = left + right
+
+        But left and right are INDICES (positions in the array), not asset prices!
+
+        Example:
+        nums = [1, 2, 3, 4, 6], left = 0, right = 4
+        Your calculation: 0 + 4 = 4 (index sum)
+        Correct:          nums[0] + nums[4] = 1 + 6 = 7 (price sum)
+
+        It's like adding the line numbers on a Bloomberg terminal instead
+        of the actual stock prices.
+
+      hint: |
+        The pointers are addresses. The values at those addresses are the
+        prices. You want to sum the prices: nums[left] + nums[right].
+
+      next_step: |
+        Change:
+          current_sum = left + right
+        To:
+          current_sum = nums[left] + nums[right]
+
+  - id: "off-by-one-loop-condition"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Using left <= right instead of left < right, allowing an asset to be paired with itself"
+
+    detection:
+      code_analysis:
+        - "Look for: while left <= right"
+        - "Instead of: while left < right"
+
+      execution_trace:
+        - "Same index used for both positions (left == right)"
+        - "Returns a pair like [4, 4] from a single $4M position"
+
+    why_students_do_this: |
+      Binary search uses <= so students carry it over. But in pair-finding,
+      you need TWO distinct positions -- you can't buy the same lot twice.
+
+    teaching_moment:
+      title: "You Can't Fill Two Slots With One Position"
+
+      explanation: |
+        Your loop condition allows left == right, which means the same asset
+        fills both allocation slots. That's not a valid pair -- compliance
+        requires two distinct positions.
+
+        With left <= right:
+        nums = [1, 2, 4, 4], target = 8
+        When left = right = 2: nums[2] + nums[2] = 4 + 4 = 8
+        But this is the SAME position counted twice!
+
+        With left < right:
+        The loop stops before this happens. The valid pair [4, 4] would
+        be found with left = 2, right = 3 (two DIFFERENT positions that
+        happen to have the same price).
+
+      hint: |
+        Use strict less-than: while left < right.
+        When left equals right, there's only one asset left -- you can't
+        make a pair from it.
+
+      next_step: |
+        Change:
+          while left <= right:
+        To:
+          while left < right:
+
+  - id: "returning-indices-instead-of-values"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Returning [left, right] (indices) instead of [nums[left], nums[right]] (prices)"
+
+    detection:
+      code_analysis:
+        - "Look for: return [left, right]"
+        - "Instead of: return [nums[left], nums[right]]"
+
+      execution_trace:
+        - "Return values are small integers that look like indices"
+        - "For nums = [1, 2, 3, 4, 6] with target 6, returns [1, 3] instead of [2, 4]"
+
+    why_students_do_this: |
+      Some problem variants ask for indices. This problem asks for VALUES.
+      Students mix up the two, especially if they've recently solved a
+      LeetCode version that returns indices.
+
+    teaching_moment:
+      title: "The Desk Wants Prices, Not Row Numbers"
+
+      explanation: |
+        You returned the positions (indices) in the watchlist, but the
+        function should return the actual asset prices.
+
+        Example:
+        nums = [1, 2, 3, 4, 6], target = 6
+        Your return:  [1, 3]      -- these are indices
+        Correct:      [2, 4]      -- these are the prices at those indices
+
+        In a trading system, the execution engine needs the prices to
+        place orders, not the row numbers on your screen.
+
+      hint: |
+        Return the values, not the indices: [nums[left], nums[right]]
+
+      next_step: |
+        Change:
+          return [left, right]
+        To:
+          return [nums[left], nums[right]]
+
+  - id: "hash-map-instead-of-two-pointers"
+    severity: low
+    category: "suboptimal-pattern"
+
+    description: "Using a hash map to find the complement -- correct but uses O(n) extra space"
+
+    detection:
+      code_analysis:
+        - "Look for: dictionary/object/set creation"
+        - "Storing seen values in a hash map"
+        - "Checking if target - current exists in the map"
+
+      complexity_analysis:
+        time: "O(n)"
+        space: "O(n)"
+
+    why_students_do_this: |
+      The hash map approach is the standard Two Sum solution and works for
+      unsorted arrays. Students default to it because it's the first
+      approach they learned, not realizing that sorted data enables a
+      more space-efficient solution.
+
+    teaching_moment:
+      title: "Your Solution Works, But You're Paying for Memory You Don't Need"
+
+      explanation: |
+        Your hash map approach is O(n) time -- great! But it uses O(n)
+        extra space for the hash map.
+
+        Since the watchlist is already sorted, Two Pointers achieves the
+        same O(n) time with O(1) space -- just two variables.
+
+        In a production trading system, less memory means:
+        - Fewer garbage collection pauses
+        - More predictable latency
+        - Better cache utilization
+        - Lower infrastructure costs at scale
+
+      hint: |
+        The sorted watchlist is a gift -- it tells you which direction to
+        search. You don't need to remember every price you've seen when
+        the ordering already encodes that information.
+
+      next_step: |
+        Try the Two Pointers approach:
+        1. left = 0, right = len(nums) - 1
+        2. Compare nums[left] + nums[right] to target
+        3. Adjust one pointer based on the comparison
+        No hash map needed!
+
+# Categorize mistakes for analysis
+mistake_categories:
+  wrong_pattern:
+    - brute-force-nested-loops
+
+  pattern_misunderstanding:
+    - pointers-same-direction
+    - moving-wrong-pointer
+
+  implementation_error:
+    - using-indices-instead-of-values
+    - off-by-one-loop-condition
+    - returning-indices-instead-of-values
+
+  suboptimal_pattern:
+    - hash-map-instead-of-two-pointers
+
+# Expected learning progression
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-nested-loops"
+      teaching: "Introduce Two Pointers concept -- the sorted watchlist is the key"
+
+    - stage: 2
+      mistake: "pointers-same-direction"
+      teaching: "Clarify SUM vs DIFFERENCE pointer initialization"
+
+    - stage: 3
+      mistake: "moving-wrong-pointer"
+      teaching: "Explain sum comparison logic -- under budget go up, over budget come down"
+
+    - stage: 4
+      mistake: "using-indices-instead-of-values or returning-indices-instead-of-values"
+      teaching: "Distinguish index positions from asset prices"
+
+    - stage: 5
+      mistake: "off-by-one-loop-condition"
+      teaching: "Strict less-than prevents self-pairing"
+
+    - stage: 6
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try Three Sum -- fix one element and run Two Pointers on the rest"
+
+# Teaching strategies by mistake type
+teaching_strategies:
+  for_brute_force_users:
+    - "Acknowledge correctness of their solution"
+    - "Show complexity comparison: 50M vs 10K comparisons for a 10K-instrument watchlist"
+    - "Explain how sorting enables elimination of impossible pairs"
+    - "Provide the budget metaphor: over budget = go cheaper, under budget = go pricier"
+
+  for_wrong_pointer_direction:
+    - "Walk through specific example step-by-step with real prices"
+    - "Show both the student's move and the correct move side-by-side"
+    - "State the rule: under budget = left++, over budget = right--"
+    - "Contrast SUM setup (opposite ends) with DIFFERENCE setup (same end)"
+
+  for_implementation_errors:
+    - "Point out exact line with error"
+    - "Show what they computed vs what they should have computed"
+    - "Use the financial analogy: indices are row numbers, values are prices"
+    - "Give corrected code snippet"
+
+  for_suboptimal_pattern:
+    - "Praise the correct time complexity"
+    - "Explain the space efficiency advantage of Two Pointers"
+    - "Connect to production trading concerns: GC pauses, cache behavior, latency"
+    - "Show how sorted data makes the hash map unnecessary"

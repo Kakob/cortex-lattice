@@ -1,0 +1,310 @@
+pattern: two-pointers
+problem_id: two-pointers-microservice-resource-pairing
+
+# This file catalogs common mistakes students make when solving this problem.
+# For each mistake, we define:
+# 1. How to detect it from execution trace
+# 2. What teaching moment to provide
+# 3. Themed context for the Software Engineering scenario
+
+common_mistakes:
+  - id: "brute-force-nested-loops"
+    severity: high
+    category: "wrong-pattern"
+
+    description: "Using nested loops to check all service pairs instead of Two Pointers"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Outer loop: for i in range(len(nums))
+        - Inner loop: for j in range(i+1, len(nums))
+        - Calculate sum for each pair
+        - Total iterations: n*(n-1)/2
+
+      complexity_analysis:
+        time: "O(n^2)"
+        space: "O(1)"
+
+      code_pattern:
+        - "Nested for loops"
+        - "Both loops iterate over nums array"
+        - "No pointer variables named 'left' and 'right'"
+
+    why_students_do_this: |
+      This is the intuitive first approach — "just check every pair of services."
+      It works correctly but is far too slow for production service fleets with
+      thousands of entries. In a real deployment pipeline, an O(n^2) scan would
+      blow past the maintenance window.
+
+    teaching_moment:
+      title: "Brute Force Works, But Two Pointers Is Production-Grade"
+
+      explanation: |
+        Your solution correctly checks all pairs, but it's O(n^2).
+
+        For a fleet of 1,000 microservices:
+        - Your approach: ~500,000 comparisons
+        - Two Pointers: ~1,000 comparisons
+
+        In a CI/CD pipeline with a 30-second deployment window, Two Pointers
+        finishes instantly while brute force could cause a timeout. The sorted
+        manifest gives you the information you need to skip impossible pairs.
+
+      hint: |
+        Think about this: when the combined utilization of the lowest and highest
+        services overshoots the target, do you really need to pair the highest
+        service with every other service? Or can you rule out all of those
+        pairings at once by moving the right pointer left?
+
+      next_step: |
+        Try implementing Two Pointers:
+        1. Start with left=0 (lowest utilization), right=n-1 (highest utilization)
+        2. Compute current_sum = nums[left] + nums[right]
+        3. Compare to target and move ONE pointer
+        4. Repeat until pointers converge
+
+  - id: "moving-wrong-pointer"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Moving the wrong pointer based on the sum comparison"
+
+    detection:
+      logic: |
+        At each step:
+        1. Calculate current_sum = nums[left] + nums[right]
+        2. Determine what should happen:
+           - If current_sum < target: should move left RIGHT (increase sum)
+           - If current_sum > target: should move right LEFT (decrease sum)
+        3. Check what actually happened in trace
+        4. If opposite move detected: FLAG this mistake
+
+      specific_patterns:
+        - pattern: "sum < target AND right moved left"
+          explanation: "Should increase sum, but decreased it"
+
+        - pattern: "sum > target AND left moved right"
+          explanation: "Should decrease sum, but increased it"
+
+    why_students_do_this: |
+      Students often reverse the logic. They think: "Sum is too small, so the
+      right pointer must be too far right — move it left." But that makes the
+      sum even smaller, pushing it further from the target.
+
+    teaching_moment:
+      title: "You Moved the Wrong Pointer — the Rebalance Went the Wrong Way"
+
+      explanation: |
+        Think of it like adjusting a load balancer:
+
+        nums[left] is the low-utilization service.
+        nums[right] is the high-utilization service.
+        Their combined load is {current_sum}, but the target is {target}.
+
+        If combined load < target:
+          You need MORE capacity. Swap in a busier service from the left.
+          Move left pointer RIGHT.
+
+        If combined load > target:
+          You need LESS capacity. Swap in a lighter service from the right.
+          Move right pointer LEFT.
+
+      hint: |
+        Simple rule:
+        - Sum too small: move LEFT pointer right (bigger value increases sum)
+        - Sum too large: move RIGHT pointer left (smaller value decreases sum)
+
+      next_step: |
+        Trace through this example manually:
+        nums = [1, 2, 3, 4, 6], target = 6
+        Start: left=0 (value 1), right=4 (value 6), sum=7
+        7 > 6, so which pointer should move?
+
+  - id: "starting-pointers-same-end"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Starting both pointers at the left end (correct for DIFFERENCE, wrong for SUM)"
+
+    detection:
+      code_analysis:
+        - "Look for: left = 0, right = 1"
+        - "Instead of: left = 0, right = len(nums) - 1"
+
+      execution_trace:
+        - "Both pointers start at low indices"
+        - "Algorithm fails to find pairs involving elements at the end of the array"
+
+    why_students_do_this: |
+      Students who have seen the "Pair with Target Difference" problem may
+      reuse its pointer initialization. For differences, both pointers start at
+      the left because you need right - left (both moving forward increases the
+      gap). For sums, you need opposite ends so you can adjust the sum up or down.
+
+    teaching_moment:
+      title: "Wrong Initialization — SUM vs DIFFERENCE Use Different Starting Points"
+
+      explanation: |
+        For DIFFERENCE problems (e.g., finding a latency gap):
+          Both pointers start from the left: left=0, right=1
+          Moving right forward increases the difference.
+
+        For SUM problems (e.g., finding a combined capacity):
+          Pointers start at OPPOSITE ENDS: left=0, right=n-1
+          This gives you control to increase or decrease the sum.
+
+        If both start at the left for a SUM problem, you can only increase
+        the sum — you have no way to decrease it. You lose half your
+        search capability.
+
+      hint: |
+        Ask yourself: "Am I looking for a + b == target, or a - b == target?"
+        - SUM (a + b): opposite ends, converge inward
+        - DIFFERENCE (a - b): same end, expand outward
+
+      next_step: |
+        Change your initialization:
+        Before:  left = 0, right = 1
+        After:   left = 0, right = len(nums) - 1
+
+  - id: "using-indices-instead-of-values"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Calculating sum using indices (left + right) instead of array values (nums[left] + nums[right])"
+
+    detection:
+      code_analysis:
+        - "Look for: current_sum = left + right"
+        - "Instead of: current_sum = nums[left] + nums[right]"
+
+      symptom:
+        - "Sum values are suspiciously small (index values, not utilization scores)"
+        - "Algorithm produces wrong results for all but trivially indexed inputs"
+
+    teaching_moment:
+      title: "You Are Summing Index Positions, Not Utilization Scores"
+
+      explanation: |
+        You calculated: current_sum = left + right
+        This sums the INDEX positions in the manifest, not the actual
+        CPU utilization values of the services!
+
+        Example:
+        nums = [1, 2, 3, 4, 6]
+        left = 1, right = 3
+
+        Your calculation: left + right = 1 + 3 = 4
+        This is the sum of array indices!
+
+        Correct: nums[left] + nums[right] = nums[1] + nums[3] = 2 + 4 = 6
+        This is the actual combined utilization!
+
+      hint: |
+        Change:
+          current_sum = left + right
+        To:
+          current_sum = nums[left] + nums[right]
+
+      next_step: |
+        Remember: left and right are pointers (indices into the array).
+        The VALUES you care about are nums[left] and nums[right].
+
+  - id: "off-by-one-loop-condition"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Using left <= right instead of left < right, allowing a service to pair with itself"
+
+    detection:
+      code_analysis:
+        - "Look for: while left <= right"
+        - "Instead of: while left < right"
+
+      execution_trace:
+        - "Loop runs an extra iteration when left == right"
+        - "May return [nums[i], nums[i]] for a single element that is target/2"
+
+    teaching_moment:
+      title: "A Service Cannot Be Co-Located With Itself"
+
+      explanation: |
+        Your loop condition allows left == right, which means you are
+        checking if a single service's utilization, doubled, equals the target.
+        But you need TWO DIFFERENT services for co-location.
+
+        Example:
+        nums = [1, 3, 5], target = 6
+        When left = right = 1, you check: nums[1] + nums[1] = 3 + 3 = 6
+        This incorrectly "pairs" the same service with itself!
+
+        Unless nums actually contains two separate entries with value 3
+        (like [1, 3, 3, 5]), this is a false match.
+
+      hint: |
+        Change your loop condition:
+        Before:  while left <= right
+        After:   while left < right
+
+        The strict inequality ensures left and right always point to
+        different services in the manifest.
+
+      next_step: |
+        Check: does your code handle the duplicate-values test case correctly?
+        nums = [1, 2, 4, 4], target = 8
+        Here left=2 and right=3 are different indices pointing to different
+        entries that both happen to have value 4. That IS a valid pair.
+
+mistake_categories:
+  wrong_pattern:
+    - brute-force-nested-loops
+
+  pattern_misunderstanding:
+    - moving-wrong-pointer
+    - starting-pointers-same-end
+
+  implementation_error:
+    - using-indices-instead-of-values
+    - off-by-one-loop-condition
+
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-nested-loops"
+      teaching: "Introduce Two Pointers concept and sorted-array exploitation"
+
+    - stage: 2
+      mistake: "starting-pointers-same-end"
+      teaching: "Clarify SUM vs DIFFERENCE pointer initialization"
+
+    - stage: 3
+      mistake: "moving-wrong-pointer"
+      teaching: "Explain sum comparison logic — bigger sum needs right to move left"
+
+    - stage: 4
+      mistake: "using-indices-instead-of-values or off-by-one-loop-condition"
+      teaching: "Fix implementation details — indices vs values, strict inequality"
+
+    - stage: 5
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try Three Sum or Container With Most Water"
+
+teaching_strategies:
+  for_brute_force_users:
+    - "Acknowledge correctness of their solution"
+    - "Show complexity comparison: 500,000 vs 1,000 comparisons for n=1,000 services"
+    - "Explain how the sorted manifest enables skipping impossible pairs"
+    - "Provide hint about starting at opposite ends"
+
+  for_wrong_pointer_movers:
+    - "Walk through the [1, 2, 3, 4, 6] example step-by-step"
+    - "Show both pointer moves side-by-side: wrong vs correct"
+    - "Use the load balancer analogy: too heavy? lighten the right side"
+    - "Provide the simple rule: small sum -> move left right, big sum -> move right left"
+
+  for_implementation_errors:
+    - "Point out exact line with error"
+    - "Show what they calculated vs what they should calculate"
+    - "Provide index-vs-value table visualization"
+    - "Give corrected code snippet"

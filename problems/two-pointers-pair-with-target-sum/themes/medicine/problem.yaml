@@ -1,0 +1,124 @@
+# Clinical Medicine theme for Two Pointers - Pair with Target Sum
+
+title: "Drug Combination Therapy Lookup"
+function_name: find_dosage_pair
+
+description: |
+  You are a clinical pharmacist working with an electronic formulary system.
+  A physician has ordered a combination therapy requiring two drugs whose
+  dosages must sum to a precise therapeutic target (measured in mg).
+
+  The hospital formulary lists available dosage strengths in ascending order.
+  Your task is to identify two dosage values from the formulary that combine
+  to reach the prescribed therapeutic target exactly.
+
+  Given a sorted array of available dosage strengths (`nums`) and a
+  therapeutic target (`target`), find two dosages that sum to the target.
+  Return the pair as [dosage1, dosage2]. If no valid combination exists,
+  return None — the physician must revise the order.
+
+story_context: |
+  In clinical practice, combination drug therapy is common: two agents with
+  complementary mechanisms are co-administered to reach a total effective dose.
+  The formulary only stocks certain dosage strengths, so the pharmacist must
+  find a valid pair from what is available. Getting the total dose wrong risks
+  therapeutic failure (underdosing) or adverse drug reactions (overdosing).
+
+  This scenario mirrors real pharmaceutical workflows: formulary lookup,
+  dose titration, and therapeutic drug monitoring all rely on searching
+  sorted datasets efficiently.
+
+examples:
+  - input:
+      nums: [1, 2, 3, 4, 6]
+      target: 6
+    output: [2, 4]
+    explanation: |
+      The formulary stocks strengths of 1 mg, 2 mg, 3 mg, 4 mg, and 6 mg.
+      The therapeutic target is 6 mg total. Combining the 2 mg and 4 mg
+      dosage forms yields exactly 6 mg (2 + 4 = 6).
+
+  - input:
+      nums: [2, 5, 9, 11]
+      target: 13
+    output: [2, 11]
+    explanation: |
+      Available strengths are 2, 5, 9, and 11 mg. The target is 13 mg.
+      The 2 mg and 11 mg tablets combine to 13 mg (2 + 11 = 13).
+      This pair uses the lowest and highest available strengths.
+
+  - input:
+      nums: [1, 2, 3, 9]
+      target: 8
+    output: null
+    explanation: |
+      No two dosage strengths in the formulary sum to 8 mg.
+      The pharmacist must notify the prescriber that this exact
+      combination cannot be filled from the current formulary.
+
+hints:
+  - level: 1
+    text: |
+      The formulary is sorted by dosage strength. Can you use that ordering
+      to avoid checking every possible pair? Think about what happens when
+      you combine the lowest and highest available doses.
+
+  - level: 2
+    text: |
+      Start with two pointers: one at the lowest dosage and one at the
+      highest. If their combined dose is too high, try a lower top dose.
+      If too low, try a higher bottom dose.
+
+  - level: 3
+    text: |
+      Initialize left=0 and right=len(nums)-1. Compute current_sum =
+      nums[left] + nums[right]. If current_sum == target, return the pair.
+      If current_sum < target, increment left. If current_sum > target,
+      decrement right. Repeat until the pointers meet.
+
+starter_code_python: |
+  def find_dosage_pair(nums, target):
+      """
+      Find two dosage strengths from a sorted formulary that sum to
+      the therapeutic target.
+
+      Args:
+          nums: List[int] - sorted list of available dosage strengths (mg)
+          target: int - required total therapeutic dose (mg)
+
+      Returns:
+          List[int] - [dosage1, dosage2] where dosage1 + dosage2 == target
+          None - if no valid combination exists in the formulary
+
+      Examples:
+          >>> find_dosage_pair([1, 2, 3, 4, 6], 6)
+          [2, 4]
+
+          >>> find_dosage_pair([1, 2, 3, 9], 8)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two dosage strengths from a sorted formulary that sum to
+   * the therapeutic target.
+   *
+   * @param {number[]} nums - sorted array of available dosage strengths (mg)
+   * @param {number} target - required total therapeutic dose (mg)
+   * @return {number[]|null} - [dosage1, dosage2] or null if no pair exists
+   */
+  function findDosagePair(nums, target) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Standard formulary lookup: 2 mg + 4 mg = 6 mg therapeutic target"
+  first-and-last: "Combination uses the lowest and highest strengths in the formulary"
+  duplicate-values: "Two identical dosage strengths (4 mg + 4 mg) meet the 8 mg target"
+  no-pair-exists: "No valid combination exists; prescriber must revise the order"
+  minimum-input: "Formulary has only two dosage options; the only possible pair"
+  negative-numbers: "Negative values represent dose reductions (e.g., antagonist offsets); -3 + 6 = 3"
+  large-values: "High-dose regimen: 9 mg + 11 mg = 20 mg total"
+  zero-target: "Net-zero therapeutic effect: -5 mg antagonist + 5 mg agonist = 0"

@@ -1,0 +1,82 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Wizard's Dungeon theme for Two Pointers: Pair with Target Sum
+
+title: "Two Pointers - The Runestone Lock"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "Your runestones are sorted by power -- this is the key that unlocks O(n)"
+    - text: "Start with one hand on the weakest stone and one on the mightiest"
+    - text: "If the combined charge is too low, the weaker stone must be swapped for a stronger one (advance left)"
+    - text: "If the combined charge is too high, the stronger stone must be swapped for a weaker one (retreat right)"
+    - text: "Time complexity: O(n) -- a single sweep through the satchel, not the O(n^2) brute-force fumbling"
+    - text: "Space complexity: O(1) -- you only need two fingers (pointers), not an enchanted ledger"
+
+  common_mistakes:
+    - text: "Don't try every pair like a panicking apprentice -- that's O(n^2) brute force and the ghouls won't wait"
+    - text: "Don't move both pointers at once -- move exactly ONE per iteration based on the sum comparison"
+    - text: "Don't use left <= right as the loop condition -- that risks pairing a runestone with itself"
+    - text: "Don't confuse indices with values: the sum is nums[left] + nums[right], not left + right"
+    - text: "Don't return None inside the loop -- only return None after the pointers have fully converged"
+
+  real_world:
+    - text: |
+        Dungeon Design and Game AI
+
+        In roguelike games and dungeon crawlers, enemies often need to find
+        pairs of items, positions, or abilities that satisfy a constraint
+        (e.g., two buffs that sum to a threshold). When the data is sorted --
+        such as a loot table ordered by item level -- Two Pointers provides
+        an O(n) lookup that keeps NPC decision-making fast even with
+        thousands of items in the world state.
+
+    - text: |
+        Financial Trading Systems
+
+        When order books are sorted by price, finding two orders whose
+        combined value meets a specific threshold uses the same Two Pointers
+        technique. High-frequency trading systems rely on this O(n) approach
+        because brute-force O(n^2) scans would miss fleeting opportunities.
+
+    - text: |
+        Chemistry and Molecular Docking
+
+        Computational chemistry tools search for pairs of molecular fragments
+        whose combined binding energy matches a target affinity. Fragment
+        libraries sorted by energy level enable the same converging-pointers
+        strategy to run in linear time.
+
+  solution_approach:
+    steps:
+      - "Initialize: left = 0 (weakest runestone), right = len(nums) - 1 (mightiest)"
+      - "While left < right (the two fingers haven't met):"
+      - "  Calculate: current_sum = nums[left] + nums[right]"
+      - "  If current_sum == target: return [nums[left], nums[right]] -- the vault opens!"
+      - "  If current_sum < target: left += 1 (swap the weak stone for a stronger one)"
+      - "  If current_sum > target: right -= 1 (swap the strong stone for a weaker one)"
+      - "If the loop ends without a match: return None -- no pair exists"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Two Pointers - Pair with Target Difference"
+      invariants_shared: ["sorted input", "pointer movement based on comparison"]
+      difference: "For difference problems, both pointers start from the left rather than opposite ends"
+      modification: "Advance the right pointer to increase the gap; advance the left to decrease it"
+
+    - name: "Container With Most Water"
+      invariants_shared: ["opposite-end initialisation", "single-direction movement"]
+      difference: "Move the pointer at the shorter height instead of using sum-based comparison"
+
+    - name: "Three Sum"
+      invariants_shared: ["sorted array enables elimination", "two-pointer inner loop"]
+      modification: "Fix one element, then run Two Pointers on the remainder -- O(n^2) total"
+
+    - name: "Two Sum (unsorted)"
+      invariants_shared: ["find pair summing to target"]
+      difference: "Without sorted input, use a hash map instead of Two Pointers"
+      modification: "Trade O(1) space for O(n) space to achieve O(n) time on unsorted data"

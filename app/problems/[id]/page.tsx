@@ -2,6 +2,7 @@
  * Problem Page - Dynamic route for individual problems
  *
  * Server component that loads problem data and renders the workspace.
+ * Accepts ?theme= query param to select a narrative theme.
  */
 
 import { notFound } from "next/navigation";
@@ -10,6 +11,7 @@ import { ProblemWorkspace } from "@/components/ProblemWorkspace";
 
 interface ProblemPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ theme?: string }>;
 }
 
 // Generate static params for all problems
@@ -21,9 +23,10 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: ProblemPageProps) {
+export async function generateMetadata({ params, searchParams }: ProblemPageProps) {
   const { id } = await params;
-  const problem = await loadProblem(id);
+  const { theme } = await searchParams;
+  const problem = await loadProblem(id, theme);
 
   if (!problem) {
     return {
@@ -37,18 +40,25 @@ export async function generateMetadata({ params }: ProblemPageProps) {
   };
 }
 
-export default async function ProblemPage({ params }: ProblemPageProps) {
+export default async function ProblemPage({ params, searchParams }: ProblemPageProps) {
   const { id } = await params;
+  const { theme } = await searchParams;
 
-  // Load problem and learning guide
+  // Load problem and learning guide with active theme
   const [problem, learningGuide] = await Promise.all([
-    loadProblem(id),
-    buildLearningGuide(id),
+    loadProblem(id, theme),
+    buildLearningGuide(id, theme),
   ]);
 
   if (!problem || !learningGuide) {
     notFound();
   }
 
-  return <ProblemWorkspace problem={problem} learningGuide={learningGuide} />;
+  return (
+    <ProblemWorkspace
+      problem={problem}
+      learningGuide={learningGuide}
+      themeId={problem.themeId}
+    />
+  );
 }

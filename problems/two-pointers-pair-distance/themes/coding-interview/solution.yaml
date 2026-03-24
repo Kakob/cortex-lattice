@@ -1,0 +1,96 @@
+# Coding Interview theme solution
+
+id: two-pointers-pair-distance
+pattern: two-pointers
+difficulty: easy
+
+solution_code_python: |
+  def find_pair_with_distance(positions, target_distance):
+      """
+      Optimal Two Pointers solution for finding a specific difference.
+      Time: O(n), Space: O(1)
+
+      Key insight: Both pointers start from the left and move forward.
+      - Move right to increase the difference
+      - Move left to decrease the difference
+      """
+      left = 0
+      right = 1
+
+      while right < len(positions):
+          current_distance = positions[right] - positions[left]
+
+          if current_distance == target_distance:
+              return [positions[left], positions[right]]
+          elif current_distance < target_distance:
+              right += 1
+          else:
+              left += 1
+              if left == right:
+                  right += 1
+
+      return None
+
+solution_code_javascript: |
+  function findPairWithDistance(positions, targetDistance) {
+      let left = 0;
+      let right = 1;
+
+      while (right < positions.length) {
+          const currentDistance = positions[right] - positions[left];
+
+          if (currentDistance === targetDistance) {
+              return [positions[left], positions[right]];
+          } else if (currentDistance < targetDistance) {
+              right++;
+          } else {
+              left++;
+              if (left === right) {
+                  right++;
+              }
+          }
+      }
+
+      return null;
+  }
+
+approach_explanation:
+  core_insight: |
+    Two Pointers works because the array is sorted. This sorted property
+    allows us to make greedy decisions that eliminate impossible pairs
+    without checking them.
+
+  step_by_step:
+    - step: 1
+      action: "Initialize left=0, right=1"
+      why: "Start with smallest gap, increase from there"
+
+    - step: 2
+      action: "Calculate distance = positions[right] - positions[left]"
+      why: "Compare current gap to target"
+
+    - step: 3
+      action: "Compare distance to target"
+      cases:
+        - "distance == target: Found it! Return the pair"
+        - "distance < target: Too small, advance right to increase"
+        - "distance > target: Too large, advance left to decrease"
+
+    - step: 4
+      action: "Repeat until right goes out of bounds"
+      why: "When right reaches the end, all pairs have been considered"
+
+alternative_solutions:
+  - name: "Brute Force"
+    approach: "Check all pairs with nested loops"
+    complexity:
+      time: "O(n^2)"
+      space: "O(1)"
+    when_to_use: "Never for this problem"
+
+  - name: "Hash Set"
+    approach: "For each element, check if complement exists in a set"
+    complexity:
+      time: "O(n)"
+      space: "O(n)"
+    when_to_use: "When input is not sorted"

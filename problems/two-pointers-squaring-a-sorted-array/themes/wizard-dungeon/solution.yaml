@@ -1,0 +1,385 @@
+id: two-pointers-squaring-a-sorted-array-wizard
+pattern: two-pointers
+difficulty: easy
+
+# The reference implementation - optimal Two Pointers solution
+# NOTE: For squaring a sorted array, pointers start at OPPOSITE ends
+#       and we fill the result array from the END (largest position) backward
+solution_code_python: |
+  def square_enchantments(nums):
+      """
+      Optimal Two Pointers solution for squaring a sorted array.
+      Time: O(n), Space: O(n) for the result array
+
+      Key insight: The largest squared value comes from whichever end
+      of the sorted rack has the greater absolute power. Fill the
+      result from right to left (largest to smallest).
+      """
+      n = len(nums)
+      result = [0] * n
+      left = 0
+      right = n - 1
+      pos = n - 1  # Fill from the end
+
+      while left <= right:
+          left_sq = nums[left] * nums[left]
+          right_sq = nums[right] * nums[right]
+
+          if left_sq > right_sq:
+              result[pos] = left_sq
+              left += 1    # This cursed rune had more power, move inward
+          else:
+              result[pos] = right_sq
+              right -= 1   # This blessed rune had more power, move inward
+
+          pos -= 1
+
+      return result
+
+solution_code_javascript: |
+  function squareEnchantments(nums) {
+      /**
+       * Optimal Two Pointers solution for squaring a sorted array.
+       * Time: O(n), Space: O(n) for the result array
+       *
+       * Key insight: The largest squared value comes from whichever end
+       * of the sorted rack has the greater absolute power. Fill the
+       * result from right to left (largest to smallest).
+       */
+      const n = nums.length;
+      const result = new Array(n);
+      let left = 0;
+      let right = n - 1;
+      let pos = n - 1;  // Fill from the end
+
+      while (left <= right) {
+          const leftSq = nums[left] * nums[left];
+          const rightSq = nums[right] * nums[right];
+
+          if (leftSq > rightSq) {
+              result[pos] = leftSq;
+              left++;    // This cursed rune had more power, move inward
+          } else {
+              result[pos] = rightSq;
+              right--;   // This blessed rune had more power, move inward
+          }
+
+          pos--;
+      }
+
+      return result;
+  }
+
+# Expected execution trace for primary example
+reference_trace:
+  input:
+    nums: [-2, -1, 0, 2, 3]
+
+  steps:
+    - step: 0
+      action: "Initialize pointers at opposite ends of the rune rack"
+      state:
+        left: 0
+        right: 4
+        pos: 4
+        nums_left: -2
+        nums_right: 3
+        result: [0, 0, 0, 0, 0]
+      explanation: "Most-cursed rune (-2) on the left, most-blessed (3) on the right"
+
+    - step: 1
+      action: "Compare squared magnitudes"
+      state:
+        left_sq: 4
+        right_sq: 9
+      calculation: "(-2)^2 = 4 vs 3^2 = 9"
+      decision: "Right rune has more power (9 > 4)"
+
+    - step: 2
+      action: "Place right square at position 4, move right pointer left"
+      state:
+        result: [0, 0, 0, 0, 9]
+        left: 0
+        right: 3
+        pos: 3
+
+    - step: 3
+      action: "Compare squared magnitudes"
+      state:
+        left_sq: 4
+        right_sq: 4
+      calculation: "(-2)^2 = 4 vs 2^2 = 4"
+      decision: "Equal power -- pick right (either works when equal)"
+
+    - step: 4
+      action: "Place right square at position 3, move right pointer left"
+      state:
+        result: [0, 0, 0, 4, 9]
+        left: 0
+        right: 2
+        pos: 2
+
+    - step: 5
+      action: "Compare squared magnitudes"
+      state:
+        left_sq: 4
+        right_sq: 0
+      calculation: "(-2)^2 = 4 vs 0^2 = 0"
+      decision: "Left rune has more power (4 > 0)"
+
+    - step: 6
+      action: "Place left square at position 2, move left pointer right"
+      state:
+        result: [0, 0, 4, 4, 9]
+        left: 1
+        right: 2
+        pos: 1
+
+    - step: 7
+      action: "Compare squared magnitudes"
+      state:
+        left_sq: 1
+        right_sq: 0
+      calculation: "(-1)^2 = 1 vs 0^2 = 0"
+      decision: "Left rune has more power (1 > 0)"
+
+    - step: 8
+      action: "Place left square at position 1, move left pointer right"
+      state:
+        result: [0, 1, 4, 4, 9]
+        left: 2
+        right: 2
+        pos: 0
+
+    - step: 9
+      action: "Left equals right -- one rune remaining"
+      state:
+        left_sq: 0
+        right_sq: 0
+      calculation: "0^2 = 0 vs 0^2 = 0"
+      decision: "Place the final square at position 0"
+
+    - step: 10
+      action: "Place last square at position 0, pointers cross"
+      state:
+        result: [0, 1, 4, 4, 9]
+        left: 2
+        right: 1
+        pos: -1
+      success: true
+
+  summary:
+    total_iterations: 5
+    elements_placed: 5
+    result: "Squared and sorted: [0, 1, 4, 4, 9]"
+    efficiency: "O(n) - single sweep through the rune rack"
+
+# Additional traces for edge cases
+additional_traces:
+  - name: "All negative (all cursed runes)"
+    input:
+      nums: [-5, -4, -3, -2, -1]
+    outcome:
+      result: [1, 4, 9, 16, 25]
+      explanation: "Squaring reverses the order. Left pointer dominates first, right dominates last."
+      note: "The most-cursed rune (-5) has the largest square (25)."
+
+  - name: "All positive (all blessed runes)"
+    input:
+      nums: [1, 2, 3, 4, 5]
+    outcome:
+      result: [1, 4, 9, 16, 25]
+      explanation: "Right pointer dominates every comparison. Squares are already in order."
+
+  - name: "Single element"
+    input:
+      nums: [0]
+    outcome:
+      result: [0]
+      explanation: "One rune, one square. Trivially correct."
+
+  - name: "Mirror values"
+    input:
+      nums: [-1, 1]
+    outcome:
+      result: [1, 1]
+      explanation: "Both runes have equal absolute power. Either pointer can go first."
+
+# Complexity analysis
+complexity:
+  time:
+    best_case: "O(n)"
+    best_case_scenario: "All elements processed in one pass regardless of input"
+
+    average_case: "O(n)"
+    average_case_scenario: "Always processes exactly n elements"
+
+    worst_case: "O(n)"
+    worst_case_scenario: "Always processes exactly n elements"
+
+    explanation: |
+      Each iteration places exactly one element in the result and advances
+      one pointer. After n iterations, all n elements are placed. This is
+      strictly O(n) -- better than the naive O(n log n) square-then-sort.
+
+  space:
+    value: "O(n)"
+    explanation: "The result array requires n positions"
+    note: "This O(n) space is inherent -- you must return a new array of n elements"
+
+# Alternative approaches for comparison
+alternative_solutions:
+  - name: "Square Then Sort (The Apprentice's Way)"
+    approach: "Square each element, then sort the resulting array"
+
+    code_python: |
+      def square_enchantments_naive(nums):
+          return sorted(x * x for x in nums)
+
+    complexity:
+      time: "O(n log n)"
+      space: "O(n)"
+
+    comparison_for_n10:
+      naive_operations: "~33"
+      two_pointers_operations: 10
+      speedup: "~3x"
+
+    comparison_for_n100000:
+      naive_operations: "~1,700,000"
+      two_pointers_operations: 100000
+      speedup: "~17x"
+
+    when_to_use: "Quick-and-dirty solution when performance is not critical"
+    teaching_value: "Shows WHY Two Pointers is an optimization -- avoids the sort step"
+
+  - name: "Find Pivot Then Merge"
+    approach: "Find where negatives end, square both halves, merge them"
+
+    code_python: |
+      def square_enchantments_merge(nums):
+          n = len(nums)
+          # Find the pivot: first non-negative index
+          pivot = 0
+          while pivot < n and nums[pivot] < 0:
+              pivot += 1
+
+          # Two pointers: left half (reversed negatives), right half (positives)
+          result = []
+          left = pivot - 1  # Negatives, going left (smallest abs first)
+          right = pivot     # Non-negatives, going right
+
+          while left >= 0 and right < n:
+              if nums[left] * nums[left] <= nums[right] * nums[right]:
+                  result.append(nums[left] * nums[left])
+                  left -= 1
+              else:
+                  result.append(nums[right] * nums[right])
+                  right += 1
+
+          while left >= 0:
+              result.append(nums[left] * nums[left])
+              left -= 1
+
+          while right < n:
+              result.append(nums[right] * nums[right])
+              right += 1
+
+          return result
+
+    complexity:
+      time: "O(n)"
+      space: "O(n)"
+
+    tradeoff: "Same complexity as Two Pointers but more code and more edge cases"
+
+    when_to_use: "When you want to fill from front to back (conceptually different)"
+
+    teaching_value: |
+      Shows there are multiple O(n) solutions. The opposite-ends approach
+      is simpler and less error-prone because it does not need to find
+      the pivot point between negatives and positives.
+
+# Approach explanation
+approach_explanation:
+  core_insight: |
+    In a sorted array with negatives, the largest absolute values are at the
+    two ends: the most-negative number on the left and the most-positive on
+    the right. Squaring preserves this property -- the largest squared value
+    must come from one of the two ends. By comparing the squares at both
+    ends and placing the larger one at the back of the result, we fill the
+    entire result in one pass.
+
+  why_it_works:
+    - reason: "Largest absolute values are at the extremes"
+      detail: |
+        In a sorted array like [-7, -3, 2, 3, 11]:
+        - Left end: |-7| = 7
+        - Right end: |11| = 11
+        The largest square must be 11^2 = 121 (from the right end).
+        After placing it, the next largest comes from the new ends.
+
+    - reason: "Reverse-filling maintains sorted order"
+      detail: |
+        By placing the largest square at the last position and working
+        backward, each subsequent square is equal to or smaller than
+        the previous one. This naturally produces a sorted result.
+
+    - reason: "Each pointer moves exactly once per element"
+      detail: |
+        Left only moves right, right only moves left. Together they
+        cover all n elements in exactly n iterations. No element is
+        visited twice, and no sorting step is needed.
+
+  step_by_step:
+    - step: 1
+      action: "Create a result array of size n, filled with zeros"
+      why: "We need a new array to hold the squared values in sorted order"
+
+    - step: 2
+      action: "Initialize left=0, right=n-1, pos=n-1"
+      why: "Start at both ends of the rune rack, fill result from the back"
+
+    - step: 3
+      action: "Compare nums[left]^2 vs nums[right]^2"
+      cases:
+        - "left square is larger: place it at result[pos], advance left"
+        - "right square is larger or equal: place it at result[pos], retreat right"
+
+    - step: 4
+      action: "Decrement pos and repeat until left > right"
+      why: "Each iteration fills one position; after n iterations, the result is complete"
+
+  visual_metaphor: |
+    Imagine your sorted rune rack laid out on a table, cursed runes glowing
+    red on the left and blessed runes glowing blue on the right. You have an
+    empty trophy shelf above. You look at both ends of the rack: whichever
+    rune has the brighter glow (higher absolute power) gets squared and
+    placed at the rightmost empty spot on the trophy shelf. You then move
+    your gaze inward and repeat. The trophy shelf fills from right to left,
+    biggest to smallest, in one sweep.
+
+# Edge case handling
+edge_case_handling:
+  - case: "All positive runes"
+    example: "nums = [1, 2, 3, 4, 5]"
+    handling: "Right pointer dominates every comparison. Squares are already sorted."
+    iterations: 5
+
+  - case: "All negative (all cursed) runes"
+    example: "nums = [-5, -4, -3, -2, -1]"
+    handling: "Left pointer dominates first. Squaring reverses the order."
+    note: "(-5)^2 = 25 is the largest, (-1)^2 = 1 is the smallest."
+
+  - case: "Single rune"
+    example: "nums = [0]"
+    handling: "One iteration: square the single element and return."
+    iterations: 1
+
+  - case: "Mirror values (-x and x)"
+    example: "nums = [-1, 1]"
+    handling: "Both squares are equal. Either pointer can go first; result is [1, 1]."
+
+  - case: "Zeros in the array"
+    example: "nums = [-4, 0, 0, 3, 10]"
+    handling: "Zeros produce 0, which ends up at the front of the result naturally."

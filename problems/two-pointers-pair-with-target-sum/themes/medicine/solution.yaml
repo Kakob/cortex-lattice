@@ -1,0 +1,309 @@
+# Clinical Medicine theme solution for Two Pointers - Pair with Target Sum
+
+id: two-pointers-pair-with-target-sum-medicine
+pattern: two-pointers
+difficulty: easy
+
+solution_code_python: |
+  def find_dosage_pair(nums, target):
+      """
+      Optimal Two Pointers solution for finding a dosage combination.
+      Time: O(n), Space: O(1)
+
+      Key insight: Pointers start at opposite ends of the sorted formulary.
+      - If the combined dose is too low, increase the lower dosage (move left right)
+      - If the combined dose is too high, decrease the higher dosage (move right left)
+      """
+      left = 0
+      right = len(nums) - 1
+
+      while left < right:
+          current_sum = nums[left] + nums[right]
+
+          if current_sum == target:
+              return [nums[left], nums[right]]
+          elif current_sum < target:
+              left += 1   # Combined dose too low, try a higher lower-bound dosage
+          else:
+              right -= 1  # Combined dose too high, try a lower upper-bound dosage
+
+      return None  # No valid combination in the formulary
+
+solution_code_javascript: |
+  function findDosagePair(nums, target) {
+      /**
+       * Optimal Two Pointers solution for finding a dosage combination.
+       * Time: O(n), Space: O(1)
+       *
+       * Key insight: Pointers start at opposite ends of the sorted formulary.
+       * - If the combined dose is too low, increase the lower dosage (move left right)
+       * - If the combined dose is too high, decrease the higher dosage (move right left)
+       */
+      let left = 0;
+      let right = nums.length - 1;
+
+      while (left < right) {
+          const currentSum = nums[left] + nums[right];
+
+          if (currentSum === target) {
+              return [nums[left], nums[right]];
+          } else if (currentSum < target) {
+              left++;   // Combined dose too low, try higher lower-bound
+          } else {
+              right--;  // Combined dose too high, try lower upper-bound
+          }
+      }
+
+      return null;  // No valid combination in the formulary
+  }
+
+# Expected execution trace for primary example
+reference_trace:
+  input:
+    nums: [1, 2, 3, 4, 6]
+    target: 6
+
+  steps:
+    - step: 0
+      action: "Initialize pointers at opposite ends of the formulary"
+      state:
+        left: 0
+        right: 4
+        dosage_left: 1
+        dosage_right: 6
+      explanation: "Start with the lowest (1 mg) and highest (6 mg) available strengths"
+
+    - step: 1
+      action: "Calculate combined dose"
+      state:
+        current_sum: 7
+      calculation: "nums[0] + nums[4] = 1 + 6 = 7"
+
+    - step: 2
+      action: "Compare to therapeutic target"
+      state:
+        current_sum: 7
+        target: 6
+      comparison: "7 > 6"
+      decision: "Combined dose exceeds target by 1 mg. Reduce the higher dosage."
+
+    - step: 3
+      action: "Move right pointer left (right -= 1)"
+      state:
+        left: 0
+        right: 3
+        dosage_left: 1
+        dosage_right: 4
+      reasoning: "Try a lower top-end dosage to bring the sum down"
+
+    - step: 4
+      action: "Calculate combined dose"
+      state:
+        current_sum: 5
+      calculation: "nums[0] + nums[3] = 1 + 4 = 5"
+
+    - step: 5
+      action: "Compare to therapeutic target"
+      state:
+        current_sum: 5
+        target: 6
+      comparison: "5 < 6"
+      decision: "Combined dose is subtherapeutic by 1 mg. Increase the lower dosage."
+
+    - step: 6
+      action: "Move left pointer right (left += 1)"
+      state:
+        left: 1
+        right: 3
+        dosage_left: 2
+        dosage_right: 4
+      reasoning: "Try a higher low-end dosage to bring the sum up"
+
+    - step: 7
+      action: "Calculate combined dose"
+      state:
+        current_sum: 6
+      calculation: "nums[1] + nums[3] = 2 + 4 = 6"
+
+    - step: 8
+      action: "Compare to therapeutic target"
+      state:
+        current_sum: 6
+        target: 6
+      comparison: "6 == 6"
+      decision: "MATCH - therapeutic target reached exactly"
+
+    - step: 9
+      action: "Return the dosage pair"
+      return_value: [2, 4]
+      state:
+        final_left: 1
+        final_right: 3
+        final_dosages: [2, 4]
+      success: true
+
+  summary:
+    total_iterations: 3
+    comparisons_made: 3
+    pointer_moves: 2
+    result: "Found dosage pair [2, 4] in 3 iterations"
+    efficiency: "O(n) - linear scan of the formulary"
+
+# Complexity analysis
+complexity:
+  time:
+    best_case: "O(1)"
+    best_case_scenario: "Target pair happens to be the first and last elements"
+
+    average_case: "O(n)"
+    average_case_scenario: "Pointers converge partway through the formulary"
+
+    worst_case: "O(n)"
+    worst_case_scenario: "No valid pair exists; pointers converge after scanning all entries"
+
+    explanation: |
+      Each pointer moves at most n-1 times (left moves right, right moves left).
+      Total operations: left_moves + right_moves <= n - 1
+      Therefore: O(n) linear time complexity — like a single pass through the formulary.
+
+  space:
+    value: "O(1)"
+    explanation: "Only two pointer variables (left, right) and one temp (current_sum)"
+    note: "Constant space regardless of formulary size"
+
+# Approach explanation
+approach_explanation:
+  core_insight: |
+    Two Pointers works because the formulary is sorted by dosage strength.
+    This ordering lets us make directional decisions: if the combined dose is
+    too high, we know to try a lower top-end dosage; if too low, a higher
+    bottom-end dosage. Each move eliminates an entire class of impossible
+    combinations without examining them individually.
+
+  why_it_works:
+    - reason: "Sorted formulary enables directional titration"
+      detail: |
+        Because nums[left] <= nums[right] is guaranteed, we can predict
+        how pointer movements affect the combined dose:
+        - Moving left right  -> increases nums[left]  -> increases sum
+        - Moving right left  -> decreases nums[right] -> decreases sum
+
+    - reason: "Each adjustment eliminates impossible combinations"
+      detail: |
+        When sum > target and we move right left: ALL combinations using
+        the current right-pointer dosage with any higher left-pointer
+        dosage would also exceed the target. We skip them all at once.
+
+    - reason: "Convergence guarantees exhaustive search"
+      detail: |
+        Starting at opposite ends and moving inward ensures we consider
+        every viable combination exactly once before the pointers meet.
+
+  step_by_step:
+    - step: 1
+      action: "Initialize left=0, right=n-1 (lowest and highest dosages)"
+      why: "Start with the widest dosage spread in the formulary"
+
+    - step: 2
+      action: "Calculate current_sum = nums[left] + nums[right]"
+      why: "See how the current combination compares to the therapeutic target"
+
+    - step: 3
+      action: "Compare current_sum to target"
+      cases:
+        - "current_sum == target: Exact match! Dispense this combination"
+        - "current_sum > target: Supratherapeutic — reduce the higher dosage (right -= 1)"
+        - "current_sum < target: Subtherapeutic — increase the lower dosage (left += 1)"
+
+    - step: 4
+      action: "Repeat until left >= right"
+      why: "When pointers converge, all combinations have been evaluated"
+
+  clinical_metaphor: |
+    Think of it as titrating a combination regimen. You start with the
+    lowest available dose of Drug A and the highest of Drug B. If the
+    total is too high, you step down Drug B. If too low, you step up
+    Drug A. This systematic titration is exactly how clinicians adjust
+    combination therapies — and it is exactly the Two Pointers algorithm.
+
+# Alternative approaches for comparison
+alternative_solutions:
+  - name: "Brute Force (Check All Combinations)"
+    approach: "Try every possible two-drug combination from the formulary"
+
+    code_python: |
+      def find_dosage_pair_brute(nums, target):
+          n = len(nums)
+          for i in range(n):
+              for j in range(i + 1, n):
+                  if nums[i] + nums[j] == target:
+                      return [nums[i], nums[j]]
+          return None
+
+    complexity:
+      time: "O(n^2)"
+      space: "O(1)"
+
+    clinical_analogy: |
+      Like manually checking every possible two-drug pairing in a
+      large hospital formulary — impractical when the formulary has
+      thousands of entries.
+
+    when_to_use: "Only acceptable for very small formularies"
+    teaching_value: "Shows WHY Two Pointers is an optimization over exhaustive search"
+
+  - name: "Hash Map (Complement Lookup)"
+    approach: "For each dosage, check if the complementary dosage exists using a hash map"
+
+    code_python: |
+      def find_dosage_pair_hash(nums, target):
+          seen = {}
+          for i, dose in enumerate(nums):
+              complement = target - dose
+              if complement in seen:
+                  return [complement, dose]
+              seen[dose] = i
+          return None
+
+    complexity:
+      time: "O(n)"
+      space: "O(n)"
+
+    clinical_analogy: |
+      Like building an index of all formulary entries first, then looking
+      up the complement directly — fast, but requires extra memory for the
+      index.
+
+    tradeoff: "Same O(n) time as Two Pointers, but requires O(n) extra space"
+    when_to_use: "When the formulary is NOT sorted (Two Pointers requires sorting)"
+    teaching_value: |
+      Demonstrates that multiple O(n) solutions exist. Two Pointers is
+      preferred here because:
+      1. The formulary is already sorted
+      2. Uses O(1) space instead of O(n)
+      3. No hash collision concerns
+
+  - name: "Binary Search"
+    approach: "For each dosage, binary search for its therapeutic complement"
+
+    code_python: |
+      def find_dosage_pair_binary(nums, target):
+          for i in range(len(nums)):
+              complement = target - nums[i]
+              left, right = i + 1, len(nums) - 1
+              while left <= right:
+                  mid = (left + right) // 2
+                  if nums[mid] == complement:
+                      return [nums[i], nums[mid]]
+                  elif nums[mid] < complement:
+                      left = mid + 1
+                  else:
+                      right = mid - 1
+          return None
+
+    complexity:
+      time: "O(n log n)"
+      space: "O(1)"
+
+    when_to_use: "Rarely — Two Pointers is strictly better for sorted input"
+    teaching_value: "Illustrates that binary search is not always optimal for sorted data"

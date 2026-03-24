@@ -1,0 +1,374 @@
+pattern: two-pointers
+problem_id: two-pointers-pair-with-target-sum
+
+# Catalog of common mistakes with detection and teaching moments
+# Themed for the Wizard's Dungeon narrative
+
+common_mistakes:
+  - id: "brute-force-nested-loops"
+    severity: high
+    category: "wrong-pattern"
+
+    description: "Using nested loops to try every possible pair of runestones"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Outer loop: for i in range(len(nums))
+        - Inner loop: for j in range(i+1, len(nums))
+        - Calculating sum for every pair
+        - Total iterations: n*(n-1)/2
+
+      complexity_analysis:
+        time: "O(n^2)"
+        space: "O(1)"
+
+      code_pattern:
+        - "Nested for loops"
+        - "Both loops iterate over nums"
+        - "No pointer variables named 'left' and 'right'"
+
+    why_students_do_this: |
+      This is the apprentice's instinct -- "just try every combination."
+      It works correctly but is the equivalent of fumbling through every
+      runestone pairing while ghouls close in. There is a faster way.
+
+    teaching_moment:
+      title: "An Apprentice's Approach -- Brute Force"
+
+      explanation: |
+        Your spell works, but it's painfully slow -- O(n^2).
+
+        For a satchel of 1,000 runestones:
+        - Your approach: ~500,000 pairings tested
+        - Two Pointers: ~1,000 comparisons
+
+        The runestones are sorted by power. A true arithmancer would use
+        that order to eliminate impossible pairings without testing them.
+
+      visualization:
+        type: "complexity-comparison"
+
+        your_approach:
+          name: "Brute Force (every pairing)"
+          code_snippet: |
+            for i in range(len(nums)):
+                for j in range(i+1, len(nums)):
+                    if nums[i] + nums[j] == target:
+                        return [nums[i], nums[j]]
+
+          complexity: "O(n^2)"
+          comparisons_for_n10: 45
+          comparisons_for_n1000: "~500,000"
+
+        optimal_approach:
+          name: "Two Pointers (converging sweep)"
+          code_snippet: |
+            left, right = 0, len(nums) - 1
+            while left < right:
+                s = nums[left] + nums[right]
+                if s == target:
+                    return [nums[left], nums[right]]
+                elif s < target:
+                    left += 1
+                else:
+                    right -= 1
+
+          complexity: "O(n)"
+          comparisons_for_n10: "~9"
+          comparisons_for_n1000: "~1,000"
+
+      hint: |
+        The stones are sorted. When the sum of your two current stones is too
+        small, do you really need to test the weak stone against every other
+        stone? Or can you just reach for the next stronger one?
+
+      next_step: |
+        Try the Two Pointers approach:
+        1. Place your left hand on the weakest runestone (index 0)
+        2. Place your right hand on the mightiest (index n-1)
+        3. Compare their combined power to the lock's charge
+        4. Move ONE hand per round based on whether the sum is too low or too high
+
+  - id: "moving-wrong-pointer"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Moving the wrong pointer based on the sum comparison"
+
+    detection:
+      logic: |
+        At each step:
+        1. Calculate current_sum = nums[left] + nums[right]
+        2. Determine what should happen:
+           - If current_sum < target: should move left RIGHT (stronger stone)
+           - If current_sum > target: should move right LEFT (weaker stone)
+        3. Check what actually happened in trace
+        4. If opposite move detected: FLAG this mistake
+
+      specific_patterns:
+        - pattern: "sum < target AND right moved left"
+          explanation: "Needed more power but grabbed a weaker stone instead"
+
+        - pattern: "sum > target AND left moved right"
+          explanation: "Needed less power but grabbed a stronger stone instead"
+
+    why_students_do_this: |
+      The logic can feel counterintuitive at first. Students think:
+      "The sum is too small, so move the right pointer because right
+      means bigger." But moving right LEFT actually decreases the sum further.
+
+    teaching_moment:
+      title: "You Reached for the Wrong Runestone!"
+
+      explanation: |
+        Let's trace through what happened:
+
+        Runestones: {show_array}
+        Left hand at index {left_idx}: power {left_val}
+        Right hand at index {right_idx}: power {right_val}
+
+        Combined power: {left_val} + {right_val} = {current_sum}
+        Lock requires: {target}
+
+        The combined charge is {too_high_or_too_low}.
+
+        You moved: {pointer_you_moved} hand
+        This made the sum go {wrong_direction}!
+
+        You should have moved: {correct_pointer} hand
+        That would make the sum go {correct_direction}.
+
+      rule_to_remember: |
+        The Arithmancer's Rule:
+
+        If combined power < lock's charge:
+          -> Need MORE power
+          -> Swap the WEAKER stone for a stronger one (left += 1)
+          -> Sum increases
+
+        If combined power > lock's charge:
+          -> Need LESS power
+          -> Swap the STRONGER stone for a weaker one (right -= 1)
+          -> Sum decreases
+
+      practice_prompt: |
+        Practice: If nums[left] = 2, nums[right] = 9, and target = 6,
+        the sum is 11 which is too high. Which hand should you move?
+
+        [Answer: Move the right hand leftward to pick a weaker stone.]
+
+  - id: "using-same-runestone-twice"
+    severity: medium
+    category: "logic-error"
+
+    description: "Using left <= right as the loop condition, risking pairing a runestone with itself"
+
+    detection:
+      code_analysis:
+        - "Loop condition is 'while left <= right' instead of 'while left < right'"
+      execution_trace:
+        - "Left and right point to the same index when a 'match' is found"
+        - "Returns [x, x] where x appears only once in the array"
+
+    why_students_do_this: |
+      A natural loop boundary mistake. Students include the equality case
+      without realising it means left == right -- the same physical runestone.
+
+    teaching_moment:
+      title: "You Cannot Place One Runestone in Two Sockets!"
+
+      explanation: |
+        The vault has TWO sockets and requires TWO distinct runestones.
+        Your loop condition 'left <= right' allows left == right, which means
+        you'd try to split one stone in half.
+
+        Example:
+        nums = [5], target = 10
+        left = 0, right = 0
+        nums[0] + nums[0] = 10 -- looks correct, but there's only one stone!
+
+      fix: |
+        Change:
+          while left <= right:    # allows same stone in both sockets
+        To:
+          while left < right:     # guarantees two distinct stones
+
+  - id: "returning-indices-instead-of-values"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Returning [left, right] (indices) instead of [nums[left], nums[right]] (values)"
+
+    detection:
+      code_analysis:
+        - "return [left, right] instead of return [nums[left], nums[right]]"
+      execution_trace:
+        - "Returned values are small non-negative integers that look like indices"
+        - "Values don't match any expected output"
+
+    why_students_do_this: |
+      Students confuse the position in the satchel (index) with the power
+      value inscribed on the runestone. A common slip when working with arrays.
+
+    teaching_moment:
+      title: "You Returned the Satchel Positions, Not the Runestones Themselves!"
+
+      explanation: |
+        The lock needs runestone POWERS, not their position in your bag.
+
+        Example:
+        nums = [1, 2, 3, 4, 6], target = 6
+        Your answer: [1, 3]    -- these are indices
+        Correct: [2, 4]        -- these are the actual power values
+
+        Index 1 holds power 2. Index 3 holds power 4.
+        The lock needs the stones, not their shelf numbers.
+
+      fix: |
+        Change:
+          return [left, right]
+        To:
+          return [nums[left], nums[right]]
+
+  - id: "early-termination"
+    severity: low
+    category: "early-termination"
+
+    description: "Returning None too early, before all pairs have been considered"
+
+    detection:
+      execution_trace:
+        - "Pointers did not converge (left < right when function returned None)"
+        - "Valid pair exists but was not found"
+        - "Loop terminated before exhausting possibilities"
+
+    why_students_do_this: |
+      Sometimes students add a return None inside the loop (e.g., after a fixed
+      number of iterations) or break out of the loop prematurely.
+
+    teaching_moment:
+      title: "You Gave Up Too Soon, Wizard!"
+
+      explanation: |
+        Your pointers stopped at:
+        left = {left_idx}, right = {right_idx}
+
+        But left < right, meaning untested pairings remain!
+
+        A valid pair [{solution_left}, {solution_right}] exists but your
+        spell abandoned the search before reaching it.
+
+      rule: |
+        The search is only complete when left >= right.
+        Only then have all pairs been tested or eliminated.
+        Return None AFTER the while loop, never inside it.
+
+      fix: |
+        Ensure your return None is OUTSIDE the while loop:
+
+        while left < right:
+            # pointer logic here (no return None inside!)
+
+        return None  # Only reached when all pairs exhausted
+
+  - id: "infinite-loop-both-pointers"
+    severity: high
+    category: "logic-error"
+
+    description: "Moving both pointers in the same iteration, or moving no pointer at all"
+
+    detection:
+      execution_trace:
+        - "Both left and right changed in the same iteration"
+        - "Or: neither pointer changed (infinite loop)"
+        - "Number of iterations >> array length"
+
+    why_students_do_this: |
+      Students sometimes write the comparison branches without else-if,
+      causing multiple branches to execute. Or they forget to move any
+      pointer in one of the branches.
+
+    teaching_moment:
+      title: "A Wizard Moves ONE Hand at a Time"
+
+      explanation: |
+        Two Pointers works by moving exactly one pointer per iteration.
+
+        You are either:
+        1. Moving both hands at once (skipping valid pairings), or
+        2. Moving neither hand (trapped in an infinite loop -- the ghouls catch up!)
+
+      correct_pattern: |
+        if current_sum == target:
+            return [nums[left], nums[right]]    # Found it!
+        elif current_sum < target:
+            left += 1                           # Move ONLY left
+        else:
+            right -= 1                          # Move ONLY right
+
+        Exactly ONE pointer moves per iteration. This guarantees O(n) time
+        and ensures no valid pair is skipped.
+
+      why_this_matters: |
+        - Moving both: you might leap over the answer
+        - Moving neither: infinite loop, your torch burns out
+        - Moving one: systematic search, guaranteed to terminate in O(n)
+
+# Categorise mistakes for analysis
+mistake_categories:
+  wrong_pattern:
+    - brute-force-nested-loops
+
+  pattern_misunderstanding:
+    - moving-wrong-pointer
+
+  implementation_error:
+    - returning-indices-instead-of-values
+
+  logic_error:
+    - using-same-runestone-twice
+    - early-termination
+    - infinite-loop-both-pointers
+
+# Expected learning progression
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-nested-loops"
+      teaching: "Introduce Two Pointers concept -- sorted order enables a single sweep"
+
+    - stage: 2
+      mistake: "moving-wrong-pointer"
+      teaching: "Explain the Arithmancer's Rule: too low -> advance left; too high -> retreat right"
+
+    - stage: 3
+      mistake: "using-same-runestone-twice or returning-indices-instead-of-values"
+      teaching: "Clarify loop boundaries and value vs index distinction"
+
+    - stage: 4
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try Three Sum or Container With Most Water"
+
+# Teaching strategies by mistake type
+teaching_strategies:
+  for_brute_force_users:
+    - "Acknowledge that their spell works correctly"
+    - "Show the complexity comparison -- 500,000 vs 1,000 operations for n=1,000"
+    - "Explain how the sorted order of runestones enables the optimisation"
+    - "Provide the hint about starting at opposite ends of the satchel"
+
+  for_wrong_pointer_movers:
+    - "Walk through a specific example with both the wrong and correct moves"
+    - "State the Arithmancer's Rule explicitly"
+    - "Provide a practice question to reinforce"
+
+  for_implementation_errors:
+    - "Point out the exact line containing the error"
+    - "Show what they computed vs what the lock expected"
+    - "Provide the corrected code snippet"
+
+  for_logic_errors:
+    - "Show the execution trace where the error manifests"
+    - "Explain why the correct loop condition or structure matters"
+    - "Provide the canonical pattern for reference"

@@ -1,0 +1,87 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Wizard's Dungeon theme for Two Pointers: Find Non-Duplicate Number Instances
+
+title: "Two Pointers - The Arcane Scroll of Unique Spells"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "The spell scroll is sorted — duplicates are always adjacent, so you only need to compare each entry with the last confirmed unique spell"
+    - text: "Use two quills: a slow 'inking quill' to mark where to write the next unique spell, and a fast 'reading quill' to scan every entry"
+    - text: "The first spell is always unique — start the inking quill there (slow = 0)"
+    - text: "When the reading quill finds a new spell (nums[fast] != nums[slow]), advance the inking quill and copy the spell"
+    - text: "Time complexity: O(n) — one pass through the entire scroll"
+    - text: "Space complexity: O(1) — only two quills (pointers), no enchanted ledger needed"
+
+  common_mistakes:
+    - text: "Don't create a new scroll (auxiliary array) — the problem requires in-place consolidation with O(1) extra space"
+    - text: "Don't use a hash set — the sorted order already tells you whether a value is new by comparing it to the last unique entry"
+    - text: "Don't forget to return slow + 1, not slow — the count is one more than the final index"
+    - text: "Don't compare nums[fast] to nums[fast - 1] instead of nums[slow] — while both work for this problem, comparing to nums[slow] is the canonical two-pointer form"
+    - text: "Don't skip the empty array check — if the scroll is empty, return 0 immediately"
+
+  real_world:
+    - text: |
+        Inventory Deduplication in RPG Game Systems
+
+        In role-playing games, sorted inventories often accumulate duplicate
+        items through looting, crafting, and quest rewards. When generating
+        a unique item catalog for a shop interface or achievement tracker,
+        the game engine must deduplicate the sorted item list in-place to
+        avoid allocating new arrays every frame. This two-pointer technique
+        is common in game engines that manage large sorted collections
+        with tight memory budgets.
+
+    - text: |
+        Log Deduplication in Distributed Systems
+
+        Distributed logging pipelines (like those using Kafka or Kinesis)
+        often produce sorted streams with duplicate entries due to at-least-once
+        delivery guarantees. Before indexing into Elasticsearch or a data
+        warehouse, a deduplication pass using two pointers on the sorted
+        stream removes redundant entries in O(n) time with O(1) space —
+        critical for processing millions of log lines per second.
+
+    - text: |
+        Sorted Sensor Data Compaction
+
+        IoT sensors frequently emit the same reading for consecutive time
+        intervals (e.g., a temperature sensor reporting 72 degrees for
+        hours). Compacting sorted readings to only unique values saves
+        storage and speeds up downstream analytics. The two-pointer
+        in-place approach is ideal because sensor firmware often has
+        very limited memory.
+
+  solution_approach:
+    steps:
+      - "Check if the scroll is empty — if so, return 0"
+      - "Initialize: slow = 0 (inking quill at the first spell — it is always unique)"
+      - "For fast from 1 to len(nums) - 1 (reading quill scans every entry):"
+      - "  If nums[fast] != nums[slow]: slow += 1, then nums[slow] = nums[fast]"
+      - "  Otherwise: skip — it is a duplicate"
+      - "Return slow + 1 — the count of unique spells"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Remove Element (in-place)"
+      invariants_shared: ["slow/fast pointer", "in-place modification", "return count"]
+      difference: "Remove a specific value instead of duplicates"
+      modification: "Compare nums[fast] to the target value instead of nums[slow]"
+
+    - name: "Move Zeroes"
+      invariants_shared: ["slow/fast pointer", "in-place array modification"]
+      difference: "Move all zeroes to the end instead of removing duplicates"
+      modification: "Swap elements instead of overwriting"
+
+    - name: "Remove Duplicates from Sorted Array II (allow k duplicates)"
+      invariants_shared: ["sorted input", "slow/fast pointer", "in-place deduplication"]
+      difference: "Allow up to k copies of each value instead of exactly one"
+      modification: "Compare nums[fast] to nums[slow - k + 1] instead of nums[slow]"
+
+    - name: "Pair with Target Sum"
+      invariants_shared: ["sorted input", "two pointers"]
+      difference: "Pointers start at opposite ends for sum; here both start from the left for scanning"

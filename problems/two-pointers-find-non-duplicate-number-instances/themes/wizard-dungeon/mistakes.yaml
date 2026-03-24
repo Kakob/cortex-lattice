@@ -1,0 +1,260 @@
+pattern: two-pointers
+problem_id: two-pointers-find-non-duplicate-number-instances
+
+# Catalog of common mistakes with detection and teaching moments
+# Themed for the Wizard's Dungeon narrative
+
+common_mistakes:
+  - id: "using-extra-space"
+    severity: high
+    category: "wrong-pattern"
+
+    description: "Creating a new array or set to store unique spells instead of deduplicating in-place"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Creation of a new list, array, or set
+        - Appending unique values to the new structure
+        - Possibly copying results back to the original array
+        - O(n) extra space used
+
+      complexity_analysis:
+        time: "O(n)"
+        space: "O(n)"
+
+      code_pattern:
+        - "result = [] or unique = set()"
+        - "result.append(val) or unique.add(val)"
+        - "No in-place modification of nums"
+
+    why_students_do_this: |
+      Using a set or a new list is the most intuitive approach: "just collect
+      the unique values." It works correctly but violates the O(1) space
+      constraint. The problem specifically asks for in-place modification —
+      you must consolidate the spell scroll itself, not copy to a new one.
+
+    teaching_moment:
+      title: "You Created a New Scroll — But the Council Wants This One Cleaned!"
+
+      explanation: |
+        Your spell works, but you conjured a new scroll to hold the unique
+        entries. The Archmage's Council requires the original scroll to be
+        consolidated in-place — no new parchment allowed.
+
+        Your approach uses O(n) extra space for the new scroll.
+        Two Pointers achieves O(1) space by writing unique values directly
+        into the front of the original scroll.
+
+      hint: |
+        You do not need to track which spells you have seen — the scroll
+        is sorted, so duplicates are adjacent. Just compare each entry to
+        the last confirmed unique spell.
+
+      next_step: |
+        Try the two-quill approach:
+        1. Inking quill (slow) sits on the first spell (index 0)
+        2. Reading quill (fast) scans from index 1 onward
+        3. When reading quill finds a new spell, advance inking quill and copy it
+        4. Return slow + 1
+
+  - id: "returning-wrong-count"
+    severity: high
+    category: "implementation-error"
+
+    description: "Returning slow instead of slow + 1 (off-by-one in the count)"
+
+    detection:
+      code_analysis:
+        - "return slow instead of return slow + 1"
+      execution_trace:
+        - "Return value is exactly 1 less than the correct answer for all test cases"
+        - "For [2, 3, 3, 3, 6, 9, 9] returns 3 instead of 4"
+
+    why_students_do_this: |
+      Students forget that slow is a 0-based index. If slow ends at 3, there
+      are 4 unique values (indices 0, 1, 2, 3). Returning the index instead
+      of the count is an extremely common off-by-one error.
+
+    teaching_moment:
+      title: "You Miscounted the Unique Spells by One!"
+
+      explanation: |
+        The inking quill ended at position {slow_value}. But position is
+        0-based — position 0, 1, 2, ..., {slow_value} means {correct_count}
+        unique spells, not {slow_value}.
+
+        Think of it this way: if the inking quill is at index 0, that means
+        one unique spell (the first one). Index 0 = count 1. Always add 1.
+
+      fix: |
+        Change:
+          return slow
+        To:
+          return slow + 1
+
+  - id: "not-modifying-array-in-place"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Counting unique elements correctly but not moving them to the front of the array"
+
+    detection:
+      code_analysis:
+        - "Increments a counter when a new value is found"
+        - "Does not write nums[slow] = nums[fast]"
+        - "Original array is unchanged after function call"
+
+      execution_trace:
+        - "Return value is correct"
+        - "But nums[:return_value] does not contain the unique sorted values"
+
+    why_students_do_this: |
+      Students focus on the return value (the count) and forget that the
+      problem also requires the array to be modified. The first k elements
+      must contain the unique values in sorted order.
+
+    teaching_moment:
+      title: "You Counted the Spells But Forgot to Rearrange the Scroll!"
+
+      explanation: |
+        Your count is correct, but the scroll itself has not changed! The
+        Council inspects the first k entries of the scroll to verify the
+        unique spells. If you do not move the unique values to the front,
+        the scroll still shows duplicates.
+
+        You need both:
+        1. Return the correct count (slow + 1)
+        2. Overwrite nums[slow] = nums[fast] when a new unique value is found
+
+      fix: |
+        When nums[fast] != nums[slow]:
+          slow += 1
+          nums[slow] = nums[fast]   # <-- This line is essential!
+
+  - id: "wrong-comparison-target"
+    severity: medium
+    category: "pattern-misunderstanding"
+
+    description: "Comparing nums[fast] to nums[fast - 1] instead of nums[slow], which works but is not the canonical two-pointer form"
+
+    detection:
+      code_analysis:
+        - "if nums[fast] != nums[fast - 1] instead of if nums[fast] != nums[slow]"
+
+    why_students_do_this: |
+      Comparing to the previous element (fast - 1) also correctly detects
+      transitions between values in a sorted array. It works for this specific
+      problem but does not generalize to variants like "allow k duplicates."
+      The slow-pointer comparison is the canonical form.
+
+    teaching_moment:
+      title: "Your Spell Works, But the Form Could Be Stronger"
+
+      explanation: |
+        Comparing nums[fast] to nums[fast - 1] works here because the array
+        is sorted — a change from fast-1 to fast always means a new value.
+
+        However, comparing to nums[slow] is the stronger pattern because:
+        1. It generalizes to "allow k duplicates" (compare to nums[slow - k + 1])
+        2. It directly expresses the invariant: "is this value different from
+           the last one I wrote?"
+        3. It makes the slow pointer's role as the write-head explicit
+
+      hint: |
+        Both approaches produce correct results here. The nums[slow]
+        comparison is preferred because it teaches the canonical two-pointer
+        deduplication pattern.
+
+  - id: "starting-both-pointers-at-zero"
+    severity: low
+    category: "implementation-error"
+
+    description: "Starting both slow and fast at 0, wasting the first comparison"
+
+    detection:
+      code_analysis:
+        - "slow = 0, fast = 0"
+        - "First comparison is always nums[0] != nums[0] which is always false"
+
+      execution_trace:
+        - "First iteration is always a no-op"
+        - "Result is still correct but one iteration is wasted"
+
+    why_students_do_this: |
+      Students default to initializing both pointers at 0. This works but
+      wastes the first iteration — the first element is always unique and
+      comparing it to itself is pointless.
+
+    teaching_moment:
+      title: "The First Spell Is Always Unique — No Need to Check It"
+
+      explanation: |
+        Starting both quills at position 0 means the first comparison is
+        nums[0] != nums[0], which is always false. The first entry on a
+        sorted scroll is trivially unique — there is no predecessor to
+        compare against.
+
+        Start slow at 0 (the first spell is already placed) and fast at 1
+        (begin scanning from the second entry). This avoids a wasted step.
+
+      fix: |
+        Change:
+          slow = 0
+          fast = 0   # <-- Wasteful
+        To:
+          slow = 0
+          for fast in range(1, len(nums)):   # Start at 1
+
+# Categorize mistakes for analysis
+mistake_categories:
+  wrong_pattern:
+    - using-extra-space
+
+  implementation_error:
+    - returning-wrong-count
+    - not-modifying-array-in-place
+    - starting-both-pointers-at-zero
+
+  pattern_misunderstanding:
+    - wrong-comparison-target
+
+# Expected learning progression
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "using-extra-space"
+      teaching: "Introduce two-pointer in-place deduplication — no new scroll needed"
+
+    - stage: 2
+      mistake: "not-modifying-array-in-place"
+      teaching: "Emphasize that both the count AND the array modification are required"
+
+    - stage: 3
+      mistake: "returning-wrong-count"
+      teaching: "Clarify 0-based index vs count: return slow + 1"
+
+    - stage: 4
+      mistake: "wrong-comparison-target"
+      teaching: "Show why comparing to nums[slow] is the canonical form"
+
+    - stage: 5
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try Remove Duplicates II (allow k duplicates)"
+
+teaching_strategies:
+  for_extra_space_users:
+    - "Acknowledge correctness of their approach"
+    - "Explain the O(1) space constraint"
+    - "Show how the sorted order eliminates the need for a set"
+    - "Introduce the inking/reading quill metaphor"
+
+  for_wrong_count_returns:
+    - "Show the off-by-one error with a concrete example"
+    - "Walk through the index-to-count conversion"
+    - "Emphasize: slow is the last index, count is slow + 1"
+
+  for_implementation_errors:
+    - "Point out the exact missing line"
+    - "Show what the array looks like with and without the fix"
+    - "Emphasize the dual requirement: correct count AND correct array state"

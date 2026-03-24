@@ -1,0 +1,85 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Wizard's Dungeon theme for Two Pointers: Squaring a Sorted Array
+
+title: "Two Pointers - The Enchantment Amplifier"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "The largest squared power comes from whichever end of the sorted rack has the greater absolute value"
+    - text: "Pointers start at opposite ends -- most-cursed rune (left) and most-blessed rune (right)"
+    - text: "Compare squares (or absolute values) at both ends to decide which goes next"
+    - text: "Fill the result array from the back (largest position) to the front"
+    - text: "Time complexity: O(n) -- one sweep through the rune rack, no sorting needed"
+    - text: "Space complexity: O(n) -- the result array is the only extra allocation"
+
+  common_mistakes:
+    - text: "Don't just square each rune in place and call it done -- negatives make the squares unsorted"
+    - text: "Don't sort after squaring -- that's O(n log n) when O(n) is possible"
+    - text: "Don't use left < right as the loop condition -- use left <= right to handle the last remaining rune"
+    - text: "Don't fill the result from the front -- you are finding the LARGEST squares first, so fill from the back"
+    - text: "Don't forget to create a NEW result array -- modifying nums in-place will overwrite values you still need"
+    - text: "Don't compare raw values instead of absolute values or squares -- a cursed rune of -7 has more power than a blessed rune of 3"
+
+  real_world:
+    - text: |
+        Signal Processing and Power Spectra
+
+        In audio and radio engineering, signals are represented as sorted
+        frequency components (some negative for phase-inverted waves). Computing
+        the power spectrum requires squaring each component's amplitude. The
+        Two Pointers approach produces a sorted power spectrum in O(n) time,
+        which is critical for real-time audio processing where FFT outputs
+        need to be converted to power values and displayed on a sorted
+        spectrum analyzer.
+
+    - text: |
+        Physics: Kinetic Energy from Sorted Velocities
+
+        In particle physics simulations, particles are sorted by velocity
+        (some moving in the negative direction). Kinetic energy is proportional
+        to v^2. Computing a sorted list of energies from sorted velocities
+        is exactly this problem. When simulating millions of particles, an
+        O(n) approach avoids the O(n log n) sorting bottleneck.
+
+    - text: |
+        Machine Learning: Squared Residuals
+
+        When evaluating model predictions, residuals (actual - predicted) are
+        often sorted. Computing squared residuals in sorted order is needed
+        for certain diagnostic plots and statistical tests. Two Pointers
+        provides the sorted squared residuals in linear time.
+
+  solution_approach:
+    steps:
+      - "Create a result array of size n (all zeros)"
+      - "Initialize: left = 0 (most-cursed rune), right = n-1 (most-blessed rune), pos = n-1 (fill from back)"
+      - "While left <= right:"
+      - "  Compute left_sq = nums[left]^2 and right_sq = nums[right]^2"
+      - "  If left_sq > right_sq: result[pos] = left_sq, left += 1"
+      - "  Else: result[pos] = right_sq, right -= 1"
+      - "  Decrement pos"
+      - "Return result"
+
+complexity:
+  time: "O(n)"
+  space: "O(n)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Two Pointers - Pair with Target Sum"
+      invariants_shared: ["sorted input", "opposite-end initialization"]
+      difference: "Pair Sum compares a sum to a target; Squaring compares absolute values at the ends"
+      modification: "Instead of searching for a match, place the larger square and advance"
+
+    - name: "Merge Two Sorted Arrays"
+      invariants_shared: ["two pointers", "filling a result array in order"]
+      difference: "Merge uses two separate arrays; this problem treats the two ends of one array as two virtual sorted sequences"
+
+    - name: "Container With Most Water"
+      invariants_shared: ["opposite-end initialization", "single-direction pointer movement"]
+      difference: "Move the pointer at the shorter wall; here, move the pointer at the larger absolute value"
+
+    - name: "Sort Colors (Dutch National Flag)"
+      invariants_shared: ["pointer-based partitioning", "filling result in specific order"]
+      difference: "Three-way partitioning vs two-pointer comparison"

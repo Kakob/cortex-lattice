@@ -1,0 +1,110 @@
+# Software Engineering theme for Two Pointers - Pair with Target Sum
+
+title: "Microservice Resource Pairing"
+function_name: find_service_pair
+
+description: |
+  You are a platform engineer responsible for capacity planning across a fleet
+  of microservices. Each service has a known CPU utilization score, and the
+  services are ranked in a sorted manifest from lowest to highest utilization.
+
+  Your SRE team needs to identify two microservices whose combined CPU
+  utilization exactly matches a target capacity threshold. This pairing is used
+  to co-locate services on the same host node so they fully saturate the
+  available resources without exceeding the capacity limit.
+
+  Given a sorted array of service utilization scores and a target capacity,
+  find two services whose utilization values sum to exactly the target. If no
+  such pair exists, return None.
+
+story_context: |
+  Your infrastructure team is migrating to a bin-packing deployment strategy.
+  Instead of spreading services thinly across many nodes, you want to pair
+  services so each host runs at exactly 100% utilization. The service manifest
+  is already sorted by CPU usage from your monitoring pipeline (Prometheus
+  metrics, sorted by avg_cpu_percent). Finding the right pair quickly is
+  critical — the deployment window is tight and you cannot afford an O(n^2)
+  brute-force scan across thousands of services.
+
+examples:
+  - input:
+      nums: [1, 2, 3, 4, 6]
+      target: 6
+    output: [2, 4]
+    explanation: |
+      Services with utilization scores 2 and 4 sum to exactly 6, matching the
+      target capacity threshold. These two microservices can be co-located on a
+      single host node.
+
+  - input:
+      nums: [2, 5, 9, 11]
+      target: 13
+    output: [2, 11]
+    explanation: |
+      The service at 2% and the service at 11% utilization sum to 13%. These
+      are the first and last entries in the manifest — found immediately by
+      starting pointers at opposite ends.
+
+  - input:
+      nums: [1, 2, 3, 9]
+      target: 8
+    output: null
+    explanation: |
+      No pair of services sums to 8. The closest pairs are [2, 9] = 11 (over)
+      and [3, 9] = 12 (over). No valid co-location pairing exists for this
+      target capacity.
+
+hints:
+  - level: 1
+    text: "The service manifest is sorted by utilization. Can you exploit the sorted order to avoid checking every possible pair?"
+
+  - level: 2
+    text: "Place one pointer at the lowest-utilization service and another at the highest. If their combined load exceeds the target capacity, which pointer should you move?"
+
+  - level: 3
+    text: "If the current sum is too large, move the right pointer left to reduce the combined utilization. If too small, move the left pointer right to increase it. Repeat until the pointers meet."
+
+starter_code_python: |
+  def find_service_pair(nums, target):
+      """
+      Find two microservices whose CPU utilization sums to target capacity.
+
+      Args:
+          nums: List[int] - sorted service utilization scores
+          target: int - target combined capacity threshold
+
+      Returns:
+          List[int] - [util1, util2] where util1 + util2 == target
+          None - if no valid pairing exists
+
+      Examples:
+          >>> find_service_pair([1, 2, 3, 4, 6], 6)
+          [2, 4]
+
+          >>> find_service_pair([1, 2, 3, 9], 8)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two microservices whose CPU utilization sums to target capacity.
+   *
+   * @param {number[]} nums - sorted service utilization scores
+   * @param {number} target - target combined capacity threshold
+   * @return {number[]|null} - [util1, util2] or null if no valid pairing
+   */
+  function findServicePair(nums, target) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Two mid-range services pair to fill a host node"
+  first-and-last: "Lowest and highest utilization services pair up"
+  duplicate-values: "Two services with identical utilization both needed"
+  no-pair-exists: "No valid co-location pairing exists for this capacity"
+  minimum-input: "Only two services in the fleet — one pair to check"
+  negative-numbers: "Services with negative scores (cooling/idle credits) included"
+  large-values: "High-utilization services near the top of the manifest"
+  zero-target: "Target capacity is zero — requires positive and negative scores to cancel out"

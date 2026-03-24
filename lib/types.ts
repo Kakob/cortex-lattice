@@ -41,7 +41,7 @@
 //
 // These types represent coding problems loaded from YAML files.
 // Each problem has a title, description, examples, constraints, test cases,
-// and metadata for categorization (pattern, difficulty, theme).
+// and metadata for categorization (pattern, difficulty, category).
 // =============================================================================
 
 export interface Problem {
@@ -49,7 +49,9 @@ export interface Problem {
   title: string;
   difficulty: "easy" | "medium" | "hard";
   pattern: string | string[];
-  theme?: string;
+  category?: string;
+  themeId?: string;
+  availableThemes?: ThemeInfo[];
   estimatedTime?: string;
   description: string;
   storyContext?: string;
@@ -58,12 +60,42 @@ export interface Problem {
   hints: ProblemHint[];
   starterCodePython: string;
   starterCodeJavascript?: string;
+  functionName?: string;
   testCases: TestCase[];
   edgeCases?: EdgeCase[];
   patternLearningObjectives?: string[];
   realWorldApplications?: string[];
   complexityAnalysis?: ComplexityAnalysis;
   patternSignature?: PatternSignature;
+}
+
+// ============================================================================
+// Theme Types
+// ============================================================================
+
+export interface ThemeInfo {
+  themeId: string;
+  displayName: string;
+  source: "public" | "private";
+}
+
+export interface CoreProblem {
+  id: string;
+  pattern: string | string[];
+  difficulty: "easy" | "medium" | "hard";
+  category?: string;
+  estimatedTime?: string;
+  constraints: string[];
+  testCaseData: Array<{
+    id: string;
+    input: Record<string, unknown>;
+    expected: unknown;
+  }>;
+  edgeCases?: EdgeCase[];
+  complexityAnalysis?: ComplexityAnalysis;
+  patternSignature?: PatternSignature;
+  patternLearningObjectives?: string[];
+  realWorldApplications?: string[];
 }
 
 export interface ProblemExample {
@@ -480,6 +512,7 @@ export interface ExecutionRequest {
   problemId: string;
   code: string;
   language?: "python" | "javascript";
+  themeId?: string;
 }
 
 export interface ExecutionResult {
@@ -538,15 +571,41 @@ export interface ProblemCard {
   title: string;
   difficulty: "easy" | "medium" | "hard";
   pattern: string | string[];
-  theme?: string;
+  category?: string;
+  availableThemes?: ThemeInfo[];
   solved?: boolean;
 }
 
 export interface ProblemGroup {
-  theme: string;
+  category: string;
   title: string;
   problems: ProblemCard[];
   solvedCount: number;
+}
+
+export interface ThemedProblemCard {
+  id: string;
+  themeId: string;
+  themeName: string;
+  title: string;
+  difficulty: "easy" | "medium" | "hard";
+  pattern: string | string[];
+  category?: string;
+  algorithmName: string;
+  solved?: boolean;
+}
+
+export interface PatternGroup {
+  pattern: string;
+  title: string;
+  algorithms: AlgorithmGroup[];
+}
+
+export interface AlgorithmGroup {
+  algorithmId: string;
+  algorithmName: string;
+  difficulty: "easy" | "medium" | "hard";
+  variants: ThemedProblemCard[];
 }
 
 // ============================================================================

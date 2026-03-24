@@ -1,0 +1,372 @@
+# mistakes.yaml - Common Mistakes Catalog
+# Clinical Medicine theme for Two Pointers - Pair with Target Sum
+
+pattern: two-pointers
+problem_id: two-pointers-pair-with-target-sum-medicine
+
+common_mistakes:
+  - id: "brute-force-nested-loops"
+    severity: high
+    category: "wrong-pattern"
+
+    description: "Using nested loops to check every possible two-drug combination instead of Two Pointers"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Outer loop: for i in range(len(nums))
+        - Inner loop: for j in range(i+1, len(nums))
+        - Calculate sum for each pair
+        - Total iterations: n*(n-1)/2
+
+      complexity_analysis:
+        time: "O(n^2)"
+        space: "O(1)"
+
+      code_pattern:
+        - "Nested for loops"
+        - "Both loops iterate over the nums array"
+        - "No pointer variables named 'left' and 'right'"
+
+    why_students_do_this: |
+      This is the most intuitive approach — "just try every pair of dosages."
+      It works correctly but is like a pharmacist manually cross-referencing
+      every entry in a thousand-page formulary instead of using the sorted
+      index to narrow the search.
+
+    teaching_moment:
+      title: "Exhaustive Search Works, But Titration Is Faster"
+
+      explanation: |
+        Your solution correctly checks all dosage pairs, but it scales as O(n^2).
+
+        For a formulary with 1,000 entries:
+        - Your approach: ~500,000 pair checks
+        - Two Pointers: ~1,000 checks
+
+        The formulary is sorted. Two Pointers exploits that ordering to
+        eliminate impossible combinations without examining them — the same
+        way a clinician titrates dosages by adjusting one drug at a time
+        rather than trying every possible combination.
+
+      hint: |
+        Think about clinical titration: you start with the lowest and
+        highest available doses. If the combined dose overshoots the
+        target, you step the higher one down. If it undershoots, you
+        step the lower one up. You never need to try every combination.
+
+      next_step: |
+        Try implementing Two Pointers:
+        1. Start with left=0 (lowest dosage), right=len(nums)-1 (highest)
+        2. Compare current_sum = nums[left] + nums[right] to target
+        3. Move ONE pointer based on that comparison
+        4. Repeat until pointers meet
+
+  - id: "moving-wrong-pointer"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Moving the wrong pointer based on sum comparison — like adjusting the wrong drug during titration"
+
+    detection:
+      logic: |
+        At each step:
+        1. Calculate current_sum = nums[left] + nums[right]
+        2. Determine what should happen:
+           - If current_sum < target -> should move left RIGHT (increase sum)
+           - If current_sum > target -> should move right LEFT (decrease sum)
+        3. Check what actually happened in the trace
+        4. If the opposite move was made -> FLAG this mistake
+
+      specific_patterns:
+        - pattern: "current_sum < target AND right moved left"
+          explanation: "Dose was subtherapeutic, but you decreased it further"
+
+        - pattern: "current_sum > target AND left moved right"
+          explanation: "Dose was supratherapeutic, but you increased it further"
+
+    why_students_do_this: |
+      Students confuse which pointer controls which direction of change.
+      They may think: "The sum is too small, so move the right pointer"
+      without realizing that moving right LEFT makes the sum even smaller.
+
+    teaching_moment:
+      title: "You Adjusted the Wrong Drug!"
+
+      explanation: |
+        Think of it like clinical dose titration:
+
+        - nums[left] is the lower dosage (Drug A)
+        - nums[right] is the higher dosage (Drug B)
+
+        If the combined dose is BELOW target (subtherapeutic):
+          -> You need MORE drug -> increase Drug A -> move left RIGHT
+
+        If the combined dose is ABOVE target (supratherapeutic):
+          -> You need LESS drug -> decrease Drug B -> move right LEFT
+
+        You moved the wrong pointer, which pushed the combined dose
+        further away from the therapeutic target — like increasing the
+        dose of the wrong drug when a patient is already overdosed.
+
+      hint: |
+        Simple clinical rule:
+        - Subtherapeutic (sum < target) -> step UP the lower dose (left++)
+        - Supratherapeutic (sum > target) -> step DOWN the higher dose (right--)
+
+      next_step: |
+        Trace through this example by hand:
+        nums = [1, 2, 3, 4, 6], target = 6
+        Start: left=0 (1 mg), right=4 (6 mg), sum = 7
+        Sum > target, so which pointer should move?
+
+  - id: "comparing-indices-instead-of-values"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Calculating the sum using pointer indices (left + right) instead of dosage values (nums[left] + nums[right])"
+
+    detection:
+      code_analysis:
+        - "Look for: current_sum = left + right"
+        - "Instead of: current_sum = nums[left] + nums[right]"
+
+      symptom:
+        - "Sum values are very small (index sums) regardless of actual dosages"
+        - "Incorrect results for almost all test cases"
+
+    why_students_do_this: |
+      A common confusion between the pointer (index into the formulary)
+      and the dosage value stored at that position. It is like looking
+      at the page number in a drug reference instead of the dosage
+      printed on that page.
+
+    teaching_moment:
+      title: "You Are Reading the Index, Not the Dosage!"
+
+      explanation: |
+        You calculated: current_sum = left + right
+        This sums the POSITIONS in the formulary, not the dosage values!
+
+        Example:
+        nums = [1, 2, 3, 4, 6]
+        left = 0, right = 4
+
+        Your calculation: 0 + 4 = 4 (index sum)
+        Correct: nums[0] + nums[4] = 1 + 6 = 7 (dosage sum)
+
+        It is like adding the page numbers in the Physicians' Desk
+        Reference instead of the actual milligram values listed on
+        those pages.
+
+      hint: |
+        Change:
+          current_sum = left + right
+        To:
+          current_sum = nums[left] + nums[right]
+
+      next_step: |
+        Review your code and make sure every reference to the dosage
+        value uses nums[left] or nums[right], not bare left or right.
+
+  - id: "pointer-initialization-error"
+    severity: medium
+    category: "pattern-misunderstanding"
+
+    description: "Starting both pointers from the same end (left=0, right=1) — this is the pattern for DIFFERENCE, not SUM"
+
+    detection:
+      code_analysis:
+        - "Look for: left = 0, right = 1"
+        - "Instead of: left = 0, right = len(nums) - 1"
+
+      symptom:
+        - "Algorithm may find incorrect pairs or miss valid ones"
+        - "Pointer logic for advancing does not converge correctly for sums"
+
+    why_students_do_this: |
+      Students may have seen the Two Pointers pattern for finding a
+      difference (where both pointers start from the left). They apply
+      that same initialization here, but SUM and DIFFERENCE problems
+      require different pointer setups.
+
+    teaching_moment:
+      title: "Wrong Starting Positions — SUM Needs Opposite Ends"
+
+      explanation: |
+        For finding a TARGET SUM in a sorted array, pointers must start
+        at opposite ends:
+        - left = 0 (lowest dosage)
+        - right = len(nums) - 1 (highest dosage)
+
+        This is because:
+        - Moving left RIGHT increases the sum
+        - Moving right LEFT decreases the sum
+        - Starting at opposite ends gives you the maximum range to titrate
+
+        Starting both from the left (left=0, right=1) is the setup for
+        finding a target DIFFERENCE — a fundamentally different problem.
+
+      hint: |
+        Clinical analogy: to titrate a combination regimen, you start
+        with one drug at its lowest available dose and the other at its
+        highest. You then adjust inward. You would not start both drugs
+        at the lowest dose — that gives you no room to decrease.
+
+      next_step: |
+        Change your initialization:
+          left = 0
+          right = len(nums) - 1
+        Then adjust your pointer-movement logic for sum comparison.
+
+  - id: "not-handling-no-pair-case"
+    severity: medium
+    category: "implementation-error"
+
+    description: "Not returning None/null when no valid dosage combination exists"
+
+    detection:
+      code_analysis:
+        - "Missing return None after the while loop"
+        - "Function returns undefined implicitly"
+        - "Or returns an incorrect default like [] or [0, 0]"
+
+      symptom:
+        - "Test case 'no-pair-exists' fails"
+        - "Function returns undefined, empty array, or wrong value instead of null/None"
+
+    why_students_do_this: |
+      Students focus on the success path (finding a pair) and forget
+      to handle the case where the formulary simply does not contain
+      a valid combination.
+
+    teaching_moment:
+      title: "The Formulary Does Not Always Have What You Need"
+
+      explanation: |
+        In clinical practice, a pharmacist must recognize when the
+        available formulary cannot fulfill a prescription. Your algorithm
+        must do the same.
+
+        When the while loop exits (left >= right), all possible
+        combinations have been evaluated and none matched the target.
+        The correct response is to return None/null — signaling that
+        the prescriber must revise the order.
+
+        Test case: nums = [1, 2, 3, 9], target = 8
+        No two values sum to 8. The function must return None.
+
+      hint: |
+        Add a return statement after the while loop:
+          return None  # (Python)
+          return null;  // (JavaScript)
+
+      next_step: |
+        Check your function against the "no-pair-exists" test case
+        to verify it returns None/null correctly.
+
+  - id: "infinite-loop-both-pointers"
+    severity: high
+    category: "logic-error"
+
+    description: "Moving both pointers in the same iteration, or not moving any pointer — causing infinite loops or skipped pairs"
+
+    detection:
+      execution_trace:
+        - "Both left and right changed in the same iteration"
+        - "Or: Neither pointer changed (infinite loop)"
+        - "Number of iterations >> array length"
+
+    why_students_do_this: |
+      Students may write if/elif/else logic that triggers two pointer
+      moves, or they may have a code path where no pointer advances,
+      trapping the algorithm in an infinite loop.
+
+    teaching_moment:
+      title: "Adjust One Drug at a Time"
+
+      explanation: |
+        In clinical titration, you adjust ONE drug per visit and observe
+        the response before adjusting the next. The same principle applies
+        here: move exactly ONE pointer per iteration.
+
+        Moving both:
+          -> You might skip over the correct combination
+          -> Like changing both drugs simultaneously — you cannot tell
+             which change caused the effect
+
+        Moving neither:
+          -> Infinite loop — the algorithm never terminates
+          -> Like never adjusting the regimen and expecting the
+             patient's labs to change on their own
+
+      hint: |
+        Ensure your code has exactly three branches:
+          if current_sum == target:
+              return [nums[left], nums[right]]
+          elif current_sum < target:
+              left += 1         # Move ONLY left
+          else:
+              right -= 1        # Move ONLY right
+
+        Exactly ONE pointer moves per iteration.
+
+      next_step: |
+        Review your if/elif/else structure. Each branch should
+        move exactly one pointer (or return the result).
+
+mistake_categories:
+  wrong_pattern:
+    - brute-force-nested-loops
+
+  pattern_misunderstanding:
+    - moving-wrong-pointer
+    - pointer-initialization-error
+
+  implementation_error:
+    - comparing-indices-instead-of-values
+    - not-handling-no-pair-case
+
+  logic_error:
+    - infinite-loop-both-pointers
+
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-nested-loops"
+      teaching: "Introduce Two Pointers concept using the clinical titration analogy"
+
+    - stage: 2
+      mistake: "pointer-initialization-error"
+      teaching: "Explain SUM vs DIFFERENCE pointer initialization"
+
+    - stage: 3
+      mistake: "moving-wrong-pointer"
+      teaching: "Walk through titration logic — subtherapeutic vs supratherapeutic"
+
+    - stage: 4
+      mistake: "comparing-indices-instead-of-values"
+      teaching: "Clarify formulary index vs dosage value"
+
+    - stage: 5
+      achievement: "Correct Two Pointers implementation!"
+      next: "Try Three Sum or more advanced Two Pointers problems"
+
+teaching_strategies:
+  for_brute_force_users:
+    - "Acknowledge correctness of their exhaustive search"
+    - "Show complexity comparison: 500,000 vs 1,000 lookups for a 1,000-entry formulary"
+    - "Introduce the titration analogy — one adjustment at a time"
+    - "Provide hint about starting at opposite ends of the sorted formulary"
+
+  for_wrong_pointer_movers:
+    - "Walk through a specific dosage example step-by-step"
+    - "Frame as clinical titration: subtherapeutic -> step up, supratherapeutic -> step down"
+    - "Show both moves side-by-side and their effect on the sum"
+    - "State the rule explicitly and ask a practice question"
+
+  for_implementation_errors:
+    - "Point out the exact line with the error"
+    - "Show calculated value vs expected value side-by-side"
+    - "Use the formulary index vs dosage value analogy"
+    - "Provide the corrected code snippet"

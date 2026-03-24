@@ -1,0 +1,102 @@
+# Space Adventure theme for Two Pointers - Pair Distance
+
+title: "Asteroid Belt Navigation"
+function_name: find_asteroid_pair
+
+description: |
+  You're piloting a spacecraft through an asteroid belt. Mission control has
+  provided you with a sorted list of asteroid positions along your flight path.
+
+  For safety planning, you need to identify pairs of asteroids that are exactly
+  a specific distance apart - this helps you plan evasive maneuvers.
+
+  Given a sorted array of asteroid positions and a target distance, find any
+  pair of asteroids that are exactly that distance apart. If multiple pairs
+  exist, return any one. If no such pair exists, return None.
+
+story_context: |
+  Your spacecraft's navigation computer needs this calculation to plan the
+  optimal flight path through the asteroid field. Two asteroids exactly the
+  target distance apart create a "navigation window" - a safe corridor to fly
+  through.
+
+examples:
+  - input:
+      positions: [100, 250, 350, 500, 750]
+      target_distance: 250
+    output: [100, 350]
+    explanation: |
+      Asteroids at positions 100 and 350 are exactly 250 units apart.
+      (350 - 100 = 250). There's also another valid pair: [250, 500],
+      but we only need to return one pair.
+
+  - input:
+      positions: [1, 5, 11, 15, 20]
+      target_distance: 9
+    output: [11, 20]
+    explanation: |
+      Only one pair has exactly 9 units distance: positions 11 and 20.
+      (20 - 11 = 9)
+
+  - input:
+      positions: [1, 2, 3, 4, 5]
+      target_distance: 10
+    output: null
+    explanation: |
+      No pair of asteroids is exactly 10 units apart. The maximum possible
+      distance is 5 - 1 = 4 units.
+
+hints:
+  - level: 1
+    text: "Since the array is sorted, you can use two pointers starting at different ends."
+
+  - level: 2
+    text: "Start with pointers at the beginning and end. Calculate the distance. If it's too large, which pointer should you move?"
+
+  - level: 3
+    text: "If the current distance is larger than target, move the right pointer left. If smaller, move the left pointer right."
+
+starter_code_python: |
+  def find_asteroid_pair(positions, target_distance):
+      """
+      Find two asteroids exactly target_distance apart.
+
+      Args:
+          positions: List[int] - sorted list of asteroid positions
+          target_distance: int - required distance between asteroids
+
+      Returns:
+          List[int] - [pos1, pos2] where pos2 - pos1 == target_distance
+          None - if no such pair exists
+
+      Examples:
+          >>> find_asteroid_pair([100, 250, 350, 500, 750], 250)
+          [100, 350]
+
+          >>> find_asteroid_pair([1, 2, 3, 4, 5], 10)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two asteroids exactly targetDistance apart.
+   *
+   * @param {number[]} positions - sorted array of asteroid positions
+   * @param {number} targetDistance - required distance between asteroids
+   * @return {number[]|null} - [pos1, pos2] or null if no pair exists
+   */
+  function findAsteroidPair(positions, targetDistance) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Basic example from problem description"
+  single-pair: "Only one valid pair exists"
+  no-pair-exists: "No pair with target distance"
+  minimum-input: "Smallest valid input (2 elements)"
+  large-distance: "Large distance between asteroids"
+  consecutive-positions: "Multiple valid pairs, any is acceptable"
+  distance-one: "Minimum distance of 1"
+  large-numbers: "Handle large position values"

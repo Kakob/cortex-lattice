@@ -1,0 +1,117 @@
+# core.yaml - Algorithm-invariant problem definition
+# Two Pointers: Find Non-Duplicate Number Instances
+
+id: two-pointers-find-non-duplicate-number-instances
+pattern: two-pointers
+difficulty: easy
+category: software-engineering
+estimated_time: "15-25 minutes"
+
+constraints:
+  - "1 <= nums.length <= 100,000"
+  - "-1,000,000,000 <= nums[i] <= 1,000,000,000"
+  - "nums is sorted in non-decreasing order"
+
+test_case_data:
+  - id: "basic-example"
+    input:
+      nums: [2, 3, 3, 3, 6, 9, 9]
+    expected: 4
+    expected_array_prefix: [2, 3, 6, 9]
+
+  - id: "two-unique-from-duplicates"
+    input:
+      nums: [2, 2, 2, 11]
+    expected: 2
+    expected_array_prefix: [2, 11]
+
+  - id: "all-same"
+    input:
+      nums: [1, 1, 1, 1, 1]
+    expected: 1
+    expected_array_prefix: [1]
+
+  - id: "already-unique"
+    input:
+      nums: [1, 2, 3, 4, 5]
+    expected: 5
+    expected_array_prefix: [1, 2, 3, 4, 5]
+
+  - id: "two-elements-same"
+    input:
+      nums: [1, 1]
+    expected: 1
+    expected_array_prefix: [1]
+
+  - id: "two-elements-different"
+    input:
+      nums: [1, 2]
+    expected: 2
+    expected_array_prefix: [1, 2]
+
+  - id: "negative-numbers"
+    input:
+      nums: [-3, -1, -1, 0, 0, 0, 3]
+    expected: 4
+    expected_array_prefix: [-3, -1, 0, 3]
+
+  - id: "single-element"
+    input:
+      nums: [1]
+    expected: 1
+    expected_array_prefix: [1]
+
+edge_cases:
+  - case: "All elements identical"
+    description: "Every element is the same — only one unique value"
+    test_id: "all-same"
+
+  - case: "Already unique"
+    description: "No duplicates at all — array is unchanged"
+    test_id: "already-unique"
+
+  - case: "Single element"
+    description: "Smallest possible array — trivially unique"
+    test_id: "single-element"
+
+  - case: "Two identical elements"
+    description: "Minimum array with a duplicate"
+    test_id: "two-elements-same"
+
+  - case: "Negative numbers"
+    description: "Array contains negative values mixed with zero and positives"
+    test_id: "negative-numbers"
+
+pattern_learning_objectives:
+  - "Recognize that a slow/fast pointer approach can deduplicate a sorted array in-place"
+  - "Understand the role of the slow pointer as a write-head placing unique values"
+  - "See how the fast pointer scans ahead to find the next distinct value"
+  - "Learn that this achieves O(n) time and O(1) space — no extra arrays or sets needed"
+
+real_world_applications:
+  - "Removing duplicate entries from sorted database query results"
+  - "Deduplicating sorted log streams before indexing"
+  - "Compacting sorted sensor readings where consecutive duplicates are noise"
+  - "Cleaning sorted transaction records for financial reporting"
+
+complexity_analysis:
+  time:
+    naive: "O(n) with O(n) space — copy unique elements to a new array"
+    optimal: "O(n) — single pass with two pointers, in-place"
+  space:
+    optimal: "O(1) — only using two pointer variables, modifying the array in place"
+
+pattern_signature:
+  indicators:
+    - "Sorted array"
+    - "Remove duplicates in-place"
+    - "Return count of unique elements"
+    - "Modify array so unique elements appear at the front"
+
+  pattern_name: "Two Pointers"
+
+  when_to_use:
+    - "Input is sorted and contains duplicates"
+    - "Need to remove duplicates without extra space"
+    - "Want to modify the array in-place and return a count"
+    - "A slow pointer tracks the write position while a fast pointer scans for new values"

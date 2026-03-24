@@ -1,0 +1,157 @@
+pattern: two-pointers
+problem_id: two-pointers-triplet-sum-to-zero
+
+core_invariants:
+  - id: "sort-first"
+    description: "The array must be sorted before applying Two Pointers"
+    why_it_matters: |
+      Sorting is the foundation of the entire approach. It enables:
+      1. Two Pointers to work correctly (directional sum control)
+      2. Duplicate skipping via adjacent-element comparison
+      3. Sorted triplets in the output (since we iterate left to right)
+      Without sorting, neither the pointer logic nor duplicate elimination works.
+    violation_detection:
+      - "Check that nums is sorted before the Two Pointers inner loop begins"
+      - "If nums is not sorted, the pointer movement logic produces incorrect results"
+    teaching_moment_if_violated: |
+      3Sum REQUIRES sorting as a preprocessing step. Even though the input is
+      unsorted, you must sort it first. The O(n log n) sorting cost is absorbed
+      by the O(n^2) main algorithm, so it does not change the overall complexity.
+
+  - id: "fix-one-use-two-pointers"
+    description: "Fix one element with the outer loop, then use Two Pointers on the remaining subarray"
+    why_it_matters: |
+      This is the key reduction: 3Sum -> 2Sum. By fixing nums[i], the problem
+      becomes: "find two elements in nums[i+1..n-1] that sum to -nums[i]."
+      This is exactly the Pair with Target Sum problem, solvable with Two
+      Pointers in O(n). Running this for each i gives O(n^2) total.
+    violation_detection:
+      - "Outer loop iterates i from 0 to n-3"
+      - "Inner Two Pointers uses left = i+1, right = n-1"
+      - "Target for inner loop is -nums[i]"
+    teaching_moment_if_violated: |
+      The trick to 3Sum is recognizing it as n instances of 2Sum. Fix one
+      element, then the remaining two must sum to its negation. You already
+      know how to solve 2Sum with Two Pointers -- just apply it n times.
+
+  - id: "duplicate-skip-outer-loop"
+    description: "Skip duplicate values in the outer loop to avoid duplicate triplets"
+    why_it_matters: |
+      If nums[i] == nums[i-1], then fixing nums[i] would produce the same
+      set of triplets as fixing nums[i-1]. Skipping duplicates in the outer
+      loop prevents this repetition. This is the first of two levels of
+      duplicate elimination.
+    violation_detection:
+      - "After sorting, check: if i > 0 and nums[i] == nums[i-1], skip this i"
+    teaching_moment_if_violated: |
+      Without skipping duplicates in the outer loop, you will get repeated
+      triplets in the output. For example, with nums = [-1, -1, 0, 1],
+      fixing the first -1 and fixing the second -1 both produce [-1, 0, 1].
+      Skip the second occurrence to avoid the duplicate.
+
+  - id: "duplicate-skip-inner-pointers"
+    description: "After finding a valid triplet, skip duplicate values for both left and right pointers"
+    why_it_matters: |
+      After recording a triplet, if nums[left] == nums[left+1] or
+      nums[right] == nums[right-1], moving only one step would produce
+      the same triplet again. Both pointers must advance past all
+      duplicate values before continuing.
+    violation_detection:
+      - "After appending a triplet: while left < right and nums[left] == nums[left+1], advance left"
+      - "After appending a triplet: while left < right and nums[right] == nums[right-1], retreat right"
+      - "Then advance left and retreat right one more time"
+    teaching_moment_if_violated: |
+      After finding a valid triplet, you must skip past duplicate values
+      on BOTH sides. If nums = [-2, 0, 0, 2, 2] and you find [-2, 0, 2],
+      the next left value is still 0 and next right value is still 2 --
+      you would record the same triplet again. Skip past all duplicates.
+
+  - id: "pointer-convergence-inner"
+    description: "Inner Two Pointers: left starts at i+1, right at n-1, they converge inward"
+    why_it_matters: |
+      For each fixed element nums[i], the Two Pointers search the subarray
+      nums[i+1..n-1]. Left starts just after i (to avoid reusing nums[i]),
+      and right starts at the end. They move toward each other based on
+      the sum comparison with -nums[i].
+    violation_detection:
+      - "left initialised to i + 1 (not 0, not i)"
+      - "right initialised to len(nums) - 1"
+      - "Loop condition: while left < right"
+    teaching_moment_if_violated: |
+      The inner pointers must search only the elements AFTER the fixed
+      element. Starting left at i+1 ensures you do not reuse nums[i].
+      Starting at 0 would pair nums[i] with elements that come before it,
+      producing duplicates or reusing elements.
+
+algorithm_correctness_invariants:
+  - id: "no-element-reuse"
+    description: "Each element can be used at most once per triplet (i < left < right)"
+    why_it_matters: |
+      The triplet must use three distinct positions: i, left, and right.
+      Since i < left (left starts at i+1) and left < right (loop condition),
+      all three indices are always distinct.
+    violation_detection:
+      - "i < left < right at all times"
+      - "No index appears twice in a triplet"
+    teaching_moment_if_violated: |
+      Each position in the array can only contribute one element to a
+      triplet. Using the same position twice would violate the problem
+      constraints. The invariant i < left < right guarantees distinctness.
+
+  - id: "collect-all-triplets"
+    description: "Must find ALL unique triplets, not just the first one"
+    why_it_matters: |
+      Unlike Pair with Target Sum which returns immediately on finding one
+      pair, 3Sum must continue searching to collect every valid triplet.
+      After finding a match, advance both pointers (with duplicate skipping)
+      and keep searching.
+    violation_detection:
+      - "After finding a triplet, do NOT return immediately"
+      - "Append the triplet to a results list and continue the inner loop"
+    teaching_moment_if_violated: |
+      3Sum asks for ALL unique triplets. If you return after the first
+      match, you miss the rest. Append each triplet to a results list,
+      then advance both pointers past duplicates and keep searching.
+
+  - id: "sorted-output"
+    description: "Each triplet must be sorted, and the list of triplets must be sorted"
+    why_it_matters: |
+      Because we sort the input first and iterate i < left < right,
+      each triplet is naturally in non-decreasing order:
+      nums[i] <= nums[left] <= nums[right]. The outer loop ensures
+      triplets are produced in lexicographic order.
+    violation_detection:
+      - "Each triplet [a, b, c] satisfies a <= b <= c"
+      - "The list of triplets is in lexicographic order"
+    teaching_moment_if_violated: |
+      Sorting the input first guarantees that every triplet you produce
+      is already sorted (since i < left < right in a sorted array).
+      This is one of the elegant side-effects of the sort-first approach.
+
+efficiency_invariants:
+  - id: "quadratic-time"
+    description: "Algorithm must run in O(n^2) time"
+    why_it_matters: |
+      The outer loop runs n times. For each iteration, Two Pointers
+      scans at most n elements. Total: O(n) * O(n) = O(n^2).
+      The O(n log n) sorting cost is dominated by O(n^2).
+    violation_detection:
+      - "No triply-nested loops"
+      - "Inner loop is Two Pointers (linear), not another nested scan"
+    teaching_moment_if_violated: |
+      If you are using three nested loops, you have O(n^3) brute force.
+      The Two Pointers inner loop reduces the inner two loops from O(n^2)
+      to O(n), bringing the total from O(n^3) down to O(n^2).
+
+  - id: "early-termination-positive"
+    description: "If nums[i] > 0, no further triplets are possible -- break the outer loop"
+    why_it_matters: |
+      After sorting, if nums[i] > 0, then nums[i] + nums[left] + nums[right]
+      is the sum of three positive numbers (since left > i and right > left),
+      which can never be zero. Breaking early avoids wasted iterations.
+    violation_detection:
+      - "Optional optimisation: if nums[i] > 0, break out of the outer loop"
+    teaching_moment_if_violated: |
+      This is an optional but effective optimisation. Once the fixed element
+      is positive, every remaining element is also positive (sorted array),
+      so no triplet can sum to zero. Breaking early can save many iterations.

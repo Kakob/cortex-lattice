@@ -1,0 +1,114 @@
+# core.yaml - Algorithm-invariant problem definition
+# Shared across all narrative themes. Test data, constraints, and complexity live here.
+
+id: two-pointers-pair-distance
+pattern: two-pointers
+difficulty: easy
+category: software-engineering
+estimated_time: "20-30 minutes"
+
+constraints:
+  - "2 <= positions.length <= 100,000"
+  - "1 <= positions[i] <= 1,000,000,000"
+  - "positions is sorted in strictly increasing order (no duplicates)"
+  - "1 <= target_distance <= 1,000,000,000"
+  - "All positions are unique"
+
+# Test case data: inputs and expected outputs only.
+# Themed explanations are provided by each theme's problem.yaml.
+test_case_data:
+  - id: "basic-example"
+    input:
+      positions: [100, 250, 350, 500, 750]
+      target_distance: 250
+    expected: [100, 350]
+
+  - id: "single-pair"
+    input:
+      positions: [1, 5, 11, 15, 20]
+      target_distance: 9
+    expected: [11, 20]
+
+  - id: "no-pair-exists"
+    input:
+      positions: [1, 2, 3, 4, 5]
+      target_distance: 10
+    expected: null
+
+  - id: "minimum-input"
+    input:
+      positions: [1, 11]
+      target_distance: 10
+    expected: [1, 11]
+
+  - id: "large-distance"
+    input:
+      positions: [1, 100, 500, 1000, 10000]
+      target_distance: 9900
+    expected: [100, 10000]
+
+  - id: "consecutive-positions"
+    input:
+      positions: [10, 20, 30, 40, 50]
+      target_distance: 10
+    expected: [10, 20]
+
+  - id: "distance-one"
+    input:
+      positions: [1, 2, 5, 8, 9]
+      target_distance: 1
+    expected: [1, 2]
+
+  - id: "large-numbers"
+    input:
+      positions: [1000000000, 1000000100, 1000000250]
+      target_distance: 150
+    expected: [1000000100, 1000000250]
+
+edge_cases:
+  - case: "Two elements only"
+    description: "Smallest possible array"
+    test_id: "minimum-input"
+
+  - case: "All distances too small"
+    description: "Maximum distance less than target"
+    test_id: "no-pair-exists"
+
+  - case: "Very large numbers"
+    description: "Positions near integer limits"
+    test_id: "large-numbers"
+
+pattern_learning_objectives:
+  - "Understand when Two Pointers pattern applies (sorted array, finding pairs)"
+  - "Learn how to move pointers based on comparison with target value"
+  - "Recognize O(n) vs O(n²) complexity trade-off"
+  - "Identify sorted data as a hint for Two Pointers approach"
+
+real_world_applications:
+  - "Finding pairs in financial data with specific price differences"
+  - "Matching timestamps with exact time intervals"
+  - "Network packet analysis (finding packets with specific delay)"
+  - "GPS coordinate matching with distance constraints"
+  - "Database query optimization for range searches"
+
+complexity_analysis:
+  time:
+    naive: "O(n²) - checking all pairs with nested loops"
+    optimal: "O(n) - single pass with two pointers"
+  space:
+    optimal: "O(1) - only using two pointer variables"
+
+pattern_signature:
+  indicators:
+    - "Sorted array or list"
+    - "Finding pairs with specific property"
+    - "Need to optimize from O(n²) to O(n)"
+    - "Comparison-based decision making"
+
+  pattern_name: "Two Pointers"
+
+  when_to_use:
+    - "Input is sorted (or can be sorted)"
+    - "Looking for pairs, triplets, or subarrays"
+    - "Need to find elements with specific relationship"
+    - "Can make progress from both ends simultaneously"

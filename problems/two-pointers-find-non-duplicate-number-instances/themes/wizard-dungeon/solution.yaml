@@ -1,0 +1,296 @@
+id: two-pointers-find-non-duplicate-number-instances-wizard
+pattern: two-pointers
+difficulty: easy
+
+# The reference implementation - optimal Two Pointers solution
+# NOTE: For deduplication, both pointers start from the left and move right
+solution_code_python: |
+  def remove_duplicate_spells(nums):
+      """
+      Optimal Two Pointers solution for removing duplicates in-place.
+      Time: O(n), Space: O(1)
+
+      Key insight: Use a slow pointer (inking quill) to track the write
+      position for unique spells, and a fast pointer (reading quill) to
+      scan every entry. When the reading quill finds a new spell, copy
+      it to the inking quill's position and advance.
+      """
+      if len(nums) == 0:
+          return 0
+
+      slow = 0  # Inking quill — last unique spell position
+
+      for fast in range(1, len(nums)):
+          if nums[fast] != nums[slow]:
+              slow += 1
+              nums[slow] = nums[fast]
+
+      return slow + 1  # Count of unique spells
+
+solution_code_javascript: |
+  function removeDuplicateSpells(nums) {
+      /**
+       * Optimal Two Pointers solution for removing duplicates in-place.
+       * Time: O(n), Space: O(1)
+       *
+       * Key insight: slow pointer tracks write position for unique values,
+       * fast pointer scans every element.
+       */
+      if (nums.length === 0) return 0;
+
+      let slow = 0;  // Inking quill — last unique spell position
+
+      for (let fast = 1; fast < nums.length; fast++) {
+          if (nums[fast] !== nums[slow]) {
+              slow++;
+              nums[slow] = nums[fast];
+          }
+      }
+
+      return slow + 1;  // Count of unique spells
+  }
+
+# Expected execution trace for primary example
+reference_trace:
+  input:
+    nums: [2, 3, 3, 3, 6, 9, 9]
+
+  steps:
+    - step: 0
+      action: "Initialize pointers"
+      state:
+        slow: 0
+        fast: 1
+        nums_slow: 2
+        nums_fast: 3
+      explanation: "Inking quill at first spell (power 2). Reading quill starts at second entry."
+
+    - step: 1
+      action: "Compare nums[fast] to nums[slow]"
+      state:
+        nums_fast: 3
+        nums_slow: 2
+      comparison: "3 != 2"
+      decision: "New spell found! Advance inking quill and copy."
+
+    - step: 2
+      action: "Write new spell and advance slow"
+      state:
+        slow: 1
+        nums: [2, 3, 3, 3, 6, 9, 9]
+      explanation: "Spell of power 3 inked at position 1. slow = 1."
+
+    - step: 3
+      action: "fast = 2: Compare nums[2] to nums[slow]"
+      state:
+        nums_fast: 3
+        nums_slow: 3
+      comparison: "3 == 3"
+      decision: "Duplicate — skip. The reading quill moves on."
+
+    - step: 4
+      action: "fast = 3: Compare nums[3] to nums[slow]"
+      state:
+        nums_fast: 3
+        nums_slow: 3
+      comparison: "3 == 3"
+      decision: "Another duplicate — skip."
+
+    - step: 5
+      action: "fast = 4: Compare nums[4] to nums[slow]"
+      state:
+        nums_fast: 6
+        nums_slow: 3
+      comparison: "6 != 3"
+      decision: "New spell found! Advance inking quill and copy."
+
+    - step: 6
+      action: "Write new spell and advance slow"
+      state:
+        slow: 2
+        nums: [2, 3, 6, 3, 6, 9, 9]
+      explanation: "Spell of power 6 inked at position 2. slow = 2."
+
+    - step: 7
+      action: "fast = 5: Compare nums[5] to nums[slow]"
+      state:
+        nums_fast: 9
+        nums_slow: 6
+      comparison: "9 != 6"
+      decision: "New spell found! Advance inking quill and copy."
+
+    - step: 8
+      action: "Write new spell and advance slow"
+      state:
+        slow: 3
+        nums: [2, 3, 6, 9, 6, 9, 9]
+      explanation: "Spell of power 9 inked at position 3. slow = 3."
+
+    - step: 9
+      action: "fast = 6: Compare nums[6] to nums[slow]"
+      state:
+        nums_fast: 9
+        nums_slow: 9
+      comparison: "9 == 9"
+      decision: "Duplicate — skip."
+
+    - step: 10
+      action: "Loop ends. Return slow + 1."
+      return_value: 4
+      state:
+        final_slow: 3
+        final_array_prefix: [2, 3, 6, 9]
+      success: true
+
+  summary:
+    total_iterations: 6
+    unique_values_found: 4
+    duplicates_skipped: 3
+    result: "4 unique spells — scroll consolidated"
+    efficiency: "O(n) — single pass through the scroll"
+
+# Additional traces for edge cases
+additional_traces:
+  - name: "All same spell (single unique)"
+    input:
+      nums: [1, 1, 1, 1, 1]
+    outcome:
+      total_iterations: 4
+      result: 1
+      explanation: "Reading quill finds no new spells. Inking quill never moves from index 0."
+
+  - name: "Already unique (no duplicates)"
+    input:
+      nums: [1, 2, 3, 4, 5]
+    outcome:
+      total_iterations: 4
+      result: 5
+      explanation: "Every entry is new. Inking quill advances on every step. No overwrites needed."
+
+  - name: "Single element"
+    input:
+      nums: [1]
+    outcome:
+      total_iterations: 0
+      result: 1
+      explanation: "Loop never executes. Return slow + 1 = 1."
+
+  - name: "Negative and positive values"
+    input:
+      nums: [-3, -1, -1, 0, 0, 0, 3]
+    outcome:
+      result: 4
+      final_prefix: [-3, -1, 0, 3]
+      explanation: "Negative values are handled identically — comparison logic is the same."
+
+# Complexity analysis
+complexity:
+  time:
+    best_case: "O(n)"
+    best_case_scenario: "All elements are identical — fast scans all, slow never moves"
+
+    average_case: "O(n)"
+    average_case_scenario: "Mix of duplicates — fast always scans all n elements"
+
+    worst_case: "O(n)"
+    worst_case_scenario: "All elements unique — fast scans and slow advances on every step"
+
+    explanation: |
+      The fast pointer always visits every element exactly once (n-1 iterations).
+      The slow pointer advances at most n-1 times. Each iteration does O(1) work
+      (one comparison and possibly one copy). Total: O(n).
+
+  space:
+    value: "O(1)"
+    explanation: "Only two pointer variables (slow, fast). The array is modified in-place."
+    note: "No auxiliary data structures — constant space regardless of scroll length."
+
+# Alternative approaches for comparison
+alternative_solutions:
+  - name: "Hash Set (The Enchanted Ledger)"
+    approach: "Use a set to track seen spells, then rebuild the array from the set"
+
+    code_python: |
+      def remove_duplicate_spells_set(nums):
+          seen = set()
+          write = 0
+          for val in nums:
+              if val not in seen:
+                  seen.add(val)
+                  nums[write] = val
+                  write += 1
+          return write
+
+    complexity:
+      time: "O(n)"
+      space: "O(n)"
+
+    tradeoff: "Same time but uses O(n) extra space for the set"
+
+    when_to_use: "When the array is NOT sorted — the set handles arbitrary order"
+
+    teaching_value: |
+      Shows that sorted input makes the set unnecessary. Because duplicates
+      are adjacent in a sorted array, a simple comparison with the previous
+      unique value replaces the entire hash set.
+
+  - name: "Brute Force (Shift Elements)"
+    approach: "When a duplicate is found, shift all remaining elements left by one"
+
+    code_python: |
+      def remove_duplicate_spells_brute(nums):
+          i = 0
+          length = len(nums)
+          while i < length - 1:
+              if nums[i] == nums[i + 1]:
+                  for j in range(i + 1, length - 1):
+                      nums[j] = nums[j + 1]
+                  length -= 1
+              else:
+                  i += 1
+          return length
+
+    complexity:
+      time: "O(n^2)"
+      space: "O(1)"
+
+    when_to_use: "Never — strictly worse than Two Pointers"
+    teaching_value: "Shows WHY Two Pointers is an optimization — avoids repeated shifting"
+
+# Approach explanation
+approach_explanation:
+  core_insight: |
+    Because the scroll is sorted, duplicates are always adjacent. A slow pointer
+    (inking quill) holds the position of the last confirmed unique spell. A fast
+    pointer (reading quill) scans every entry. When the reading quill finds a
+    value different from the inking quill's current spell, the inking quill
+    advances and the new spell is copied there. This partitions the array into
+    a clean prefix of unique values and a tail of leftover duplicates.
+
+  step_by_step:
+    - step: 1
+      action: "Initialize slow = 0 (first spell is always unique)"
+      why: "The first entry on any sorted scroll has no predecessor — it is trivially unique."
+
+    - step: 2
+      action: "Loop fast from 1 to n-1, visiting every entry"
+      why: "The reading quill must inspect every parchment entry to find all unique spells."
+
+    - step: 3
+      action: "Compare nums[fast] to nums[slow]"
+      cases:
+        - "nums[fast] == nums[slow]: Duplicate — skip it, advance fast only."
+        - "nums[fast] != nums[slow]: New spell — advance slow, copy the spell."
+
+    - step: 4
+      action: "Return slow + 1"
+      why: "slow is the index of the last unique spell (0-based). Count = index + 1."
+
+  visual_metaphor: |
+    Imagine two quills hovering over a long spell scroll. The inking quill
+    sits on the last confirmed unique spell. The reading quill flies down
+    the scroll, entry by entry. When the reading quill spots a new spell
+    (different from what the inking quill sits on), the inking quill hops
+    forward one space and the reading quill dictates the new spell to be
+    inked there. By the time the reading quill reaches the end, the front
+    of the scroll contains a clean, duplicate-free catalog.

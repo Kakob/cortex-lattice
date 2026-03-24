@@ -1,0 +1,111 @@
+# Wizard's Dungeon theme for Two Pointers - Find Non-Duplicate Number Instances
+
+title: "The Arcane Scroll of Unique Spells"
+function_name: remove_duplicate_spells
+
+description: |
+  You are Elara, a wandering wizard cataloging spells recovered from a
+  collapsed library in the Ruins of Zanthar. The ancient librarians were
+  meticulous but redundant — your spell scroll lists every incantation by
+  power level in ascending order, but many spells are recorded multiple
+  times.
+
+  Before presenting the scroll to the Archmage's Council, you must
+  consolidate it: remove all duplicate entries so that each unique power
+  level appears exactly once, keeping them in sorted order at the front
+  of the scroll. The remaining parchment beyond the unique entries can be
+  ignored — only the count of distinct spells matters for the Council's
+  records.
+
+  Given a sorted array of spell power levels (`nums`), modify the array
+  in-place so that the first k elements contain only the unique values
+  in sorted order. Return k — the number of unique spells.
+
+story_context: |
+  The Ruins of Zanthar once housed the greatest magical library in the
+  realm. When the tower fell, scrolls were scattered and hastily re-copied
+  by apprentice scribes, resulting in countless duplicates. The Council
+  demands a clean inventory — each unique spell counted exactly once —
+  before they will authorize an expedition to recover more artifacts.
+  You cannot create a new scroll (no extra space allowed); you must
+  consolidate the entries directly on the existing parchment using only
+  a reading quill (fast pointer) and an inking quill (slow pointer).
+
+examples:
+  - input:
+      nums: [2, 3, 3, 3, 6, 9, 9]
+    output: 4
+    explanation: |
+      The spell scroll lists power levels 2, 3, 3, 3, 6, 9, 9.
+      After consolidation, the scroll reads [2, 3, 6, 9, ...].
+      Four unique spells remain — the Council is satisfied.
+
+  - input:
+      nums: [1, 1, 1, 1, 1]
+    output: 1
+    explanation: |
+      Five copies of the same spell at power level 1. After
+      consolidation, only one entry remains: [1, ...].
+      The Council notes a single unique incantation.
+
+  - input:
+      nums: [1, 2, 3, 4, 5]
+    output: 5
+    explanation: |
+      No duplicates on this scroll — every spell is unique.
+      The scroll is already clean: [1, 2, 3, 4, 5].
+      Five distinct spells are reported to the Council.
+
+hints:
+  - level: 1
+    text: "The spell scroll is sorted by power level, so all copies of the same spell are grouped together. You do not need to search far to find duplicates."
+
+  - level: 2
+    text: "Use two quills: an inking quill (slow pointer) that marks where to write the next unique spell, and a reading quill (fast pointer) that scans each entry on the scroll."
+
+  - level: 3
+    text: "Start the inking quill at the first entry (it is always unique). Move the reading quill through every entry. When the reading quill finds a spell different from the one at the inking quill, advance the inking quill and copy the new spell there. Return the inking quill's position + 1 as the count."
+
+starter_code_python: |
+  def remove_duplicate_spells(nums):
+      """
+      Consolidate a sorted spell scroll by removing duplicate power levels
+      in-place. Return the count of unique spells.
+
+      Args:
+          nums: List[int] - sorted list of spell power levels (modified in-place)
+
+      Returns:
+          int - the number of unique spell power levels
+
+      Examples:
+          >>> nums = [2, 3, 3, 3, 6, 9, 9]
+          >>> remove_duplicate_spells(nums)
+          4
+          >>> nums[:4]
+          [2, 3, 6, 9]
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Consolidate a sorted spell scroll by removing duplicate power levels
+   * in-place. Return the count of unique spells.
+   *
+   * @param {number[]} nums - sorted array of spell power levels (modified in-place)
+   * @return {number} - the count of unique spell power levels
+   */
+  function removeDuplicateSpells(nums) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Scroll with mixed duplicates — four unique spells emerge from seven entries"
+  two-unique-from-duplicates: "Three copies of one spell and one unique — two distinct power levels"
+  all-same: "Every entry is the same incantation — only one unique spell"
+  already-unique: "A perfectly cataloged scroll — no duplicates to remove"
+  two-elements-same: "Two copies of the same spell — one remains"
+  two-elements-different: "Two different spells — both are unique"
+  negative-numbers: "Cursed spells with negative power levels mixed with normal ones"
+  single-element: "A scroll with only one entry — trivially unique"

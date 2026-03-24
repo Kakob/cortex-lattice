@@ -4,8 +4,8 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Cortex Lattice - Learn AI Safety Through Code",
-  description: "Master data structures and algorithms through AI safety research paper implementations",
+  title: "Cortex Lattice - Learn Algorithms Through Guided Problem Solving",
+  description: "Master data structures and algorithms through guided, themed problem solving",
 };
 
 export default async function RootLayout({

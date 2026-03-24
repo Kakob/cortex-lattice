@@ -5,7 +5,7 @@ id: pattern-name-problem-title  # Must match directory name
 title: "Problem Title"
 difficulty: easy  # easy | medium | hard
 pattern: pattern-name  # e.g., two-pointers, sliding-window, binary-search
-theme: software-engineering  # Category for grouping
+category: software-engineering  # Category for grouping on home page
 estimated_time: "20-30 minutes"
 
 description: |

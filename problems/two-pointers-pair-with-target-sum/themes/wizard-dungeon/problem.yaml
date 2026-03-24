@@ -1,0 +1,112 @@
+# Wizard's Dungeon theme for Two Pointers - Pair with Target Sum
+
+title: "The Runestone Lock"
+function_name: find_rune_pair
+
+description: |
+  You are Elara, a wandering wizard delving into the Crypts of Kaelthar. Deep
+  beneath the earth you encounter a sealed vault door inscribed with an ancient
+  lock. The lock displays a glowing number -- the *required arcane charge* --
+  and the door will only open when two runestones whose combined power equals
+  that charge are placed into its twin sockets.
+
+  Fortunately, your satchel contains a collection of runestones, each etched
+  with a power value. You sorted them by potency long ago (a wise habit for
+  any dungeon-crawler). Given this sorted array of runestone powers and the
+  lock's required charge, find two runestones whose powers sum to exactly the
+  target. Return them as a pair. If no such pair exists, the vault remains
+  sealed -- return None.
+
+story_context: |
+  The Crypts of Kaelthar were built by an order of arithmancer-monks who
+  believed every door should test the mind as well as the spirit. Their locks
+  are puzzles: a pair of sockets that accept runestones, and an enchantment
+  that checks whether the two stones' combined power matches the door's
+  requirement. Brute-force trial of every combination would take hours --
+  hours you do not have, with ghouls shambling in the corridors behind you.
+  But the stones in your satchel are sorted by power, and a clever wizard
+  can exploit that order to find the answer in a single sweep.
+
+examples:
+  - input:
+      nums: [1, 2, 3, 4, 6]
+      target: 6
+    output: [2, 4]
+    explanation: |
+      Your satchel holds runestones of power 1, 2, 3, 4, and 6.
+      The vault demands a combined charge of 6.
+      The runestones of power 2 and 4 together yield 2 + 4 = 6 -- the door
+      grinds open, revealing the treasure beyond.
+
+  - input:
+      nums: [2, 5, 9, 11]
+      target: 13
+    output: [2, 11]
+    explanation: |
+      Among powers 2, 5, 9, and 11, only the weakest stone (2) and the
+      mightiest (11) combine to reach the required charge of 13.
+      2 + 11 = 13. The lock clicks and the vault yields.
+
+  - input:
+      nums: [1, 2, 3, 9]
+      target: 8
+    output: null
+    explanation: |
+      No pair of runestones sums to 8. The closest are 3 + 9 = 12
+      (too powerful) and 2 + 3 = 5 (too weak). The vault remains sealed,
+      and you must seek another passage.
+
+hints:
+  - level: 1
+    text: "Your runestones are sorted by power. A seasoned wizard would exploit that order rather than fumbling through every possible pairing."
+
+  - level: 2
+    text: "Place one finger on the weakest runestone and another on the mightiest. Their combined charge tells you which finger to move next."
+
+  - level: 3
+    text: "If the combined power is too low, advance the left finger to a stronger stone. If too high, retreat the right finger to a weaker one. When the fingers meet without a match, no pair exists."
+
+starter_code_python: |
+  def find_rune_pair(nums, target):
+      """
+      Find two runestones whose combined power equals the lock's charge.
+
+      Args:
+          nums: List[int] - sorted list of runestone power values
+          target: int - the lock's required arcane charge
+
+      Returns:
+          List[int] - [power1, power2] where power1 + power2 == target
+          None - if no valid pair of runestones exists
+
+      Examples:
+          >>> find_rune_pair([1, 2, 3, 4, 6], 6)
+          [2, 4]
+
+          >>> find_rune_pair([1, 2, 3, 9], 8)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two runestones whose combined power equals the lock's charge.
+   *
+   * @param {number[]} nums - sorted array of runestone power values
+   * @param {number} target - the lock's required arcane charge
+   * @return {number[]|null} - [power1, power2] or null if no pair exists
+   */
+  function findRunePair(nums, target) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Five runestones, straightforward pair sums to 6"
+  first-and-last: "The answer lies at the extremes of the satchel"
+  duplicate-values: "Two identical runestones of power 4 combine for the charge"
+  no-pair-exists: "No combination of two stones reaches the required charge"
+  minimum-input: "Only two runestones -- check the single pair"
+  negative-numbers: "Cursed runestones with negative power drain can still be useful"
+  large-values: "Powerful runestones near the top of the satchel"
+  zero-target: "The vault demands perfect balance: positive and negative must cancel"

@@ -1,0 +1,110 @@
+# core.yaml - Algorithm-invariant problem definition
+# Two Pointers: Squaring a Sorted Array
+
+id: two-pointers-squaring-a-sorted-array
+pattern: two-pointers
+difficulty: easy
+category: software-engineering
+estimated_time: "15-25 minutes"
+
+constraints:
+  - "1 <= nums.length <= 100,000"
+  - "-10,000 <= nums[i] <= 10,000"
+  - "nums is sorted in non-decreasing order"
+
+test_case_data:
+  - id: "mixed-negatives-and-positives"
+    input:
+      nums: [-2, -1, 0, 2, 3]
+    expected: [0, 1, 4, 4, 9]
+
+  - id: "mixed-with-symmetric-values"
+    input:
+      nums: [-3, -1, 0, 1, 2]
+    expected: [0, 1, 1, 4, 9]
+
+  - id: "all-positive"
+    input:
+      nums: [1, 2, 3, 4, 5]
+    expected: [1, 4, 9, 16, 25]
+
+  - id: "all-negative"
+    input:
+      nums: [-5, -4, -3, -2, -1]
+    expected: [1, 4, 9, 16, 25]
+
+  - id: "two-elements-mirror"
+    input:
+      nums: [-1, 1]
+    expected: [1, 1]
+
+  - id: "single-zero"
+    input:
+      nums: [0]
+    expected: [0]
+
+  - id: "zeros-and-mixed"
+    input:
+      nums: [-4, 0, 0, 3, 10]
+    expected: [0, 0, 9, 16, 100]
+
+  - id: "mixed-with-large-spread"
+    input:
+      nums: [-7, -3, 2, 3, 11]
+    expected: [4, 9, 9, 49, 121]
+
+edge_cases:
+  - case: "All positive values"
+    description: "Squares are already in sorted order -- no reordering needed"
+    test_id: "all-positive"
+
+  - case: "All negative values"
+    description: "Squares are in reverse order -- the smallest absolute value is at the right end"
+    test_id: "all-negative"
+
+  - case: "Single element"
+    description: "Only one element -- trivially square and return it"
+    test_id: "single-zero"
+
+  - case: "Zeros in the array"
+    description: "Zeros produce squares of zero, which should appear at the beginning of the result"
+    test_id: "zeros-and-mixed"
+
+  - case: "Mirror values"
+    description: "Negative and positive values with the same absolute value produce equal squares"
+    test_id: "two-elements-mirror"
+
+pattern_learning_objectives:
+  - "Recognize that squaring a sorted array with negatives disrupts the sorted order"
+  - "Understand why two pointers from opposite ends solves this in O(n)"
+  - "Learn to compare absolute values to determine which square is larger"
+  - "Practice filling a result array from the end (largest to smallest)"
+  - "See that the largest squared value must come from one of the two ends of the sorted input"
+
+real_world_applications:
+  - "Signal processing: computing power spectra from sorted frequency data"
+  - "Physics simulations: calculating energy (proportional to v^2) from sorted velocity data"
+  - "Statistics: computing squared deviations from sorted residuals"
+  - "Machine learning: computing squared error terms for sorted prediction residuals"
+
+complexity_analysis:
+  time:
+    naive: "O(n log n) - square each element then sort the result"
+    optimal: "O(n) - single pass with two pointers from opposite ends"
+  space:
+    optimal: "O(n) - the output array (required, since we return a new array)"
+
+pattern_signature:
+  indicators:
+    - "Sorted array that may contain negative values"
+    - "Need squares in sorted order"
+    - "Largest absolute values are at the ends of the sorted array"
+    - "Can compare from both ends and fill result backwards"
+
+  pattern_name: "Two Pointers"
+
+  when_to_use:
+    - "Input is sorted and contains negative values"
+    - "Squaring would break the sorted order"
+    - "Need to produce a sorted result without an explicit sort step"
+    - "The largest square must come from one of the two ends"

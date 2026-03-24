@@ -1,0 +1,117 @@
+# Wizard's Dungeon theme for Two Pointers - Squaring a Sorted Array
+
+title: "The Enchantment Amplifier"
+function_name: square_enchantments
+
+description: |
+  You are Elara, a wandering wizard preparing for a trial in the Amplification
+  Chamber. The chamber's ancient mechanism takes a collection of enchantment
+  runes -- each inscribed with a power level -- and amplifies them by squaring
+  their magnitude. Some runes carry cursed (negative) power, and others carry
+  blessed (positive) power, but the amplifier treats all power equally: it
+  squares the raw value, turning both curses and blessings into pure arcane
+  energy.
+
+  Your runes are arranged in a sorted rack, from most-cursed (most negative)
+  to most-blessed (most positive). After amplification, you must present the
+  squared power levels in ascending order to pass through the chamber's
+  guardian ward. Return a new array of the squared values, sorted from
+  smallest to largest.
+
+story_context: |
+  The Amplification Chamber was designed by the arithmancer-monks of Kaelthar
+  to test a wizard's understanding of magnitude. Cursed runes like -7 and
+  blessed runes like 3 both produce positive energy when squared (49 and 9),
+  but a naive wizard who simply squares each rune in order will find the
+  results scrambled -- the most-cursed rune at the far left might produce
+  the largest squared value. The chamber's ward detects unsorted output
+  and slams shut.
+
+  A clever wizard notices that the largest squared values must come from the
+  extremes of the sorted rack -- either the most-cursed rune on the left or
+  the most-blessed rune on the right. By comparing these two ends and
+  working inward, the wizard can fill the result from largest to smallest
+  in a single sweep.
+
+examples:
+  - input:
+      nums: [-2, -1, 0, 2, 3]
+    output: [0, 1, 4, 4, 9]
+    explanation: |
+      Your rune rack holds powers -2, -1, 0, 2, 3 (sorted, curses first).
+      Squaring each: 4, 1, 0, 4, 9. But these must be sorted!
+      Using Two Pointers from the ends:
+        Compare |-2| vs |3|: 3 is larger, so 9 goes at position 4
+        Compare |-2| vs |2|: equal, pick right: 4 goes at position 3
+        Compare |-2| vs |0|: 2 is larger, so 4 goes at position 2
+        Compare |-1| vs |0|: 1 is larger, so 1 goes at position 1
+        Only 0 remains: 0 goes at position 0
+      Result: [0, 1, 4, 4, 9]
+
+  - input:
+      nums: [-5, -4, -3, -2, -1]
+    output: [1, 4, 9, 16, 25]
+    explanation: |
+      All runes are cursed (negative). Squaring reverses their order:
+      (-1)^2 = 1 is the smallest, (-5)^2 = 25 is the largest.
+      The Two Pointers approach correctly fills from the ends inward.
+
+  - input:
+      nums: [0]
+    output: [0]
+    explanation: |
+      A single neutral rune. 0^2 = 0. The chamber lets you pass.
+
+hints:
+  - level: 1
+    text: "After squaring, the largest values come from the runes with the greatest absolute power -- and those sit at the far ends of your sorted rack."
+
+  - level: 2
+    text: "Place one finger on the most-cursed rune (leftmost) and another on the most-blessed rune (rightmost). Compare their absolute magnitudes to decide which produces the larger square."
+
+  - level: 3
+    text: "Whichever end has the greater absolute value produces the next largest square. Place it at the END of your result array, then move that finger inward. Fill the result from right to left until both fingers have crossed."
+
+starter_code_python: |
+  def square_enchantments(nums):
+      """
+      Square each rune's power and return the results sorted ascending.
+
+      Args:
+          nums: List[int] - sorted list of enchantment power levels
+                            (may contain negative/cursed values)
+
+      Returns:
+          List[int] - sorted list of squared power levels
+
+      Examples:
+          >>> square_enchantments([-2, -1, 0, 2, 3])
+          [0, 1, 4, 4, 9]
+
+          >>> square_enchantments([-5, -4, -3, -2, -1])
+          [1, 4, 9, 16, 25]
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Square each rune's power and return the results sorted ascending.
+   *
+   * @param {number[]} nums - sorted array of enchantment power levels
+   *                          (may contain negative/cursed values)
+   * @return {number[]} - sorted array of squared power levels
+   */
+  function squareEnchantments(nums) {
+      // Your code here
+  }
+
+test_case_explanations:
+  mixed-negatives-and-positives: "A mix of cursed and blessed runes -- squaring scrambles the order"
+  mixed-with-symmetric-values: "Runes of power -1 and 1 produce identical squares"
+  all-positive: "All blessed runes -- squares are already in order"
+  all-negative: "All cursed runes -- squaring reverses the order completely"
+  two-elements-mirror: "One cursed and one blessed rune of equal magnitude"
+  single-zero: "A single neutral rune -- trivially pass the chamber"
+  zeros-and-mixed: "Zeros produce the smallest squares; large magnitudes at the ends dominate"
+  mixed-with-large-spread: "Wide spread of powers tests that the algorithm handles big and small squares correctly"

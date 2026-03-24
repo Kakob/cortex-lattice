@@ -1,0 +1,445 @@
+id: two-pointers-triplet-sum-to-zero
+pattern: two-pointers
+difficulty: medium
+
+# The reference implementation - optimal Two Pointers solution
+# Key: Sort first, fix one element, run Two Pointers on the remainder
+solution_code_python: |
+  def find_null_wards(nums):
+      """
+      Optimal Two Pointers solution for finding all unique triplets summing to zero.
+      Time: O(n^2), Space: O(n) for sorting
+
+      Strategy: Sort the components. For each anchor component, use Two Pointers
+      on the remaining subarray to find pairs summing to the anchor's negation.
+      Skip duplicates at both the outer and inner levels.
+      """
+      nums.sort()
+      triplets = []
+
+      for i in range(len(nums) - 2):
+          # Skip duplicate anchors
+          if i > 0 and nums[i] == nums[i - 1]:
+              continue
+
+          # Early termination: if anchor is positive, no triplet can sum to 0
+          if nums[i] > 0:
+              break
+
+          left = i + 1
+          right = len(nums) - 1
+
+          while left < right:
+              current_sum = nums[i] + nums[left] + nums[right]
+
+              if current_sum == 0:
+                  triplets.append([nums[i], nums[left], nums[right]])
+
+                  # Skip duplicate left values
+                  while left < right and nums[left] == nums[left + 1]:
+                      left += 1
+                  # Skip duplicate right values
+                  while left < right and nums[right] == nums[right - 1]:
+                      right -= 1
+
+                  left += 1
+                  right -= 1
+              elif current_sum < 0:
+                  left += 1   # Need larger sum -- advance to stronger charge
+              else:
+                  right -= 1  # Need smaller sum -- retreat to weaker charge
+
+      return triplets
+
+solution_code_javascript: |
+  function findNullWards(nums) {
+      /**
+       * Optimal Two Pointers solution for finding all unique triplets summing to zero.
+       * Time: O(n^2), Space: O(n) for sorting
+       *
+       * Strategy: Sort the components. For each anchor, use Two Pointers on the
+       * remaining subarray. Skip duplicates at both levels.
+       */
+      nums.sort((a, b) => a - b);
+      const triplets = [];
+
+      for (let i = 0; i < nums.length - 2; i++) {
+          // Skip duplicate anchors
+          if (i > 0 && nums[i] === nums[i - 1]) continue;
+
+          // Early termination: if anchor is positive, no triplet can sum to 0
+          if (nums[i] > 0) break;
+
+          let left = i + 1;
+          let right = nums.length - 1;
+
+          while (left < right) {
+              const currentSum = nums[i] + nums[left] + nums[right];
+
+              if (currentSum === 0) {
+                  triplets.push([nums[i], nums[left], nums[right]]);
+
+                  // Skip duplicate left values
+                  while (left < right && nums[left] === nums[left + 1]) left++;
+                  // Skip duplicate right values
+                  while (left < right && nums[right] === nums[right - 1]) right--;
+
+                  left++;
+                  right--;
+              } else if (currentSum < 0) {
+                  left++;   // Need larger sum
+              } else {
+                  right--;  // Need smaller sum
+              }
+          }
+      }
+
+      return triplets;
+  }
+
+# Expected execution trace for primary example
+reference_trace:
+  input:
+    nums: [-3, 0, 1, 2, -1, 1, -2]
+
+  steps:
+    - step: 0
+      action: "Sort the spell components by charge"
+      state:
+        nums_before: [-3, 0, 1, 2, -1, 1, -2]
+        nums_after: [-3, -2, -1, 0, 1, 1, 2]
+      explanation: "Arrange components from most negative to most positive charge"
+
+    - step: 1
+      action: "Fix anchor at i=0, nums[0]=-3"
+      state:
+        anchor: -3
+        target_pair_sum: 3
+        left: 1
+        right: 6
+      explanation: "Need two components summing to 3 to cancel the -3 anchor"
+
+    - step: 2
+      action: "Inner Two Pointers: nums[-2] + nums[2] = -2 + 2 = 0, total = -3 + 0 = -3"
+      state:
+        current_sum: -3
+      comparison: "-3 < 0 -- sum too low, advance left"
+
+    - step: 3
+      action: "left advances to index 2 (value -1), sum = -3 + (-1) + 2 = -2"
+      state:
+        current_sum: -2
+      comparison: "-2 < 0 -- still too low, advance left"
+
+    - step: 4
+      action: "left advances to index 3 (value 0), sum = -3 + 0 + 2 = -1"
+      state:
+        current_sum: -1
+      comparison: "-1 < 0 -- still too low, advance left"
+
+    - step: 5
+      action: "left advances to index 4 (value 1), sum = -3 + 1 + 2 = 0"
+      state:
+        current_sum: 0
+      comparison: "0 == 0 -- MATCH! Record triplet [-3, 1, 2]"
+      triplets_so_far: [[-3, 1, 2]]
+
+    - step: 6
+      action: "Skip duplicate left (nums[4]=1 == nums[5]=1), advance left to 5, then left=6, right=5"
+      state:
+        left: 6
+        right: 5
+      explanation: "Pointers crossed -- done with anchor -3"
+
+    - step: 7
+      action: "Fix anchor at i=1, nums[1]=-2"
+      state:
+        anchor: -2
+        target_pair_sum: 2
+        left: 2
+        right: 6
+      explanation: "Need two components summing to 2 to cancel the -2 anchor"
+
+    - step: 8
+      action: "sum = -2 + (-1) + 2 = -1"
+      comparison: "-1 < 0 -- advance left"
+
+    - step: 9
+      action: "left=3 (value 0), sum = -2 + 0 + 2 = 0"
+      comparison: "0 == 0 -- MATCH! Record triplet [-2, 0, 2]"
+      triplets_so_far: [[-3, 1, 2], [-2, 0, 2]]
+
+    - step: 10
+      action: "Skip duplicates, advance left to 4, retreat right to 5. sum = -2 + 1 + 1 = 0"
+      comparison: "0 == 0 -- MATCH! Record triplet [-2, 1, 1]"
+      triplets_so_far: [[-3, 1, 2], [-2, 0, 2], [-2, 1, 1]]
+
+    - step: 11
+      action: "Pointers cross after duplicate skip -- done with anchor -2"
+
+    - step: 12
+      action: "Fix anchor at i=2, nums[2]=-1"
+      state:
+        anchor: -1
+        target_pair_sum: 1
+        left: 3
+        right: 6
+
+    - step: 13
+      action: "sum = -1 + 0 + 2 = 1"
+      comparison: "1 > 0 -- retreat right"
+
+    - step: 14
+      action: "right=5 (value 1), sum = -1 + 0 + 1 = 0"
+      comparison: "0 == 0 -- MATCH! Record triplet [-1, 0, 1]"
+      triplets_so_far: [[-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]]
+
+    - step: 15
+      action: "Pointers cross -- done with anchor -1"
+
+    - step: 16
+      action: "Fix anchor at i=3, nums[3]=0. Since 0 is not > 0, continue."
+      state:
+        left: 4
+        right: 6
+      explanation: "sum = 0 + 1 + 2 = 3 > 0, retreat right. right=5, sum = 0 + 1 + 1 = 2 > 0, retreat right. Pointers cross."
+
+    - step: 17
+      action: "i=4, nums[4]=1 > 0 -- early termination. Break outer loop."
+      explanation: "All remaining anchors are positive; no more triplets possible."
+
+  summary:
+    total_outer_iterations: 5
+    total_triplets_found: 4
+    result: [[-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]]
+    efficiency: "O(n^2) -- quadratic, but optimal for this problem"
+
+# Additional traces for edge cases
+additional_traces:
+  - name: "All zeros (trivial balance)"
+    input:
+      nums: [0, 0, 0]
+    outcome:
+      result: [[0, 0, 0]]
+      explanation: "Three neutral components -- the simplest null-field ward"
+
+  - name: "No valid triplet (all positive charges)"
+    input:
+      nums: [1, 2, 3]
+    outcome:
+      result: []
+      explanation: "No negative charges available to cancel the positives"
+
+  - name: "Duplicate skipping critical"
+    input:
+      nums: [-2, 0, 0, 2, 2]
+    outcome:
+      result: [[-2, 0, 2]]
+      explanation: "Despite duplicate 0s and 2s, only one unique ward exists"
+
+  - name: "Multiple identical negatives"
+    input:
+      nums: [-1, -1, -1, 2]
+    outcome:
+      result: [[-1, -1, 2]]
+      explanation: "Only one triplet: two of the three -1 components pair with the 2"
+
+# Complexity analysis
+complexity:
+  time:
+    best_case: "O(n^2)"
+    best_case_scenario: "Even with early termination, the outer loop and inner sweep dominate"
+
+    average_case: "O(n^2)"
+    average_case_scenario: "Most elements require a full inner Two Pointers scan"
+
+    worst_case: "O(n^2)"
+    worst_case_scenario: "All elements are distinct and no early termination applies"
+
+    explanation: |
+      Sorting: O(n log n)
+      Outer loop: O(n) iterations
+      Inner Two Pointers: O(n) per iteration
+      Total: O(n log n) + O(n) * O(n) = O(n^2)
+
+      The O(n^2) bound is tight because we must potentially examine O(n^2)
+      pairs in the worst case. No algorithm can do better in the general case.
+
+  space:
+    value: "O(n)"
+    explanation: |
+      O(n) for the sorting algorithm's auxiliary space (in most languages).
+      O(k) for the output list where k is the number of valid triplets.
+      In the worst case, k = O(n^2) triplets are possible.
+    note: "The Two Pointers themselves use O(1) extra space"
+
+# Alternative approaches for comparison
+alternative_solutions:
+  - name: "Brute Force (Triple Nested Loops)"
+    approach: "Try every combination of three components"
+
+    code_python: |
+      def find_null_wards_brute(nums):
+          nums.sort()
+          triplets = set()
+          n = len(nums)
+          for i in range(n):
+              for j in range(i + 1, n):
+                  for k in range(j + 1, n):
+                      if nums[i] + nums[j] + nums[k] == 0:
+                          triplets.add((nums[i], nums[j], nums[k]))
+          return [list(t) for t in sorted(triplets)]
+
+    complexity:
+      time: "O(n^3)"
+      space: "O(k) where k = number of triplets"
+
+    comparison_for_n100:
+      brute_force_operations: "~166,650"
+      two_pointers_operations: "~10,000"
+      speedup: "~17x faster"
+
+    comparison_for_n3000:
+      brute_force_operations: "~4,500,000,000"
+      two_pointers_operations: "~9,000,000"
+      speedup: "~500x faster"
+
+    when_to_use: "Never for production -- strictly worse than Two Pointers"
+    teaching_value: "Shows WHY the sort + Two Pointers reduction matters"
+
+  - name: "Hash Set Approach"
+    approach: "For each pair, check if the negation exists in a hash set"
+
+    code_python: |
+      def find_null_wards_hash(nums):
+          nums.sort()
+          triplets = []
+          for i in range(len(nums) - 2):
+              if i > 0 and nums[i] == nums[i - 1]:
+                  continue
+              seen = set()
+              j = i + 1
+              while j < len(nums):
+                  complement = -nums[i] - nums[j]
+                  if complement in seen:
+                      triplets.append([nums[i], complement, nums[j]])
+                      while j + 1 < len(nums) and nums[j] == nums[j + 1]:
+                          j += 1
+                  seen.add(nums[j])
+                  j += 1
+          return triplets
+
+    complexity:
+      time: "O(n^2)"
+      space: "O(n)"
+
+    tradeoff: "Same O(n^2) time but uses O(n) space for the hash set per iteration"
+
+    when_to_use: "Viable but Two Pointers is cleaner and uses less space per inner iteration"
+
+    teaching_value: |
+      Shows that hash-based approaches extend from 2Sum to 3Sum.
+      However, the duplicate-handling logic is trickier with hash sets
+      than with the cleaner sorted Two Pointers approach.
+
+# Approach explanation
+approach_explanation:
+  core_insight: |
+    3Sum reduces to 2Sum. By sorting the array and fixing one element (the
+    anchor), the problem becomes: "find two elements that sum to the negation
+    of the anchor." This is exactly the Pair with Target Sum problem, solved
+    with Two Pointers in O(n). Running this for each anchor gives O(n^2).
+
+  why_it_works:
+    - reason: "Sorting enables both Two Pointers and duplicate detection"
+      detail: |
+        Sorting is the key enabler. It allows:
+        1. Two Pointers to adjust the sum directionally
+        2. Adjacent-element comparison for duplicate skipping
+        3. Naturally sorted triplets in the output
+
+    - reason: "Fix-one-search-two reduces the dimensionality"
+      detail: |
+        Instead of searching in 3D (three nested loops = O(n^3)), we fix
+        one dimension and search in 2D (one loop + Two Pointers = O(n^2)).
+        This is a fundamental algorithmic technique: reduce k-Sum to
+        (k-1)-Sum by fixing one element at a time.
+
+    - reason: "Two-level duplicate skipping ensures uniqueness"
+      detail: |
+        Level 1: Skip duplicate anchor values in the outer loop.
+        Level 2: After finding a triplet, skip duplicate left and right
+        values in the inner loop. Together, these guarantee no duplicate
+        triplets appear in the output.
+
+  step_by_step:
+    - step: 1
+      action: "Sort the array"
+      why: "Prerequisite for Two Pointers and duplicate skipping"
+
+    - step: 2
+      action: "Outer loop: iterate i from 0 to n-3"
+      why: "Fix each element as the anchor of a potential triplet"
+
+    - step: 3
+      action: "Skip if nums[i] == nums[i-1]"
+      why: "Avoid duplicate triplets from identical anchors"
+
+    - step: 4
+      action: "Early break if nums[i] > 0"
+      why: "Three positive numbers cannot sum to zero"
+
+    - step: 5
+      action: "Inner Two Pointers: left = i+1, right = n-1"
+      why: "Search for pairs summing to -nums[i]"
+
+    - step: 6
+      action: "If sum == 0: record triplet, skip duplicates on both sides, advance both pointers"
+      why: "Collect the result and avoid duplicates"
+
+    - step: 7
+      action: "If sum < 0: advance left. If sum > 0: retreat right."
+      why: "Standard Two Pointers directional logic"
+
+    - step: 8
+      action: "Return the collected triplets"
+      why: "All unique triplets have been found"
+
+  visual_metaphor: |
+    Imagine laying out all your spell components on a long dungeon shelf,
+    sorted from most negative charge on the left to most positive on the
+    right. You walk along the shelf, picking up each component as an anchor.
+    For each anchor, you send two spectral hands to the remaining components
+    -- one starting just right of the anchor, the other at the far end.
+    The hands sweep toward each other, and whenever their combined charge
+    cancels the anchor exactly, you record a ward. When the hands meet,
+    you drop the anchor and pick up the next one. You skip any anchor
+    that is identical to the previous one -- a ward is a ward, no matter
+    which copy of the component you used.
+
+# Edge case handling
+edge_case_handling:
+  - case: "All zeros"
+    example: "nums = [0, 0, 0]"
+    handling: "Sort produces [0,0,0]. Anchor=0 at i=0, left=1 (0), right=2 (0). Sum=0. Record [0,0,0]."
+    note: "The only triplet where all elements are the same value."
+
+  - case: "No valid triplet (all positive)"
+    example: "nums = [1, 2, 3]"
+    handling: "After sorting, nums[0]=1 > 0 triggers early termination. Return []."
+    note: "Three positives can never sum to zero."
+
+  - case: "Extra duplicates"
+    example: "nums = [0, 0, 0, 0]"
+    handling: "Only one triplet [0,0,0] despite four zeros. Outer duplicate skip prevents repetition."
+    note: "Without duplicate skipping, you would get the same triplet multiple times."
+
+  - case: "Duplicate values on both sides"
+    example: "nums = [-2, 0, 0, 2, 2]"
+    handling: "Only one triplet [-2,0,2]. Inner duplicate skipping on both left and right prevents copies."
+    note: "Critical test for the inner pointer duplicate-skip logic."
+
+  - case: "Minimum valid input"
+    example: "nums = [0, 0, 0]"
+    handling: "Exactly three elements, exactly one possible combination."
+    note: "Smallest input that can produce a result."

@@ -1,0 +1,309 @@
+pattern: two-pointers
+problem_id: two-pointers-asteroid-belt
+
+# Pause points create interactive learning moments during code execution.
+# These transform passive observation into active learning by forcing
+# students to predict what should happen next.
+
+pause_points:
+  - id: "initial-setup"
+    trigger:
+      step: 0
+      condition: "Before any iterations, pointers just initialized"
+    
+    context:
+      show_state: |
+        positions = [100, 250, 350, 500, 750]
+        target_distance = 250
+        
+        left = 0  (positions[left] = 100)
+        right = 4 (positions[right] = 750)
+    
+    question: |
+      Before we start, let's think about the Two Pointers strategy.
+      
+      Why do we start with pointers at opposite ends of the array?
+    
+    question_type: "conceptual-understanding"
+    
+    options:
+      - text: "So we can check the largest possible distance first"
+        correct: false
+        feedback: |
+          That's part of it, but not the main reason. Think about what
+          starting at opposite ends allows us to do as we move inward.
+      
+      - text: "So we can make progress from both directions simultaneously"
+        correct: true
+        feedback: |
+          ✓ Exactly! Starting at opposite ends and moving toward the middle
+          ensures we can adjust the distance in both directions:
+          - Move left right → increase distance
+          - Move right left → decrease distance
+          
+          This gives us control to "dial in" the exact distance we want.
+      
+      - text: "Because the problem requires it"
+        correct: false
+        feedback: |
+          The problem doesn't require starting at the ends - that's just
+          the most efficient Two Pointers strategy for this type of problem.
+    
+    teaching_moment: |
+      Key insight: Two Pointers works by giving us bidirectional control.
+      
+      Starting at the ends means:
+      - Current distance is MAXIMUM possible
+      - Moving left right → increases minimum, decreases distance
+      - Moving right left → decreases maximum, decreases distance
+      
+      We can navigate toward any target distance by choosing which pointer to move!
+
+  - id: "first-comparison"
+    trigger:
+      step: 1
+      condition: "First iteration, just calculated first distance"
+    
+    context:
+      show_state: |
+        positions = [100, 250, 350, 500, 750]
+        target_distance = 250
+        
+        left = 0  (positions[left] = 100)
+        right = 4 (positions[right] = 750)
+        
+        current_distance = positions[right] - positions[left]
+        current_distance = 750 - 100 = 650
+    
+    question: |
+      Current distance (650) is GREATER than target distance (250).
+      
+      Which pointer should we move, and why?
+    
+    question_type: "decision-making"
+    
+    options:
+      - text: "Move left pointer right (left += 1)"
+        correct: false
+        feedback: |
+          Let's think about what happens if we move left right:
+          
+          Current: left=0 (value 100), right=4 (value 750), distance=650
+          After move: left=1 (value 250), right=4 (value 750)
+          New distance: 750 - 250 = 500
+          
+          Distance went from 650 → 500. Better, but still too large!
+          
+          More importantly: moving left right INCREASES the left value,
+          which DECREASES the distance. That's actually the right direction,
+          but there's a better move...
+      
+      - text: "Move right pointer left (right -= 1)"
+        correct: true
+        feedback: |
+          ✓ Correct!
+          
+          Current: left=0 (value 100), right=4 (value 750), distance=650
+          After move: left=0 (value 100), right=3 (value 500)
+          New distance: 500 - 100 = 400
+          
+          Distance went from 650 → 400. Getting closer to target of 250!
+          
+          Rule: When distance is TOO LARGE, move right pointer left.
+          This decreases the right value, shrinking the distance.
+    
+    visualization:
+      type: "before-after-comparison"
+      
+      before:
+        array: "[100, 250, 350, 500, 750]"
+        pointers:
+          left: 0
+          right: 4
+        distance: 650
+        vs_target: "Too large by 400"
+      
+      after_correct_move:
+        array: "[100, 250, 350, 500, 750]"
+        pointers:
+          left: 0
+          right: 3
+        distance: 400
+        vs_target: "Too large by 150 (getting closer!)"
+    
+    teaching_moment: |
+      Decision rule:
+      
+      If current_distance > target:
+        → Need SMALLER distance
+        → Move RIGHT pointer LEFT
+        → Decreases right value → distance shrinks ✓
+      
+      If current_distance < target:
+        → Need LARGER distance
+        → Move LEFT pointer RIGHT
+        → Increases left value → distance grows ✓
+
+  - id: "pattern-recognition"
+    trigger:
+      step: 3
+      condition: "After 3 moves, student should recognize the pattern"
+    
+    context:
+      show_state: |
+        You've made 3 moves so far:
+        
+        Step 0: left=0, right=4, distance=650 > 250 → moved right left
+        Step 1: left=0, right=3, distance=400 > 250 → moved right left
+        Step 2: left=0, right=2, distance=250 == 250 → FOUND IT!
+    
+    question: |
+      Look at the sequence of moves. Can you describe the pattern in your own words?
+      
+      What's the rule for deciding which pointer to move?
+    
+    question_type: "reflection"
+    
+    free_response_prompt: |
+      Take a moment to articulate the pattern. Then we'll reveal the answer.
+    
+    expected_understanding:
+      - "Compare current distance to target distance"
+      - "If too large, move right pointer left"
+      - "If too small, move left pointer right"
+      - "If equal, found the answer"
+    
+    reveal_answer: |
+      The Two Pointers Pattern:
+      
+      1. Calculate current_distance = positions[right] - positions[left]
+      
+      2. Compare to target:
+         - current_distance == target → FOUND IT! ✓
+         - current_distance > target → move right LEFT (shrink distance)
+         - current_distance < target → move left RIGHT (grow distance)
+      
+      3. Repeat until pointers meet (left >= right)
+      
+      This pattern works because:
+      - Array is sorted (critical!)
+      - Each move eliminates impossible pairs
+      - Pointers eventually meet after checking all possibilities
+      - Achieves O(n) time instead of O(n²)
+    
+    next_challenge: |
+      Now that you understand the pattern, try solving the problem yourself!
+      
+      Remember:
+      - Initialize: left=0, right=len-1
+      - Loop while: left < right
+      - Move based on comparison
+      - Return pair when found, None if pointers meet
+
+  - id: "edge-case-awareness"
+    trigger:
+      step: "after-successful-solve"
+      condition: "User solved basic case correctly"
+    
+    question: |
+      Great job! You've solved the basic case.
+      
+      Now think about edge cases. What could go wrong?
+    
+    question_type: "edge-case-thinking"
+    
+    prompts:
+      - "What if the array only has 2 elements?"
+      - "What if no pair has the target distance?"
+      - "What if multiple pairs have the target distance?"
+      - "What if target distance is larger than max possible distance?"
+    
+    discussion: |
+      Edge case thinking:
+      
+      1. Array has 2 elements:
+         - Still works! Check the one pair, return it or None
+      
+      2. No pair with target distance:
+         - Pointers will meet (left >= right)
+         - Return None when loop exits
+      
+      3. Multiple valid pairs:
+         - Return the first one found
+         - Or modify to return all pairs (different problem)
+      
+      4. Target larger than max distance:
+         - First comparison will have distance < target
+         - Move left right repeatedly
+         - Eventually pointers meet, return None
+      
+      Your Two Pointers implementation handles all these naturally!
+
+learning_objectives_by_pause_point:
+  initial_setup:
+    - "Understand why Two Pointers starts at opposite ends"
+    - "Recognize the bidirectional control strategy"
+  
+  first_comparison:
+    - "Learn the decision rule for which pointer to move"
+    - "Understand how pointer movement affects distance"
+  
+  pattern_recognition:
+    - "Internalize the complete Two Pointers pattern"
+    - "See how it achieves O(n) complexity"
+  
+  edge_case_awareness:
+    - "Think about boundary conditions"
+    - "Verify pattern handles edge cases correctly"
+
+interactive_elements:
+  visualization_types:
+    - "Array with pointers highlighted"
+    - "Distance bar showing current vs target"
+    - "Step-by-step move animation"
+    - "Comparison of brute force vs Two Pointers"
+  
+  engagement_techniques:
+    - "Multiple choice questions"
+    - "Free response reflection prompts"
+    - "Predict-then-reveal"
+    - "Side-by-side comparisons"
+    - "Interactive step-through"
+
+pedagogical_approach:
+  scaffolding:
+    - "Start with conceptual understanding (why opposite ends?)"
+    - "Practice decision-making (which pointer to move?)"
+    - "Synthesize pattern (what's the rule?)"
+    - "Apply to edge cases (what could go wrong?)"
+  
+  active_learning:
+    - "Questions before showing answers"
+    - "Predict outcome before seeing result"
+    - "Articulate pattern in own words"
+    - "Apply pattern to new scenarios"
+  
+  immediate_feedback:
+    - "Explain why each answer choice is right/wrong"
+    - "Show visualization of consequences"
+    - "Connect back to invariants and pattern rules"
+    - "Encourage revision and retry"
+
+progression_triggers:
+  completion_criteria:
+    - "Answered all pause point questions"
+    - "Demonstrated understanding in reflections"
+    - "Successfully solved the problem"
+    - "Handled edge cases correctly"
+  
+  ready_for_next:
+    - "User can articulate the Two Pointers pattern"
+    - "User understands O(n) vs O(n²) trade-off"
+    - "User recognizes when to apply pattern"
+    - "User can implement pattern independently"
+  
+  mastery_indicators:
+    - "Solves similar problems without hints"
+    - "Explains pattern to others"
+    - "Recognizes pattern in new contexts"
+    - "Adapts pattern to variations (3Sum, etc.)"

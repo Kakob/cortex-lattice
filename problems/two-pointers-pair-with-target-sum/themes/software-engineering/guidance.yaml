@@ -1,0 +1,74 @@
+# guidance.yaml - Cortex Lattice Teaching Guide
+# Software Engineering theme for Two Pointers - Pair with Target Sum
+
+title: "Two Pointers - Microservice Resource Pairing"
+pattern: "Two Pointers"
+
+hints:
+  key_concepts:
+    - text: "For finding a SUM, pointers start at opposite ends of the sorted array"
+    - text: "Move left pointer right to increase the sum (swap in a higher-utilization service)"
+    - text: "Move right pointer left to decrease the sum (swap in a lower-utilization service)"
+    - text: "The sorted manifest enables O(n) search instead of O(n^2) brute force"
+    - text: "Time complexity: O(n) — critical for scanning thousands of services in a tight deployment window"
+    - text: "Space complexity: O(1) — no auxiliary data structures, just two index variables"
+
+  common_mistakes:
+    - text: "Don't start both pointers from the same end — that works for DIFFERENCE, not SUM"
+    - text: "Don't move both pointers in one iteration — you might skip over the valid pairing"
+    - text: "Don't use nested loops — that's O(n^2) and unacceptable for large service fleets"
+    - text: "Don't confuse indices with values: sum = nums[left] + nums[right], not left + right"
+    - text: "Use left < right (strict), not left <= right — a service cannot pair with itself"
+
+  real_world:
+    - text: |
+        Kubernetes Bin-Packing and Node Autoscaling
+
+        In production Kubernetes clusters, the scheduler must co-locate pods on
+        nodes to maximize resource utilization. When services are ranked by CPU
+        or memory requests, finding pairs that sum to the node's allocatable
+        capacity is essentially this algorithm. Cloud providers like AWS and GCP
+        use similar heuristics in their autoscaler logic to decide when to pack
+        workloads onto fewer nodes (saving cost) versus scaling out.
+
+        The key insight: when resource requests are sorted, two-pointer
+        techniques provide O(n) bin-packing decisions where naive approaches
+        would require O(n^2) pairwise comparisons across the fleet.
+
+    - text: |
+        Load Balancer Session Affinity and Connection Pairing
+
+        Layer 4 load balancers (HAProxy, Envoy, NGINX) maintain sorted
+        connection tables indexed by latency or request rate. When rebalancing
+        traffic, they need to find pairs of backend servers whose combined
+        throughput matches a target QPS threshold. Two-pointer scans on sorted
+        server lists enable microsecond rebalancing decisions — essential for
+        meeting SLA requirements at scale.
+
+  solution_approach:
+    steps:
+      - "Initialize: left = 0, right = len(nums) - 1 (opposite ends of the manifest)"
+      - "While left < right:"
+      - "  Calculate: current_sum = nums[left] + nums[right]"
+      - "  If current_sum == target: return [nums[left], nums[right]]"
+      - "  If current_sum < target: left++ (swap in a higher-utilization service)"
+      - "  If current_sum > target: right-- (swap in a lower-utilization service)"
+      - "If loop ends without finding a match: return None"
+
+complexity:
+  time: "O(n)"
+  space: "O(1)"
+
+pattern_transfer:
+  similar_problems:
+    - name: "Three Sum (sorted array)"
+      invariants_shared: ["sorted input", "pointer movement based on sum comparison"]
+      modification: "Fix one element, run two pointers on the rest — O(n^2) total"
+
+    - name: "Container With Most Water"
+      invariants_shared: ["opposite-end initialization", "single-direction pointer movement"]
+      difference: "Move the pointer at the shorter wall instead of sum-based comparison"
+
+    - name: "Pair with Target Difference"
+      invariants_shared: ["sorted array", "two pointers", "O(n) linear scan"]
+      difference: "Both pointers start from the left for difference; opposite ends for sum"

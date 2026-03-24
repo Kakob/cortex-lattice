@@ -7,27 +7,41 @@
  */
 
 import { useState, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { CodeEditor } from "./CodeEditor";
 import { TestResults } from "./TestResults";
 import { BottomSheet } from "./BottomSheet";
 import { LearningGuide } from "./LearningGuide";
 import { UserMenu } from "./auth/UserMenu";
 import { executeCode } from "@/lib/api";
-import type { Problem, LearningGuide as LearningGuideType, ExecutionResult } from "@/lib/types";
-import { ArrowLeft, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import type { Problem, LearningGuide as LearningGuideType, ExecutionResult, ThemeInfo } from "@/lib/types";
+import { ArrowLeft, BookOpen, ChevronDown, ChevronUp, Palette } from "lucide-react";
 import Link from "next/link";
 
 interface ProblemWorkspaceProps {
   problem: Problem;
   learningGuide: LearningGuideType;
+  themeId?: string;
 }
 
-export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspaceProps) {
+export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWorkspaceProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isRunning, setIsRunning] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [showTestPanel, setShowTestPanel] = useState(true);
+
+  const handleThemeChange = useCallback(
+    (newThemeId: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("theme", newThemeId);
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname, searchParams]
+  );
 
   // Handle code execution
   const handleRunCode = useCallback(
@@ -40,6 +54,7 @@ export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspacePro
           problemId: problem.id,
           code,
           language: "python",
+          themeId,
         });
         setExecutionResult(result);
       } catch (error) {
@@ -55,7 +70,7 @@ export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspacePro
         setIsRunning(false);
       }
     },
-    [problem.id]
+    [problem.id, themeId]
   );
 
   // Get pattern display
@@ -95,6 +110,13 @@ export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspacePro
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {problem.availableThemes && problem.availableThemes.length > 1 && (
+            <ThemeSelector
+              themes={problem.availableThemes}
+              activeThemeId={themeId || problem.themeId}
+              onThemeChange={handleThemeChange}
+            />
+          )}
           <button
             onClick={() => setShowDescription(!showDescription)}
             className="flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-surface-light"
@@ -214,6 +236,65 @@ export function ProblemWorkspace({ problem, learningGuide }: ProblemWorkspacePro
       <BottomSheet isOpen={bottomSheetOpen} onOpenChange={setBottomSheetOpen}>
         <LearningGuide guide={learningGuide} />
       </BottomSheet>
+    </div>
+  );
+}
+
+// =============================================================================
+// Theme Selector
+// =============================================================================
+
+interface ThemeSelectorProps {
+  themes: ThemeInfo[];
+  activeThemeId?: string;
+  onThemeChange: (themeId: string) => void;
+}
+
+function ThemeSelector({ themes, activeThemeId, onThemeChange }: ThemeSelectorProps) {
+  const [open, setOpen] = useState(false);
+
+  const activeTheme = themes.find((t) => t.themeId === activeThemeId) || themes[0];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-surface-light"
+      >
+        <Palette className="h-4 w-4" />
+        <span className="hidden sm:inline">{activeTheme.displayName}</span>
+        <ChevronDown className="h-3 w-3" />
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+
+          {/* Dropdown */}
+          <div className="absolute right-0 z-20 mt-1 w-56 overflow-hidden rounded-lg border border-gray-600 bg-surface shadow-xl">
+            {themes.map((theme) => (
+              <button
+                key={theme.themeId}
+                onClick={() => {
+                  onThemeChange(theme.themeId);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-surface-light ${
+                  theme.themeId === activeThemeId
+                    ? "bg-surface-light text-accent-primary"
+                    : "text-gray-300"
+                }`}
+              >
+                <span className="flex-1">{theme.displayName}</span>
+                {theme.themeId === activeThemeId && (
+                  <span className="text-xs text-accent-primary">Active</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

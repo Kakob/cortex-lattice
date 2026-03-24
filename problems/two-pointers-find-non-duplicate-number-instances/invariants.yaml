@@ -1,0 +1,133 @@
+pattern: two-pointers
+problem_id: two-pointers-find-non-duplicate-number-instances
+
+core_invariants:
+  - id: "sorted-input-assumption"
+    description: "Input array must be sorted in non-decreasing order"
+    why_it_matters: |
+      The algorithm relies on duplicates being adjacent. In a sorted array,
+      all copies of a given value are grouped together. The fast pointer only
+      needs to compare against the last placed unique value (at the slow
+      pointer position) to determine if the current element is new. Without
+      sorting, duplicates could appear anywhere and a simple two-pointer
+      scan would miss them.
+    violation_detection:
+      - "Check if nums[i] <= nums[i+1] for all i"
+    teaching_moment_if_violated: |
+      This algorithm assumes sorted input. If your array is not sorted,
+      either sort it first (O(n log n)) or use a hash set to track seen
+      values (O(n) time, O(n) space). The two-pointer approach achieves
+      O(1) space precisely because sorting clusters duplicates together.
+
+  - id: "slow-pointer-write-head"
+    description: "The slow pointer marks the position where the next unique element should be written"
+    why_it_matters: |
+      The slow pointer always points to the last confirmed unique element.
+      Everything from index 0 to slow (inclusive) is the deduplicated prefix
+      of the array. When fast finds a new value, it gets written at slow + 1,
+      then slow advances. This maintains the invariant that nums[0..slow]
+      contains only unique, sorted values.
+    violation_detection:
+      - "slow starts at 0 (first element is always unique)"
+      - "slow only advances when a new unique value is found"
+      - "nums[0..slow] contains distinct values in sorted order at all times"
+    teaching_moment_if_violated: |
+      The slow pointer is your write-head. It should only advance when you
+      have a genuinely new value to place. If slow is advancing on every
+      iteration, you are not filtering duplicates — you are just copying
+      the original array.
+
+  - id: "fast-pointer-scanner"
+    description: "The fast pointer scans every element to find values that differ from nums[slow]"
+    why_it_matters: |
+      The fast pointer visits each element exactly once, comparing it to the
+      value at the slow pointer. When nums[fast] != nums[slow], we have found
+      a new unique value. The fast pointer never moves backward — it always
+      advances by one each iteration, ensuring O(n) time.
+    violation_detection:
+      - "fast starts at 1 (comparing against the first element)"
+      - "fast increments by 1 each iteration"
+      - "fast scans the entire array from index 1 to n-1"
+    teaching_moment_if_violated: |
+      The fast pointer must visit every element exactly once. If it skips
+      elements or moves backward, the algorithm may miss unique values or
+      run forever. The fast pointer always advances: fast += 1 on every
+      iteration, unconditionally.
+
+  - id: "in-place-modification"
+    description: "Unique elements are written into the original array — no auxiliary array is used"
+    why_it_matters: |
+      The entire point of the two-pointer approach is to achieve O(1) space.
+      When fast discovers a new unique value, it overwrites nums[slow + 1]
+      with that value. The original elements beyond the slow pointer may be
+      overwritten, but they have already been scanned by fast. The first
+      slow + 1 elements form the deduplicated result.
+    violation_detection:
+      - "No additional arrays or lists are created"
+      - "Values are written directly into nums"
+      - "Only two index variables (slow, fast) are used"
+    teaching_moment_if_violated: |
+      Creating a new array defeats the purpose of this problem. The
+      challenge is to deduplicate IN-PLACE using O(1) extra space. The
+      two-pointer technique achieves this by using the front of the
+      original array as the output buffer.
+
+  - id: "return-value-is-count"
+    description: "The function returns slow + 1, which is the count of unique elements"
+    why_it_matters: |
+      After the loop, slow is the index of the last unique element (0-based).
+      The count of unique elements is therefore slow + 1. The caller uses
+      this count to know how many elements at the front of the array are
+      valid. Elements beyond index slow are leftover duplicates and should
+      be ignored.
+    violation_detection:
+      - "Function returns slow + 1 (not slow, not len(nums))"
+      - "Return value matches the number of distinct elements"
+    teaching_moment_if_violated: |
+      Remember: slow is a 0-based index. If slow ends at 3, there are 4
+      unique elements (indices 0, 1, 2, 3). Return slow + 1 as the count.
+
+algorithm_correctness_invariants:
+  - id: "first-element-always-unique"
+    description: "The first element of a non-empty sorted array is always part of the unique set"
+    why_it_matters: |
+      In a sorted array, the first element has no predecessor, so it is
+      trivially unique. That is why slow starts at 0 — the element at
+      index 0 is always kept. The fast pointer starts at 1 and begins
+      comparing from the second element onward.
+    violation_detection:
+      - "slow starts at 0, fast starts at 1"
+      - "nums[0] is never overwritten"
+    teaching_moment_if_violated: |
+      The first element is always unique by definition. Start slow at 0
+      (it is already placed) and fast at 1 (start scanning from the second
+      element). Do not start both at 0 — that wastes a comparison.
+
+efficiency_invariants:
+  - id: "linear-time"
+    description: "Algorithm must run in O(n) time"
+    why_it_matters: |
+      The fast pointer visits each of the n elements exactly once. The
+      slow pointer advances at most n-1 times. Total work is O(n).
+    violation_detection:
+      - "No nested loops"
+      - "Fast pointer advances by exactly 1 each iteration"
+      - "Loop runs exactly n-1 iterations"
+    teaching_moment_if_violated: |
+      If you are using nested loops or re-scanning portions of the array,
+      you have exceeded O(n). The two-pointer approach needs only a single
+      pass: fast walks the array once, and slow writes each unique value
+      exactly once.
+
+  - id: "constant-space"
+    description: "Should use O(1) extra space"
+    why_it_matters: |
+      The algorithm modifies the array in-place using only two index
+      variables. No hash sets, no auxiliary arrays, no extra storage.
+    violation_detection:
+      - "No additional data structures allocated"
+      - "Only two index variables used"
+    teaching_moment_if_violated: |
+      Using a set or a new array would work but uses O(n) space. The
+      two-pointer technique achieves the same result with O(1) space
+      by writing unique values directly into the front of the input array.

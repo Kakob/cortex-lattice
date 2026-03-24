@@ -1,0 +1,116 @@
+# Wizard's Dungeon theme for Two Pointers - Triplet Sum to Zero (3Sum)
+
+title: "The Null-Field Ward"
+function_name: find_null_wards
+
+description: |
+  You are Elara, deep within the Vaults of Nethara, where ancient traps
+  activate if any residual magic persists in the air. To pass safely, you
+  must erect *null-field wards* -- protective barriers created by combining
+  exactly three spell components whose magical charges cancel out perfectly
+  (sum to zero).
+
+  Your satchel contains an unsorted collection of spell components, each
+  inscribed with a positive, negative, or zero charge value. Find every
+  unique combination of three components whose charges sum to exactly zero.
+  Each combination forms one null-field ward.
+
+  Return a sorted list of all unique triplets. If no valid combination
+  exists, the vault's traps remain active -- return an empty list.
+
+story_context: |
+  The Vaults of Nethara were designed by Archmage Nethara herself, who
+  believed that only a wizard with true mastery of balance could be trusted
+  with her secrets. Every corridor is laced with detection enchantments that
+  trigger if any non-zero magical charge lingers in the air. The only way
+  to suppress these sensors is to create null fields -- perfectly balanced
+  zones where positive and negative charges cancel to zero.
+
+  Brute-forcing every possible trio of components would take far too long.
+  But a clever wizard knows that sorting the components by charge first
+  allows a systematic sweep: fix one component, then use two fingers
+  (pointers) on the remaining sorted line to find pairs that complete the
+  cancellation. Duplicate components must be skipped to avoid wasting
+  energy on redundant wards.
+
+examples:
+  - input:
+      nums: [-3, 0, 1, 2, -1, 1, -2]
+    output: [[-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]]
+    explanation: |
+      Your satchel holds components with charges -3, 0, 1, 2, -1, 1, -2.
+      After sorting: [-3, -2, -1, 0, 1, 1, 2].
+      Four unique null-field wards can be constructed:
+        -3 + 1 + 2 = 0  (a powerful negative anchored by two positives)
+        -2 + 0 + 2 = 0  (the neutral component bridges negative and positive)
+        -2 + 1 + 1 = 0  (two weak positives counter one moderate negative)
+        -1 + 0 + 1 = 0  (a simple balanced trio)
+
+  - input:
+      nums: [-5, 2, 3, 1, 0]
+    output: [[-5, 2, 3]]
+    explanation: |
+      Only one ward is possible: the deeply negative component (-5) is
+      balanced by the two strongest positives (2 + 3 = 5). The vault
+      passage opens with a single null field.
+
+  - input:
+      nums: [1, 2, 3]
+    output: []
+    explanation: |
+      All components carry positive charge. No combination of three
+      positive charges can sum to zero. The vault's traps remain active,
+      and you must seek another route.
+
+hints:
+  - level: 1
+    text: "A wise wizard sorts the components by charge first. This ordering reveals structure that brute force cannot see."
+
+  - level: 2
+    text: "Fix one component (the anchor). The remaining two must sum to the negation of the anchor. This is a problem you have solved before -- Pair with Target Sum."
+
+  - level: 3
+    text: "After sorting, iterate through each component as the anchor. For each anchor, place two fingers on the remaining components (one at the start, one at the end) and sweep inward. Skip duplicate anchors and duplicate pairs to avoid redundant wards."
+
+starter_code_python: |
+  def find_null_wards(nums):
+      """
+      Find all unique triplets of spell components whose charges sum to zero.
+
+      Args:
+          nums: List[int] - unsorted list of spell component charges
+
+      Returns:
+          List[List[int]] - sorted list of sorted triplets that sum to zero
+                           (empty list if no valid combinations exist)
+
+      Examples:
+          >>> find_null_wards([-3, 0, 1, 2, -1, 1, -2])
+          [[-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]]
+
+          >>> find_null_wards([1, 2, 3])
+          []
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find all unique triplets of spell components whose charges sum to zero.
+   *
+   * @param {number[]} nums - unsorted array of spell component charges
+   * @return {number[][]} - sorted list of sorted triplets summing to zero
+   */
+  function findNullWards(nums) {
+      // Your code here
+  }
+
+test_case_explanations:
+  multiple-triplets: "Seven components yield four distinct null-field wards"
+  single-triplet: "Only one valid combination -- the strongest negative balanced by two positives"
+  all-zeros: "Three neutral components form a trivially balanced ward"
+  no-triplet: "All positive charges -- impossible to achieve zero sum"
+  classic-example: "The classic 3Sum example with duplicates requiring careful skip logic"
+  duplicate-elements: "Repeated zeros and twos -- only one unique ward despite multiple copies"
+  extra-zeros: "Four neutral components but only one ward [0,0,0] -- duplicate skipping essential"
+  repeated-negative: "Three identical negative components but only one valid triplet using two of them"

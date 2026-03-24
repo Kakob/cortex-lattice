@@ -1,0 +1,448 @@
+pattern: two-pointers
+problem_id: two-pointers-triplet-sum-to-zero
+
+# Catalog of common mistakes with detection and teaching moments
+# Themed for the Wizard's Dungeon narrative
+
+common_mistakes:
+  - id: "brute-force-triple-nested"
+    severity: high
+    category: "wrong-pattern"
+
+    description: "Using three nested loops to try every combination of spell components"
+
+    detection:
+      execution_trace_pattern: |
+        Look for:
+        - Three nested for loops iterating over nums
+        - Total iterations: n*(n-1)*(n-2)/6
+        - O(n^3) complexity
+
+      complexity_analysis:
+        time: "O(n^3)"
+        space: "O(1)"
+
+      code_pattern:
+        - "Three nested for loops"
+        - "No pointer variables named 'left' and 'right'"
+        - "No sort() call"
+
+    why_students_do_this: |
+      This is the apprentice's instinct -- "just try every trio." It works
+      correctly but is the equivalent of testing every combination of three
+      components while ghouls close in from every corridor.
+
+    teaching_moment:
+      title: "An Apprentice's Approach -- Triple Brute Force"
+
+      explanation: |
+        Your spell works, but it is painfully slow -- O(n^3).
+
+        For a satchel of 1,000 components:
+        - Your approach: ~166,000,000 trios tested
+        - Two Pointers: ~1,000,000 operations
+
+        The key insight: sort the components, then for each anchor, the
+        remaining problem is just Pair with Target Sum -- a problem you
+        already know how to solve in O(n) with Two Pointers.
+
+      visualization:
+        type: "complexity-comparison"
+
+        your_approach:
+          name: "Brute Force (every trio)"
+          code_snippet: |
+            for i in range(n):
+                for j in range(i+1, n):
+                    for k in range(j+1, n):
+                        if nums[i] + nums[j] + nums[k] == 0:
+                            ...
+          complexity: "O(n^3)"
+          operations_for_n100: "~166,650"
+          operations_for_n3000: "~4,500,000,000"
+
+        optimal_approach:
+          name: "Sort + Fix One + Two Pointers"
+          code_snippet: |
+            nums.sort()
+            for i in range(n - 2):
+                left, right = i + 1, n - 1
+                while left < right:
+                    ...
+          complexity: "O(n^2)"
+          operations_for_n100: "~10,000"
+          operations_for_n3000: "~9,000,000"
+
+      hint: |
+        Think about this: once you fix one component as the anchor, the
+        remaining two must sum to the anchor's negation. That is exactly
+        Pair with Target Sum -- and you know how to solve that with Two
+        Pointers in O(n). Sort first, then fix-and-sweep.
+
+      next_step: |
+        Try this approach:
+        1. Sort the components by charge
+        2. For each component i (the anchor):
+           a. Set target = -nums[i]
+           b. Use Two Pointers (left=i+1, right=n-1) to find pairs summing to target
+        3. Skip duplicate anchors to avoid duplicate wards
+
+  - id: "missing-sort"
+    severity: high
+    category: "pattern-misunderstanding"
+
+    description: "Attempting Two Pointers without sorting the array first"
+
+    detection:
+      code_analysis:
+        - "No sort() or sorted() call before the main loop"
+        - "Two Pointers used on unsorted data"
+
+      symptom:
+        - "Missing some valid triplets"
+        - "Producing unsorted triplets"
+        - "Duplicate skipping logic fails"
+
+    why_students_do_this: |
+      Students may think sorting is unnecessary because the output can be
+      sorted at the end. But sorting is not just for output -- it is the
+      fundamental prerequisite for Two Pointers to work correctly.
+
+    teaching_moment:
+      title: "You Cannot Cast Two Pointers Without Sorting First!"
+
+      explanation: |
+        Two Pointers relies on the sorted property to make directional
+        decisions. Without sorting:
+        - Moving left might increase OR decrease the sum unpredictably
+        - Adjacent-element comparison for duplicate skipping fails
+        - Triplets are not naturally sorted
+
+        Sort first. The O(n log n) cost is absorbed by O(n^2) overall.
+
+      fix: |
+        Add this as the FIRST line of your function:
+          nums.sort()
+
+      next_step: |
+        After sorting, verify that your duplicate-skipping logic works
+        correctly with sorted data.
+
+  - id: "missing-outer-duplicate-skip"
+    severity: high
+    category: "duplicate-handling"
+
+    description: "Not skipping duplicate anchor values in the outer loop"
+
+    detection:
+      code_analysis:
+        - "Outer loop does not check: if i > 0 and nums[i] == nums[i-1]"
+
+      execution_trace:
+        - "Duplicate triplets in the output"
+        - "Same triplet appears multiple times with different anchor indices"
+
+    why_students_do_this: |
+      Students implement the Two Pointers inner loop correctly but forget
+      that duplicate anchor values produce duplicate sets of triplets.
+
+    teaching_moment:
+      title: "You Are Creating Redundant Wards, Wizard!"
+
+      explanation: |
+        When two adjacent components have the same charge, using each as
+        an anchor produces identical triplets.
+
+        Example: nums = [-1, -1, 0, 1, 2]
+        - Anchor = nums[0] = -1: finds [-1, 0, 1] and [-1, -1, 2]
+        - Anchor = nums[1] = -1: finds [-1, 0, 1] and [-1, -1, 2] AGAIN
+
+        The second anchor produces the exact same wards. Skip it.
+
+      fix: |
+        Add this check at the start of the outer loop:
+          if i > 0 and nums[i] == nums[i - 1]:
+              continue
+
+      next_step: |
+        Test with nums = [-1, -1, 0, 1] and verify you get exactly
+        one triplet: [-1, 0, 1], not two copies.
+
+  - id: "missing-inner-duplicate-skip"
+    severity: high
+    category: "duplicate-handling"
+
+    description: "Not skipping duplicate left/right values after finding a triplet"
+
+    detection:
+      code_analysis:
+        - "After appending a triplet, no while loop to skip duplicates"
+        - "Missing: while left < right and nums[left] == nums[left+1]: left += 1"
+        - "Missing: while left < right and nums[right] == nums[right-1]: right -= 1"
+
+      execution_trace:
+        - "Same triplet recorded multiple times within the same anchor iteration"
+
+    why_students_do_this: |
+      Students advance the pointers by exactly one step after a match,
+      not realizing that the next position might have the same value,
+      producing the same triplet again.
+
+    teaching_moment:
+      title: "Your Ward Spell Is Stuttering -- Same Ward Cast Twice!"
+
+      explanation: |
+        After finding a valid triplet, you must skip past ALL duplicate
+        values on both the left and right sides before continuing.
+
+        Example: nums = [-2, 0, 0, 2, 2], anchor = -2
+        After finding [-2, 0, 2]:
+        - If left was at index 1 (value 0), index 2 is also 0
+        - If right was at index 4 (value 2), index 3 is also 2
+        - Without skipping, you record [-2, 0, 2] a second time
+
+      fix: |
+        After recording a triplet, add:
+          # Skip duplicate left values
+          while left < right and nums[left] == nums[left + 1]:
+              left += 1
+          # Skip duplicate right values
+          while left < right and nums[right] == nums[right - 1]:
+              right -= 1
+          left += 1
+          right -= 1
+
+      next_step: |
+        Test with nums = [-2, 0, 0, 2, 2] and verify you get exactly
+        one triplet: [-2, 0, 2].
+
+  - id: "returning-first-triplet-only"
+    severity: high
+    category: "logic-error"
+
+    description: "Returning immediately after finding the first triplet instead of collecting all"
+
+    detection:
+      code_analysis:
+        - "return statement inside the if sum == 0 block"
+        - "No results list being built up"
+
+      execution_trace:
+        - "Function returns a single triplet instead of a list of triplets"
+        - "Missing valid triplets that occur later in the search"
+
+    why_students_do_this: |
+      Students carry over the pattern from Pair with Target Sum, which
+      returns immediately on finding the first match. But 3Sum requires
+      ALL unique triplets, not just the first one.
+
+    teaching_moment:
+      title: "One Ward Is Not Enough, Wizard!"
+
+      explanation: |
+        Unlike Pair with Target Sum (which finds ONE pair), Triplet Sum
+        to Zero asks for ALL unique triplets. You must:
+        1. Create a results list before the loops
+        2. Append each valid triplet to the list (don't return it)
+        3. After all loops finish, return the complete list
+
+        Returning early means you only erect one null-field ward when
+        the vault may need four to fully suppress the detection enchantments.
+
+      fix: |
+        Change:
+          if current_sum == 0:
+              return [nums[i], nums[left], nums[right]]
+        To:
+          if current_sum == 0:
+              triplets.append([nums[i], nums[left], nums[right]])
+              # skip duplicates and advance both pointers
+              ...
+
+      next_step: |
+        Test with nums = [-3, 0, 1, 2, -1, 1, -2]. You should get
+        FOUR triplets, not just one.
+
+  - id: "moving-wrong-pointer"
+    severity: medium
+    category: "pattern-misunderstanding"
+
+    description: "Moving the wrong pointer when the sum is too high or too low"
+
+    detection:
+      specific_patterns:
+        - pattern: "sum < 0 AND right moved left"
+          explanation: "Sum was negative (need more), but decreased it further"
+
+        - pattern: "sum > 0 AND left moved right"
+          explanation: "Sum was positive (need less), but increased it further"
+
+    why_students_do_this: |
+      The same confusion as in Pair with Target Sum: which pointer
+      controls which direction of change.
+
+    teaching_moment:
+      title: "You Reached for the Wrong Component!"
+
+      explanation: |
+        The Arithmancer's Rule still applies:
+        - Sum < 0 (charges too negative): need MORE positive charge
+          -> advance LEFT pointer to a stronger positive (left += 1)
+        - Sum > 0 (charges too positive): need MORE negative charge
+          -> retreat RIGHT pointer to a weaker positive (right -= 1)
+
+        You moved the wrong pointer, pushing the sum further from zero
+        instead of closer to it.
+
+      fix: |
+        if current_sum < 0:
+            left += 1     # Move ONLY left to increase the sum
+        else:
+            right -= 1    # Move ONLY right to decrease the sum
+
+  - id: "not-advancing-both-after-match"
+    severity: medium
+    category: "logic-error"
+
+    description: "After finding a triplet, advancing only one pointer instead of both"
+
+    detection:
+      code_analysis:
+        - "After recording a triplet: only left += 1 or only right -= 1"
+        - "Missing one of the two pointer advances after duplicate skipping"
+
+      execution_trace:
+        - "Same match found again with one pointer unchanged"
+        - "Extra iterations that do not progress the search"
+
+    why_students_do_this: |
+      In Pair with Target Sum, you return immediately after a match, so
+      you never need to advance both. In 3Sum, you continue searching,
+      so both pointers must advance to avoid re-finding the same triplet.
+
+    teaching_moment:
+      title: "Move Both Hands After Casting a Ward!"
+
+      explanation: |
+        When you find a valid triplet (sum == 0), both the left and right
+        values contributed to that match. If you advance only one pointer:
+        - The other pointer still holds a value from the matched triplet
+        - This can produce the same triplet again or waste iterations
+
+        After recording a triplet and skipping duplicates, advance BOTH:
+          left += 1
+          right -= 1
+
+        This ensures you move on to genuinely new combinations.
+
+      fix: |
+        After the duplicate-skipping while loops, make sure you have:
+          left += 1
+          right -= 1
+
+  - id: "using-set-for-deduplication"
+    severity: low
+    category: "suboptimal-pattern"
+
+    description: "Using a set or dictionary to deduplicate triplets instead of skip logic"
+
+    detection:
+      code_analysis:
+        - "Set or frozenset used to store/check triplets"
+        - "Converting triplets to tuples for set membership"
+
+    why_students_do_this: |
+      Students find it easier to just throw results into a set rather
+      than carefully skipping duplicates. It produces correct output
+      but is less efficient and does not demonstrate mastery of the pattern.
+
+    teaching_moment:
+      title: "Your Ward Works, But Your Technique Is Wasteful"
+
+      explanation: |
+        Using a set for deduplication is correct but:
+        1. Wastes time converting lists to tuples and hashing
+        2. Uses extra memory for the set
+        3. Obscures the elegant skip logic that is core to the pattern
+        4. Does not transfer to problems where set-based dedup is infeasible
+
+        The sorted Two Pointers approach with skip logic is both faster
+        and a more transferable technique.
+
+      hint: |
+        Replace the set with two skip conditions:
+        - Outer loop: skip when nums[i] == nums[i-1]
+        - Inner loop: after a match, skip while nums[left] == nums[left+1]
+          and nums[right] == nums[right-1], then advance both
+
+# Categorise mistakes for analysis
+mistake_categories:
+  wrong_pattern:
+    - brute-force-triple-nested
+
+  pattern_misunderstanding:
+    - missing-sort
+    - moving-wrong-pointer
+
+  duplicate_handling:
+    - missing-outer-duplicate-skip
+    - missing-inner-duplicate-skip
+
+  logic_error:
+    - returning-first-triplet-only
+    - not-advancing-both-after-match
+
+  suboptimal_pattern:
+    - using-set-for-deduplication
+
+# Expected learning progression
+mistake_progression:
+  typical_learning_path:
+    - stage: 1
+      mistake: "brute-force-triple-nested"
+      teaching: "Introduce the reduction: 3Sum = fix one + 2Sum with Two Pointers"
+
+    - stage: 2
+      mistake: "missing-sort"
+      teaching: "Explain that sorting is a prerequisite, not just a nicety"
+
+    - stage: 3
+      mistake: "returning-first-triplet-only"
+      teaching: "Clarify: 3Sum collects ALL unique triplets, not just the first"
+
+    - stage: 4
+      mistake: "missing-outer-duplicate-skip or missing-inner-duplicate-skip"
+      teaching: "Walk through duplicate examples to show why both skip levels are needed"
+
+    - stage: 5
+      mistake: "not-advancing-both-after-match"
+      teaching: "Explain why both pointers advance after a match in the collect-all variant"
+
+    - stage: 6
+      achievement: "Correct Two Pointers 3Sum implementation!"
+      next: "Try 4Sum, 3Sum Closest, or 3Sum Smaller"
+
+# Teaching strategies by mistake type
+teaching_strategies:
+  for_brute_force_users:
+    - "Acknowledge that their spell works correctly"
+    - "Show the complexity comparison -- 166M vs 1M operations for n=1000"
+    - "Explain the reduction: 3Sum = loop over anchors + 2Sum inner search"
+    - "Point out they already solved 2Sum -- this is just wrapping it"
+
+  for_duplicate_errors:
+    - "Walk through a concrete example with duplicates (e.g., [-1, -1, 0, 1])"
+    - "Show exactly which duplicate triplets appear without skip logic"
+    - "Explain two-level skipping: outer (anchor) and inner (left + right)"
+    - "Provide the exact skip code and explain each line"
+
+  for_pointer_errors:
+    - "Review the Pair with Target Sum solution first -- build from known ground"
+    - "Trace through a small example step by step"
+    - "State the Arithmancer's Rule: sum too low -> advance left, sum too high -> retreat right"
+
+  for_logic_errors:
+    - "Show the execution trace where the error manifests"
+    - "Compare the student's output with the expected output"
+    - "Explain why both pointers must advance after a match"
+    - "Provide the canonical match-handling code block"

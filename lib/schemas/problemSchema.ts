@@ -84,7 +84,7 @@ export const problemSchema = z.object({
     .min(3, "At least 3 test cases are required"),
 
   // Optional fields
-  theme: z.string().optional(),
+  category: z.string().optional(),
   estimatedTime: z.string().optional(),
   storyContext: z.string().optional(),
   starterCodeJavascript: z.string().optional(),

@@ -1,0 +1,112 @@
+# core.yaml - Algorithm-invariant problem definition
+# Two Pointers: Triplet Sum to Zero (3Sum)
+
+id: two-pointers-triplet-sum-to-zero
+pattern: two-pointers
+difficulty: medium
+category: software-engineering
+estimated_time: "25-40 minutes"
+
+constraints:
+  - "3 <= nums.length <= 3,000"
+  - "-100,000 <= nums[i] <= 100,000"
+  - "nums is unsorted (may contain duplicates)"
+  - "Each triplet in the result must be sorted in non-decreasing order"
+  - "The list of triplets must be sorted and contain no duplicate triplets"
+
+test_case_data:
+  - id: "multiple-triplets"
+    input:
+      nums: [-3, 0, 1, 2, -1, 1, -2]
+    expected: [[-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]]
+
+  - id: "single-triplet"
+    input:
+      nums: [-5, 2, 3, 1, 0]
+    expected: [[-5, 2, 3]]
+
+  - id: "all-zeros"
+    input:
+      nums: [0, 0, 0]
+    expected: [[0, 0, 0]]
+
+  - id: "no-triplet"
+    input:
+      nums: [1, 2, 3]
+    expected: []
+
+  - id: "classic-example"
+    input:
+      nums: [-1, 0, 1, 2, -1, -4]
+    expected: [[-1, -1, 2], [-1, 0, 1]]
+
+  - id: "duplicate-elements"
+    input:
+      nums: [-2, 0, 0, 2, 2]
+    expected: [[-2, 0, 2]]
+
+  - id: "extra-zeros"
+    input:
+      nums: [0, 0, 0, 0]
+    expected: [[0, 0, 0]]
+
+  - id: "repeated-negative"
+    input:
+      nums: [-1, -1, -1, 2]
+    expected: [[-1, -1, 2]]
+
+edge_cases:
+  - case: "All zeros"
+    description: "Every element is 0 -- the only triplet is [0, 0, 0]"
+    test_id: "all-zeros"
+
+  - case: "No valid triplet"
+    description: "All positive (or all negative) -- no three elements can sum to zero"
+    test_id: "no-triplet"
+
+  - case: "Duplicate elements require skip logic"
+    description: "Duplicate values must be skipped to avoid producing duplicate triplets"
+    test_id: "duplicate-elements"
+
+  - case: "More zeros than needed"
+    description: "Four zeros but only one valid triplet [0,0,0] -- duplicate skipping must work"
+    test_id: "extra-zeros"
+
+  - case: "Repeated negatives"
+    description: "Multiple identical negative values but only one valid triplet using two of them"
+    test_id: "repeated-negative"
+
+pattern_learning_objectives:
+  - "Recognize that 3Sum reduces to fixing one element and running Two Pointers on the remainder"
+  - "Understand why sorting is a prerequisite even though the input is unsorted"
+  - "Master duplicate-skipping logic for both the outer loop and the inner Two Pointers"
+  - "See how a O(n^2) solution can be optimal when sorting costs O(n log n)"
+  - "Learn to collect ALL valid results, not just the first match"
+
+real_world_applications:
+  - "Finding neutralizing combinations in chemical or pharmaceutical formulations"
+  - "Portfolio construction -- identifying positions that hedge to net-zero exposure"
+  - "Load balancing -- finding groups of latency adjustments that cancel out"
+  - "Signal processing -- finding frequency components that destructively interfere"
+
+complexity_analysis:
+  time:
+    naive: "O(n^3) - three nested loops checking all combinations"
+    optimal: "O(n^2) - sort O(n log n) + for each element O(n) Two Pointers = O(n^2)"
+  space:
+    optimal: "O(n) - space for sorting (language-dependent) + output storage"
+
+pattern_signature:
+  indicators:
+    - "Find all triplets summing to a target (zero)"
+    - "Result must contain no duplicates"
+    - "Unsorted input but can be sorted"
+    - "Extension of the pair-sum pattern to three elements"
+
+  pattern_name: "Two Pointers (nested)"
+
+  when_to_use:
+    - "Need to find all unique triplets (or k-tuples) with a given sum"
+    - "Duplicate avoidance is critical"
+    - "O(n^2) is acceptable (n <= ~3000)"
+    - "Problem is a natural extension of the two-element sum pattern"

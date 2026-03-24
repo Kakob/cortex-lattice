@@ -1,0 +1,125 @@
+# Finance & Trading theme for Two Pointers - Pair with Target Sum
+
+title: "Portfolio Pair Allocation"
+function_name: find_allocation_pair
+
+description: |
+  You are a portfolio manager at a quantitative trading firm. Your risk
+  management system has flagged that a specific dollar amount must be
+  deployed into exactly two positions before the market closes.
+
+  You have a sorted watchlist of asset valuations (sorted by current price
+  in ascending order). You need to find two assets whose combined cost
+  exactly matches your remaining risk budget.
+
+  Given a sorted array of asset prices (`nums`) and a target allocation
+  amount (`target`), return the two prices that sum to the target. If no
+  valid pair exists, return None -- the capital will remain undeployed.
+
+story_context: |
+  Your firm's risk committee has approved a specific capital allocation for
+  today's session. The compliance engine requires that you fill the budget
+  with exactly two positions -- no more, no less. Your desk's watchlist is
+  already ranked by price, giving you a natural advantage: you can scan
+  from the cheapest and most expensive ends simultaneously, narrowing in
+  on the pair that hits your budget without brute-forcing every combination.
+  In live trading, every millisecond counts -- an O(n) scan beats an O(n^2)
+  search when the order book has tens of thousands of instruments.
+
+examples:
+  - input:
+      nums: [1, 2, 3, 4, 6]
+      target: 6
+    output: [2, 4]
+    explanation: |
+      Your watchlist prices are $1, $2, $3, $4, $6 (in millions). The risk
+      budget is $6M. The pair $2M + $4M = $6M fills the allocation exactly.
+      Starting with pointers at $1 (cheapest) and $6 (most expensive):
+        $1 + $6 = $7 > $6 --> too expensive, move right pointer left
+        $1 + $4 = $5 < $6 --> under budget, move left pointer right
+        $2 + $4 = $6 == $6 --> exact match, deploy both positions
+
+  - input:
+      nums: [2, 5, 9, 11]
+      target: 13
+    output: [2, 11]
+    explanation: |
+      Prices: $2M, $5M, $9M, $11M. Budget: $13M.
+        $2 + $11 = $13 --> first check is an exact match.
+      The cheapest and most expensive assets fill the allocation perfectly.
+
+  - input:
+      nums: [1, 2, 3, 9]
+      target: 8
+    output: null
+    explanation: |
+      Prices: $1M, $2M, $3M, $9M. Budget: $8M.
+      No two assets combine to $8M. The closest pairs are $3 + $9 = $12
+      (over budget) and $2 + $3 = $5 (under budget). Capital stays on the
+      sideline.
+
+hints:
+  - level: 1
+    text: |
+      Your watchlist is sorted by price. Think about what happens if you
+      look at the cheapest and most expensive asset at the same time -- how
+      does their combined cost compare to your budget?
+
+  - level: 2
+    text: |
+      Use two pointers: one at the lowest-priced asset, one at the highest.
+      If their combined cost overshoots the budget, you need cheaper exposure
+      -- move the right pointer left. If it undershoots, you need more
+      expensive exposure -- move the left pointer right.
+
+  - level: 3
+    text: |
+      Initialize left = 0 (cheapest asset), right = len(nums) - 1 (most
+      expensive). While left < right: compute sum = nums[left] + nums[right].
+      If sum == target, return [nums[left], nums[right]]. If sum < target,
+      left += 1. If sum > target, right -= 1. If the loop ends, return None.
+
+starter_code_python: |
+  def find_allocation_pair(nums, target):
+      """
+      Find two asset prices in a sorted watchlist that sum to the risk budget.
+
+      Args:
+          nums: List[int] - sorted list of asset prices
+          target: int - total capital to deploy across two positions
+
+      Returns:
+          List[int] - [price1, price2] where price1 + price2 == target
+          None - if no valid pair exists (capital stays undeployed)
+
+      Examples:
+          >>> find_allocation_pair([1, 2, 3, 4, 6], 6)
+          [2, 4]
+
+          >>> find_allocation_pair([1, 2, 3, 9], 8)
+          None
+      """
+      # Your code here
+      pass
+
+starter_code_javascript: |
+  /**
+   * Find two asset prices in a sorted watchlist that sum to the risk budget.
+   *
+   * @param {number[]} nums - sorted array of asset prices
+   * @param {number} target - total capital to deploy across two positions
+   * @return {number[]|null} - [price1, price2] or null if no valid pair
+   */
+  function findAllocationPair(nums, target) {
+      // Your code here
+  }
+
+test_case_explanations:
+  basic-example: "Five assets on the watchlist, budget of $6M -- pair found in the middle"
+  first-and-last: "The cheapest and most expensive assets fill the budget on the first check"
+  duplicate-values: "Two positions in the same asset class at $4M each hit the $8M budget"
+  no-pair-exists: "No combination of two assets matches the $8M budget -- capital stays idle"
+  minimum-input: "Only two assets on the watchlist -- the only possible pair"
+  negative-numbers: "Short positions (negative values) combined with long positions to net the target"
+  large-values: "High-conviction large-cap positions near the top of the watchlist"
+  zero-target: "Short and long exposure that nets to zero -- a market-neutral hedge"
