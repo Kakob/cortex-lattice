@@ -15,7 +15,7 @@ import { LearningGuide } from "./LearningGuide";
 import { UserMenu } from "./auth/UserMenu";
 import { executeCode } from "@/lib/api";
 import type { Problem, LearningGuide as LearningGuideType, ExecutionResult, ThemeInfo } from "@/lib/types";
-import { ArrowLeft, BookOpen, ChevronDown, ChevronUp, Palette } from "lucide-react";
+import { ArrowLeft, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 
 interface ProblemWorkspaceProps {
@@ -241,8 +241,17 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
 }
 
 // =============================================================================
-// Theme Selector
+// Domain Selector
 // =============================================================================
+
+const domainEmojis: Record<string, string> = {
+  "wizard-dungeon": "🧙",
+  "medicine": "💊",
+  "finance": "💸",
+  "software-engineering": "🖥️",
+  "space-adventure": "🚀",
+  "coding-interview": "💻",
+};
 
 interface ThemeSelectorProps {
   themes: ThemeInfo[];
@@ -254,6 +263,7 @@ function ThemeSelector({ themes, activeThemeId, onThemeChange }: ThemeSelectorPr
   const [open, setOpen] = useState(false);
 
   const activeTheme = themes.find((t) => t.themeId === activeThemeId) || themes[0];
+  const activeEmoji = domainEmojis[activeTheme.themeId] || "📝";
 
   return (
     <div className="relative">
@@ -261,7 +271,7 @@ function ThemeSelector({ themes, activeThemeId, onThemeChange }: ThemeSelectorPr
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-surface-light"
       >
-        <Palette className="h-4 w-4" />
+        <span>{activeEmoji}</span>
         <span className="hidden sm:inline">{activeTheme.displayName}</span>
         <ChevronDown className="h-3 w-3" />
       </button>
@@ -286,6 +296,7 @@ function ThemeSelector({ themes, activeThemeId, onThemeChange }: ThemeSelectorPr
                     : "text-gray-300"
                 }`}
               >
+                <span>{domainEmojis[theme.themeId] || "📝"}</span>
                 <span className="flex-1">{theme.displayName}</span>
                 {theme.themeId === activeThemeId && (
                   <span className="text-xs text-accent-primary">Active</span>

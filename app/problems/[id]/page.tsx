@@ -1,12 +1,19 @@
 /**
  * Problem Page - Dynamic route for individual problems
  *
- * Server component that loads problem data and renders the workspace.
- * Accepts ?theme= query param to select a narrative theme.
+ * - /problems/[id]              → Theme picker (choose a narrative theme)
+ * - /problems/[id]?theme=<id>  → Workspace (code editor + tests)
+ *
+ * If only one theme exists, the picker is skipped via redirect.
  */
 
-import { notFound } from "next/navigation";
-import { loadProblem, buildLearningGuide, getAllProblems } from "@/lib/problems";
+import { notFound, redirect } from "next/navigation";
+import {
+  loadProblem,
+  buildLearningGuide,
+  getAllProblems,
+  getAvailableThemes,
+} from "@/lib/problems";
 import { ProblemWorkspace } from "@/components/ProblemWorkspace";
 
 interface ProblemPageProps {
@@ -29,9 +36,7 @@ export async function generateMetadata({ params, searchParams }: ProblemPageProp
   const problem = await loadProblem(id, theme);
 
   if (!problem) {
-    return {
-      title: "Problem Not Found - Cortex Lattice",
-    };
+    return { title: "Problem Not Found - Cortex Lattice" };
   }
 
   return {
@@ -44,7 +49,15 @@ export default async function ProblemPage({ params, searchParams }: ProblemPageP
   const { id } = await params;
   const { theme } = await searchParams;
 
-  // Load problem and learning guide with active theme
+  // No theme specified — redirect to the first available theme
+  if (!theme) {
+    const themes = await getAvailableThemes(id);
+    if (themes.length > 0) {
+      redirect(`/problems/${id}?theme=${themes[0].themeId}`);
+    }
+    notFound();
+  }
+
   const [problem, learningGuide] = await Promise.all([
     loadProblem(id, theme),
     buildLearningGuide(id, theme),

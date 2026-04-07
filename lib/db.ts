@@ -38,6 +38,12 @@
 
 import { PrismaClient } from "@prisma/client";
 
+// Slow query threshold in ms — queries above this get a warning log
+const SLOW_QUERY_THRESHOLD = parseInt(
+  process.env.SLOW_QUERY_THRESHOLD || "200",
+  10
+);
+
 /**
  * Extend globalThis with our prisma property.
  * This type assertion is needed because globalThis doesn't have a prisma
@@ -50,17 +56,53 @@ const globalForPrisma = globalThis as unknown as {
 /**
  * The singleton Prisma Client instance.
  *
- * Uses nullish coalescing (??): if globalForPrisma.prisma exists, use it;
- * otherwise, create a new PrismaClient.
+ * Logging is configured via Prisma events so we can add timing and
+ * slow-query detection on top of the default output.
  */
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]  // Verbose logging in dev
-        : ["error"],                   // Only errors in production
+    log: [
+      { emit: "event", level: "query" },
+      { emit: "event", level: "error" },
+      { emit: "event", level: "warn" },
+      { emit: "stdout", level: "info" },
+    ],
   });
+
+// ── Query timing & slow-query detection ──────────────────────────────
+
+prisma.$on("query" as never, (e: { query: string; params: string; duration: number }) => {
+  const tag = e.duration >= SLOW_QUERY_THRESHOLD ? "[db] SLOW QUERY" : "[db] query";
+
+  if (e.duration >= SLOW_QUERY_THRESHOLD) {
+    console.warn(tag, {
+      duration: `${e.duration}ms`,
+      query: e.query.slice(0, 300),
+      params: e.params.slice(0, 200),
+    });
+  } else if (process.env.NODE_ENV === "development") {
+    console.log(tag, {
+      duration: `${e.duration}ms`,
+      query: e.query.slice(0, 200),
+    });
+  }
+});
+
+// ── Error logging ────────────────────────────────────────────────────
+
+prisma.$on("error" as never, (e: { message: string; target?: string }) => {
+  console.error("[db] ERROR", {
+    message: e.message,
+    target: e.target,
+  });
+});
+
+// ── Warning logging ──────────────────────────────────────────────────
+
+prisma.$on("warn" as never, (e: { message: string }) => {
+  console.warn("[db] WARN", { message: e.message });
+});
 
 /**
  * In non-production environments, save the client to globalThis.

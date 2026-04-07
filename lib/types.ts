@@ -605,7 +605,31 @@ export interface AlgorithmGroup {
   algorithmId: string;
   algorithmName: string;
   difficulty: "easy" | "medium" | "hard";
+  themeCount: number;
   variants: ThemedProblemCard[];
+}
+
+// ============================================================================
+// Algorithm Summary (for theme picker page)
+// ============================================================================
+
+export interface AlgorithmSummary {
+  id: string;
+  algorithmName: string;
+  pattern: string | string[];
+  difficulty: "easy" | "medium" | "hard";
+  category?: string;
+  estimatedTime?: string;
+  themes: ThemeSummary[];
+}
+
+export interface ThemeSummary {
+  themeId: string;
+  displayName: string;
+  title: string;
+  storyPreview?: string;
+  source: "public" | "private";
+  solved?: boolean;
 }
 
 // ============================================================================

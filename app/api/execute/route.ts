@@ -3,13 +3,14 @@
  *
  * POST /api/execute
  *
- * Executes user code against problem test cases in a Docker sandbox.
+ * Executes user code against problem test cases via Modal sandbox.
+ * Falls back to local Docker execution if MODAL_ENDPOINT_URL is not set.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { writeFile, mkdir } from "fs/promises";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { auth } from "@/auth";
 import { problemExists, getProblemDir, buildMergedProblemYaml } from "@/lib/problems";
@@ -18,6 +19,11 @@ import type { ExecutionRequest, ExecutionResult } from "@/lib/types";
 const execAsync = promisify(exec);
 
 // Configuration
+const MODAL_ENDPOINT_URL = process.env.MODAL_ENDPOINT_URL; // e.g. https://your-workspace--cortex-lattice-executor-execute.modal.run
+const MODAL_TOKEN_ID = process.env.MODAL_TOKEN_ID;
+const MODAL_TOKEN_SECRET = process.env.MODAL_TOKEN_SECRET;
+
+// Docker fallback config (local development)
 const DOCKER_PATH = process.env.DOCKER_PATH || "/usr/local/bin/docker";
 const DOCKER_IMAGE = process.env.DOCKER_IMAGE || "cortex-executor:latest";
 const EXECUTION_TIMEOUT = parseInt(
@@ -27,7 +33,7 @@ const EXECUTION_TIMEOUT = parseInt(
 const MAX_MEMORY = process.env.MAX_MEMORY || "512m";
 const MAX_CONCURRENT = parseInt(process.env.MAX_CONCURRENT || "3", 10);
 
-// Simple semaphore for limiting concurrent executions
+// Simple semaphore for limiting concurrent executions (Docker fallback only)
 let currentExecutions = 0;
 const executionQueue: Array<() => void> = [];
 
@@ -57,7 +63,6 @@ function releaseLock(): void {
  * Validate problem ID to prevent path traversal attacks.
  */
 function isValidProblemId(id: string): boolean {
-  // Only allow alphanumeric characters, hyphens, and underscores
   return /^[a-zA-Z0-9_-]+$/.test(id) && id.length < 100;
 }
 
@@ -85,9 +90,153 @@ async function cleanupTempDir(tempDir: string): Promise<void> {
   }
 }
 
-export async function POST(request: NextRequest) {
+/**
+ * Get the problem YAML content for the executor.
+ * Returns merged themed YAML, or reads the raw problem.yaml from disk.
+ */
+async function getProblemYamlContent(
+  problemId: string,
+  problemDir: string,
+  themeId?: string
+): Promise<string> {
+  // Try themed merge first
+  const mergedYaml = await buildMergedProblemYaml(problemId, themeId);
+  if (mergedYaml) {
+    return mergedYaml;
+  }
+
+  // Fallback: read raw problem.yaml from the problem directory
+  const rawPath = path.join(problemDir, "problem.yaml");
+  return readFile(rawPath, "utf-8");
+}
+
+/**
+ * Execute code via Modal cloud sandbox.
+ */
+async function executeViaModal(
+  code: string,
+  problemYaml: string
+): Promise<ExecutionResult> {
+  const start = performance.now();
+  console.log("[execute] Modal request starting:", {
+    endpoint: MODAL_ENDPOINT_URL,
+    codeLength: code.length,
+    yamlLength: problemYaml.length,
+  });
+
+  const response = await fetch(MODAL_ENDPOINT_URL!, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      code,
+      problem_yaml: problemYaml,
+    }),
+  });
+
+  const elapsed = Math.round(performance.now() - start);
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("[execute] Modal request failed:", {
+      status: response.status,
+      elapsed: `${elapsed}ms`,
+      body: text.slice(0, 500),
+    });
+    throw new Error(`Modal execution failed (${response.status}): ${text}`);
+  }
+
+  const result: ExecutionResult = await response.json();
+  console.log("[execute] Modal request completed:", {
+    elapsed: `${elapsed}ms`,
+    passed: result.passed,
+    failed: result.failed,
+    total: result.total,
+    error: result.error || null,
+  });
+
+  return result;
+}
+
+/**
+ * Execute code via local Docker container (fallback).
+ */
+async function executeViaDocker(
+  code: string,
+  problemDir: string,
+  problemId: string,
+  themeId?: string
+): Promise<ExecutionResult> {
   let tempDir: string | null = null;
 
+  try {
+    await acquireLock();
+
+    tempDir = await createTempDir();
+    const solutionPath = path.join(tempDir, "solution.py");
+    await writeFile(solutionPath, code, "utf-8");
+
+    // For themed problems, build a merged problem.yaml
+    let mountProblemDir = problemDir;
+    const mergedYaml = await buildMergedProblemYaml(problemId, themeId);
+    if (mergedYaml) {
+      const mergedProblemDir = path.join(tempDir, "problem");
+      await mkdir(mergedProblemDir, { recursive: true });
+      await writeFile(
+        path.join(mergedProblemDir, "problem.yaml"),
+        mergedYaml,
+        "utf-8"
+      );
+      mountProblemDir = mergedProblemDir;
+    }
+
+    const dockerCmd = [
+      DOCKER_PATH,
+      "run",
+      "--rm",
+      `--memory=${MAX_MEMORY}`,
+      "--cpus=1",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:noexec,nosuid,size=64m",
+      "-v",
+      `${mountProblemDir}:/code/problem:ro`,
+      "-v",
+      `${solutionPath}:/code/solution.py:ro`,
+      DOCKER_IMAGE,
+      "python",
+      "/code/run_tests.py",
+    ].join(" ");
+
+    const { stdout, stderr } = await execAsync(dockerCmd, {
+      timeout: EXECUTION_TIMEOUT,
+      maxBuffer: 1024 * 1024,
+    });
+
+    const output = stdout.trim() || stderr.trim();
+    const jsonMatch = output.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+
+    return {
+      success: false,
+      total: 0,
+      passed: 0,
+      failed: 0,
+      results: [],
+      error: output || "No JSON found in output",
+    };
+  } finally {
+    releaseLock();
+    if (tempDir) {
+      await cleanupTempDir(tempDir);
+    }
+  }
+}
+
+export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const session = await auth();
@@ -141,82 +290,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Acquire execution lock
-    await acquireLock();
+    // Route to Modal or Docker
+    const executor = MODAL_ENDPOINT_URL ? "modal" : "docker";
+    const startTime = performance.now();
 
-    try {
-      // Create temp directory and write user code
-      tempDir = await createTempDir();
-      const solutionPath = path.join(tempDir, "solution.py");
-      await writeFile(solutionPath, code, "utf-8");
+    console.log("[execute] Starting execution:", {
+      executor,
+      problemId,
+      themeId: themeId || "default",
+      userId: session.user.id,
+      codeLength: code.length,
+    });
 
-      // For themed problems (core.yaml exists), build a merged problem.yaml
-      // so the test runner sees the same schema it always has.
-      let mountProblemDir = problemDir;
-      const mergedYaml = await buildMergedProblemYaml(problemId, themeId);
-      if (mergedYaml) {
-        const mergedProblemDir = path.join(tempDir, "problem");
-        await mkdir(mergedProblemDir, { recursive: true });
-        await writeFile(
-          path.join(mergedProblemDir, "problem.yaml"),
-          mergedYaml,
-          "utf-8"
-        );
-        mountProblemDir = mergedProblemDir;
-      }
+    let result: ExecutionResult;
 
-      // Build Docker command
-      const dockerCmd = [
-        DOCKER_PATH,
-        "run",
-        "--rm", // Remove container after execution
-        `--memory=${MAX_MEMORY}`, // Memory limit
-        "--cpus=1", // CPU limit
-        "--network=none", // No network access
-        "--read-only", // Read-only filesystem
-        "--tmpfs=/tmp:noexec,nosuid,size=64m", // Temp space
-        "-v",
-        `${mountProblemDir}:/code/problem:ro`, // Mount problem (read-only)
-        "-v",
-        `${solutionPath}:/code/solution.py:ro`, // Mount solution (read-only)
-        DOCKER_IMAGE,
-        "python",
-        "/code/run_tests.py",
-      ].join(" ");
-
-      // Execute with timeout
-      const { stdout, stderr } = await execAsync(dockerCmd, {
-        timeout: EXECUTION_TIMEOUT,
-        maxBuffer: 1024 * 1024, // 1MB output limit
-      });
-
-      // Parse results - try stdout first, then stderr (some docker configs output to stderr)
-      let result: ExecutionResult;
-      const output = stdout.trim() || stderr.trim();
-
-      try {
-        // Find JSON in the output (in case there's extra text)
-        const jsonMatch = output.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          result = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("No JSON found in output");
-        }
-      } catch (parseError) {
-        result = {
-          success: false,
-          total: 0,
-          passed: 0,
-          failed: 0,
-          results: [],
-          error: output || "Failed to parse execution result",
-        };
-      }
-
-      return NextResponse.json(result);
-    } finally {
-      releaseLock();
+    if (MODAL_ENDPOINT_URL) {
+      const problemYaml = await getProblemYamlContent(problemId, problemDir, themeId);
+      result = await executeViaModal(code, problemYaml);
+    } else {
+      result = await executeViaDocker(code, problemDir, problemId, themeId);
     }
+
+    const totalElapsed = Math.round(performance.now() - startTime);
+
+    console.log("[execute] Execution complete:", {
+      executor,
+      problemId,
+      totalElapsed: `${totalElapsed}ms`,
+      passed: result.passed,
+      failed: result.failed,
+      total: result.total,
+    });
+
+    return NextResponse.json({
+      ...result,
+      _meta: {
+        executor,
+        totalMs: totalElapsed,
+      },
+    });
   } catch (error) {
     const err = error as Error & { killed?: boolean; code?: string; stdout?: string; stderr?: string };
 
@@ -232,8 +344,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Handle Docker not available
-    if (err.code === "ENOENT") {
+    // Handle Docker not available (only relevant for Docker fallback)
+    if (err.code === "ENOENT" && !MODAL_ENDPOINT_URL) {
       return NextResponse.json({
         success: false,
         total: 0,
@@ -271,11 +383,6 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
-  } finally {
-    // Cleanup temp directory
-    if (tempDir) {
-      await cleanupTempDir(tempDir);
-    }
   }
 }
 
@@ -284,5 +391,6 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     message: "Code execution endpoint. Use POST to execute code.",
+    executor: MODAL_ENDPOINT_URL ? "modal" : "docker",
   });
 }

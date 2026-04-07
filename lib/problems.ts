@@ -62,6 +62,8 @@ import type {
   ThemedProblemCard,
   PatternGroup,
   AlgorithmGroup,
+  AlgorithmSummary,
+  ThemeSummary,
   LearningGuide,
 } from "./types";
 
@@ -947,41 +949,8 @@ export async function getProblemsByPattern(): Promise<PatternGroup[]> {
       algorithmId: problemId,
       algorithmName,
       difficulty: core.difficulty as "easy" | "medium" | "hard",
+      themeCount: themes.length,
       variants,
-    });
-  }
-
-  // Legacy-format problems: one variant, no theme
-  for (const problemPath of legacyDirs) {
-    const problemId = path.dirname(problemPath);
-    if (newFormatIds.has(problemId)) continue;
-
-    const problem = await loadProblem(problemId);
-    if (!problem) continue;
-
-    const pattern = Array.isArray(problem.pattern) ? problem.pattern[0] : problem.pattern;
-    const algorithmName = formatAlgorithmName(problemId, pattern);
-
-    const variant: ThemedProblemCard = {
-      id: problemId,
-      themeId: "",
-      themeName: "",
-      title: problem.title,
-      difficulty: problem.difficulty,
-      pattern: problem.pattern,
-      category: problem.category,
-      algorithmName,
-      solved: false,
-    };
-
-    if (!patternMap.has(pattern)) {
-      patternMap.set(pattern, []);
-    }
-    patternMap.get(pattern)!.push({
-      algorithmId: problemId,
-      algorithmName,
-      difficulty: problem.difficulty,
-      variants: [variant],
     });
   }
 
@@ -995,6 +964,64 @@ export async function getProblemsByPattern(): Promise<PatternGroup[]> {
   }
 
   return groups;
+}
+
+// ============================================================================
+// Algorithm Summary (for theme picker page)
+// ============================================================================
+
+/**
+ * Load a lightweight summary for the theme picker page.
+ * Loads core metadata + each theme's title and story preview.
+ */
+export async function loadAlgorithmSummary(
+  problemId: string
+): Promise<AlgorithmSummary | null> {
+  const core = await loadCore(problemId);
+  if (!core) return null;
+
+  const pattern = Array.isArray(core.pattern) ? core.pattern[0] : core.pattern;
+  const algorithmName = formatAlgorithmName(problemId, pattern);
+  const availableThemes = await getAvailableThemes(problemId);
+
+  const themes: ThemeSummary[] = [];
+
+  for (const theme of availableThemes) {
+    const themePath = await resolveThemePath(problemId, theme.themeId);
+    if (!themePath) continue;
+
+    const themed = await loadYamlFile<{
+      title: string;
+      story_context?: string;
+    }>(path.join(themePath, "problem.yaml"));
+    if (!themed) continue;
+
+    const storyPreview = themed.story_context
+      ? themed.story_context.slice(0, 150) +
+        (themed.story_context.length > 150 ? "..." : "")
+      : undefined;
+
+    themes.push({
+      themeId: theme.themeId,
+      displayName: theme.displayName,
+      title: themed.title,
+      storyPreview,
+      source: theme.source,
+      solved: false,
+    });
+  }
+
+  if (themes.length === 0) return null;
+
+  return {
+    id: core.id,
+    algorithmName,
+    pattern: core.pattern,
+    difficulty: core.difficulty as "easy" | "medium" | "hard",
+    category: core.category,
+    estimatedTime: core.estimated_time,
+    themes,
+  };
 }
 
 /**

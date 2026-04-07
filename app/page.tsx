@@ -7,11 +7,9 @@
 import Link from "next/link";
 import { getProblemsByPattern } from "@/lib/problems";
 import { UserMenu } from "@/components/auth/UserMenu";
-import type { PatternGroup, AlgorithmGroup, ThemedProblemCard } from "@/lib/types";
+import type { PatternGroup, AlgorithmGroup } from "@/lib/types";
 import {
   Brain,
-  CheckCircle,
-  ChevronRight,
   Code,
   Sparkles,
 } from "lucide-react";
@@ -43,13 +41,6 @@ export default async function HomePage() {
           <UserMenu />
         </div>
       </nav>
-
-      {/* TODO Banner */}
-      <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-3">
-        <p className="text-center text-sm text-amber-300">
-          <strong>TODO:</strong> Migrate Postgres and executor sandbox to the cloud (Neon + Modal/Fly.io) to free up local disk space and prevent data loss.
-        </p>
-      </div>
 
       {/* Hero Section */}
       <header className="border-b border-gray-800 bg-gradient-to-b from-surface to-surface-dark px-4 py-12 text-center">
@@ -163,71 +154,49 @@ const difficultyColors = {
   hard: "text-red-400 bg-red-500/10",
 };
 
+const domainEmojis: Record<string, string> = {
+  "wizard-dungeon": "🧙",
+  "medicine": "💊",
+  "finance": "💸",
+  "software-engineering": "🖥️",
+  "space-adventure": "🚀",
+  "coding-interview": "💻",
+};
+
 function AlgorithmCard({ algorithm }: { algorithm: AlgorithmGroup }) {
   const firstVariant = algorithm.variants[0];
-  const defaultHref = firstVariant.themeId
-    ? `/problems/${firstVariant.id}?theme=${firstVariant.themeId}`
-    : `/problems/${firstVariant.id}`;
-
-  // Collect themed titles for display: "The Runestone Lock, Portfolio Pair Allocation, ..."
-  const themedTitles = algorithm.variants
-    .filter((v) => v.themeName)
-    .map((v) => v.title);
+  const defaultHref = `/problems/${algorithm.algorithmId}?theme=${firstVariant.themeId}`;
 
   return (
     <div className="px-4 py-4">
-      <div className="flex items-center gap-3">
-        {firstVariant.solved ? (
-          <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-500" />
-        ) : (
-          <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-gray-600" />
-        )}
-        <div className="min-w-0 flex-1">
-          {/* Algorithm name + difficulty */}
-          <div className="flex items-center gap-2">
-            <Link
-              href={defaultHref}
-              className="font-medium text-gray-100 hover:text-white transition-colors"
-            >
-              {algorithm.algorithmName}
-            </Link>
-            <span
-              className={`rounded px-2 py-0.5 text-xs ${difficultyColors[algorithm.difficulty]}`}
-            >
-              {algorithm.difficulty}
-            </span>
-          </div>
-
-          {/* Themed titles as a subtitle */}
-          {themedTitles.length > 0 && (
-            <p className="mt-0.5 text-sm text-gray-500">
-              {themedTitles.join(" / ")}
-            </p>
-          )}
-
-          {/* Play as: theme links */}
-          {algorithm.variants.length > 1 && (
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-              <span className="text-gray-500">play as:</span>
-              {algorithm.variants.map((variant, i) => (
-                <span key={variant.themeId} className="flex items-center gap-x-2">
-                  <Link
-                    href={`/problems/${variant.id}?theme=${variant.themeId}`}
-                    className="text-gray-400 hover:text-gray-200 transition-colors"
-                  >
-                    {variant.themeName}
-                  </Link>
-                  {i < algorithm.variants.length - 1 && (
-                    <span className="text-gray-600">/</span>
-                  )}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-        <Link href={defaultHref}>
-          <ChevronRight className="h-5 w-5 flex-shrink-0 text-gray-500" />
+      <div className="flex items-center gap-2">
+        <Link
+          href={defaultHref}
+          className="font-medium text-gray-100 hover:text-white transition-colors"
+        >
+          {algorithm.algorithmName}
         </Link>
+        <span
+          className={`rounded px-2 py-0.5 text-xs ${difficultyColors[algorithm.difficulty]}`}
+        >
+          {algorithm.difficulty}
+        </span>
+      </div>
+      <div className="mt-3 flex justify-center gap-6">
+        {algorithm.variants.map((variant) => (
+          <Link
+            key={variant.themeId}
+            href={`/problems/${algorithm.algorithmId}?theme=${variant.themeId}`}
+            className="flex flex-col items-center gap-1.5 rounded-lg px-3 py-2 transition-colors hover:bg-surface-light"
+          >
+            <span className="text-2xl">
+              {domainEmojis[variant.themeId] || "📝"}
+            </span>
+            <span className="text-xs text-gray-400">
+              {variant.title}
+            </span>
+          </Link>
+        ))}
       </div>
     </div>
   );
