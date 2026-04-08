@@ -1,8 +1,8 @@
 {
-  "../../../../@crx/manifest": {
-    "file": "assets/crx-manifest.js-CER9CcQP.js",
+  "../../../../../../../@crx/manifest": {
+    "file": "assets/crx-manifest.js-DWKgld4k.js",
     "name": "crx-manifest.js",
-    "src": "../../../../@crx/manifest",
+    "src": "../../../../../../../@crx/manifest",
     "isEntry": true
   },
   "_globals-!~{003}~.js": {

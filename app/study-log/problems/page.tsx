@@ -6,7 +6,7 @@
 
 import Link from "next/link";
 import { getStudyProblemsByPattern, getStudyProgress, type StudyProblem } from "@/lib/study-log-yaml";
-import { normalizeTitle } from "@/lib/curriculum";
+import { normalizeTitle, getDesignGurusUrl } from "@/lib/curriculum";
 import {
   Brain,
   CheckCircle,
@@ -216,19 +216,19 @@ function ProblemCard({ problem }: { problem: StudyProblem }) {
   const slug = normalizeTitle(problem.title);
 
   return (
-    <Link
-      href={`/study-log/${slug}`}
-      className="flex items-start justify-between px-4 py-4 hover:bg-surface-light transition-colors group"
-    >
-      <div className="flex items-start gap-3">
+    <div className="flex items-start justify-between px-4 py-4 hover:bg-surface-light transition-colors group">
+      <Link
+        href={`/study-log/${slug}`}
+        className="flex items-start gap-3 flex-1 min-w-0"
+      >
         {problem.can_solve_cold ? (
-          <CheckCircle className="mt-0.5 h-5 w-5 text-green-500" />
+          <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
         ) : hasInsight ? (
-          <Lightbulb className="mt-0.5 h-5 w-5 text-yellow-500" />
+          <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-yellow-500" />
         ) : (
-          <div className="mt-0.5 h-5 w-5 rounded-full border-2 border-gray-600" />
+          <div className="mt-0.5 h-5 w-5 shrink-0 rounded-full border-2 border-gray-600" />
         )}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h3 className="font-medium text-gray-100 group-hover:text-indigo-400 transition-colors">
             {problem.title}
           </h3>
@@ -260,7 +260,18 @@ function ProblemCard({ problem }: { problem: StudyProblem }) {
             </p>
           )}
         </div>
-      </div>
-    </Link>
+      </Link>
+      <a
+        href={getDesignGurusUrl(slug)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-1 ml-2 shrink-0 text-gray-600 hover:text-indigo-400 transition-colors"
+        title="Open on DesignGurus"
+      >
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+    </div>
   );
 }

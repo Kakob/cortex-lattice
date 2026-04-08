@@ -1,6 +1,9 @@
 /**
  * GTCI (Grokking the Coding Interview) Curriculum Data
  * Maps problem titles to their patterns and metadata
+ *
+ * Full DesignGurus course: 244 problems across 30 sections.
+ * This array contains ~235 unique problems (cross-section duplicates excluded).
  */
 
 export interface CurriculumProblem {
@@ -12,6 +15,16 @@ export interface CurriculumProblem {
 }
 
 export const GTCI_CURRICULUM: CurriculumProblem[] = [
+  // Warmup
+  { title: 'Contains Duplicate', normalizedTitle: 'contains-duplicate', difficulty: 'easy', patternKey: 'warmup', index: 0 },
+  { title: 'Pangram', normalizedTitle: 'pangram', difficulty: 'easy', patternKey: 'warmup', index: 1 },
+  { title: 'Reverse Vowels', normalizedTitle: 'reverse-vowels', difficulty: 'easy', patternKey: 'warmup', index: 2 },
+  { title: 'Valid Palindrome', normalizedTitle: 'valid-palindrome', difficulty: 'easy', patternKey: 'warmup', index: 3 },
+  { title: 'Valid Anagram', normalizedTitle: 'valid-anagram', difficulty: 'easy', patternKey: 'warmup', index: 4 },
+  { title: 'Shortest Word Distance', normalizedTitle: 'shortest-word-distance', difficulty: 'easy', patternKey: 'warmup', index: 5 },
+  { title: 'Number of Good Pairs', normalizedTitle: 'number-of-good-pairs', difficulty: 'easy', patternKey: 'warmup', index: 6 },
+  { title: 'Sqrt', normalizedTitle: 'sqrt', difficulty: 'medium', patternKey: 'warmup', index: 7 },
+
   // Two Pointers
   { title: 'Pair with Target Sum', normalizedTitle: 'pair-with-target-sum', difficulty: 'easy', patternKey: 'two-pointers', index: 0 },
   { title: 'Find Non-Duplicate Number Instances', normalizedTitle: 'find-non-duplicate-number-instances', difficulty: 'easy', patternKey: 'two-pointers', index: 1 },
@@ -44,6 +57,8 @@ export const GTCI_CURRICULUM: CurriculumProblem[] = [
   { title: 'String Anagrams', normalizedTitle: 'string-anagrams', difficulty: 'hard', patternKey: 'sliding-window', index: 7 },
   { title: 'Smallest Window containing Substring', normalizedTitle: 'smallest-window-containing-substring', difficulty: 'hard', patternKey: 'sliding-window', index: 8 },
   { title: 'Words Concatenation', normalizedTitle: 'words-concatenation', difficulty: 'hard', patternKey: 'sliding-window', index: 9 },
+  { title: 'Counting Subarrays with Product Less than a Target', normalizedTitle: 'counting-subarrays-with-product-less-than-a-target', difficulty: 'hard', patternKey: 'sliding-window', index: 10 },
+  { title: 'Subarrays with Product Less than a Target', normalizedTitle: 'subarrays-with-product-less-than-a-target', difficulty: 'hard', patternKey: 'sliding-window', index: 11 },
 
   // Merge Intervals
   { title: 'Merge Intervals', normalizedTitle: 'merge-intervals', difficulty: 'medium', patternKey: 'merge-intervals', index: 0 },
@@ -71,17 +86,27 @@ export const GTCI_CURRICULUM: CurriculumProblem[] = [
   { title: 'Reverse alternating K-element Sub-list', normalizedTitle: 'reverse-alternating-k-element-sub-list', difficulty: 'medium', patternKey: 'linked-list-reversal', index: 3 },
   { title: 'Rotate a LinkedList', normalizedTitle: 'rotate-a-linkedlist', difficulty: 'medium', patternKey: 'linked-list-reversal', index: 4 },
 
-  // Binary Search
-  { title: 'Order-agnostic Binary Search', normalizedTitle: 'order-agnostic-binary-search', difficulty: 'easy', patternKey: 'binary-search', index: 0 },
-  { title: 'Ceiling of a Number', normalizedTitle: 'ceiling-of-a-number', difficulty: 'medium', patternKey: 'binary-search', index: 1 },
-  { title: 'Next Letter', normalizedTitle: 'next-letter', difficulty: 'medium', patternKey: 'binary-search', index: 2 },
-  { title: 'Number Range', normalizedTitle: 'number-range', difficulty: 'medium', patternKey: 'binary-search', index: 3 },
-  { title: 'Search in a Sorted Infinite Array', normalizedTitle: 'search-in-a-sorted-infinite-array', difficulty: 'medium', patternKey: 'binary-search', index: 4 },
-  { title: 'Minimum Difference Element', normalizedTitle: 'minimum-difference-element', difficulty: 'medium', patternKey: 'binary-search', index: 5 },
-  { title: 'Bitonic Array Maximum', normalizedTitle: 'bitonic-array-maximum', difficulty: 'easy', patternKey: 'binary-search', index: 6 },
-  { title: 'Search Bitonic Array', normalizedTitle: 'search-bitonic-array', difficulty: 'medium', patternKey: 'binary-search', index: 7 },
-  { title: 'Search in Rotated Array', normalizedTitle: 'search-in-rotated-array', difficulty: 'medium', patternKey: 'binary-search', index: 8 },
-  { title: 'Rotation Count', normalizedTitle: 'rotation-count', difficulty: 'medium', patternKey: 'binary-search', index: 9 },
+  // Stack (Balanced Parentheses omitted — exists in Subsets)
+  { title: 'Reverse a String', normalizedTitle: 'reverse-a-string', difficulty: 'easy', patternKey: 'stack', index: 0 },
+  { title: 'Decimal to Binary Conversion', normalizedTitle: 'decimal-to-binary-conversion', difficulty: 'medium', patternKey: 'stack', index: 1 },
+  { title: 'Next Greater Element', normalizedTitle: 'next-greater-element', difficulty: 'easy', patternKey: 'stack', index: 2 },
+  { title: 'Sorting a Stack', normalizedTitle: 'sorting-a-stack', difficulty: 'easy', patternKey: 'stack', index: 3 },
+  { title: 'Simplify Path', normalizedTitle: 'simplify-path', difficulty: 'medium', patternKey: 'stack', index: 4 },
+
+  // Monotonic Stack (Next Greater Element omitted — exists in Stack)
+  { title: 'Remove Nodes From Linked List', normalizedTitle: 'remove-nodes-from-linked-list', difficulty: 'easy', patternKey: 'monotonic-stack', index: 0 },
+  { title: 'Remove All Adjacent Duplicates In String', normalizedTitle: 'remove-all-adjacent-duplicates-in-string', difficulty: 'easy', patternKey: 'monotonic-stack', index: 1 },
+  { title: 'Daily Temperatures', normalizedTitle: 'daily-temperatures', difficulty: 'easy', patternKey: 'monotonic-stack', index: 2 },
+  { title: 'Remove All Adjacent Duplicates in String II', normalizedTitle: 'remove-all-adjacent-duplicates-in-string-ii', difficulty: 'medium', patternKey: 'monotonic-stack', index: 3 },
+  { title: 'Sum of Subarray Minimums', normalizedTitle: 'sum-of-subarray-minimums', difficulty: 'medium', patternKey: 'monotonic-stack', index: 4 },
+  { title: 'Remove K Digits', normalizedTitle: 'remove-k-digits', difficulty: 'hard', patternKey: 'monotonic-stack', index: 5 },
+
+  // Level Order Traversal (Reverse Level Order & Zigzag omitted — exist in Tree BFS)
+  { title: 'Find Largest Value in Each Tree Row', normalizedTitle: 'find-largest-value-in-each-tree-row', difficulty: 'medium', patternKey: 'level-order-traversal', index: 0 },
+  { title: 'Maximum Width of Binary Tree', normalizedTitle: 'maximum-width-of-binary-tree', difficulty: 'medium', patternKey: 'level-order-traversal', index: 1 },
+  { title: 'Maximum Level Sum of a Binary Tree', normalizedTitle: 'maximum-level-sum-of-a-binary-tree', difficulty: 'medium', patternKey: 'level-order-traversal', index: 2 },
+  { title: 'Even Odd Tree', normalizedTitle: 'even-odd-tree', difficulty: 'medium', patternKey: 'level-order-traversal', index: 3 },
+  { title: 'N-ary Tree Level Order Traversal', normalizedTitle: 'nary-tree-level-order-traversal', difficulty: 'hard', patternKey: 'level-order-traversal', index: 4 },
 
   // Tree BFS
   { title: 'Binary Tree Level Order Traversal', normalizedTitle: 'binary-tree-level-order-traversal', difficulty: 'easy', patternKey: 'tree-bfs', index: 0 },
@@ -103,6 +128,22 @@ export const GTCI_CURRICULUM: CurriculumProblem[] = [
   { title: 'Tree Diameter', normalizedTitle: 'tree-diameter', difficulty: 'medium', patternKey: 'tree-dfs', index: 5 },
   { title: 'Path with Maximum Sum', normalizedTitle: 'path-with-maximum-sum', difficulty: 'hard', patternKey: 'tree-dfs', index: 6 },
 
+  // Graph
+  { title: 'Find if Path Exists in Graph', normalizedTitle: 'find-if-path-exists-in-graph', difficulty: 'easy', patternKey: 'graph', index: 0 },
+  { title: 'Number of Provinces', normalizedTitle: 'number-of-provinces', difficulty: 'medium', patternKey: 'graph', index: 1 },
+  { title: 'Find Eventual Safe States', normalizedTitle: 'find-eventual-safe-states', difficulty: 'medium', patternKey: 'graph', index: 2 },
+  { title: 'Minimum Number of Vertices to Reach All Nodes', normalizedTitle: 'minimum-number-of-vertices-to-reach-all-nodes', difficulty: 'medium', patternKey: 'graph', index: 3 },
+  { title: 'Bus Routes', normalizedTitle: 'bus-routes', difficulty: 'hard', patternKey: 'graph', index: 4 },
+
+  // Islands
+  { title: 'Number of Islands', normalizedTitle: 'number-of-islands', difficulty: 'easy', patternKey: 'islands', index: 0 },
+  { title: 'Biggest Island', normalizedTitle: 'biggest-island', difficulty: 'easy', patternKey: 'islands', index: 1 },
+  { title: 'Flood Fill', normalizedTitle: 'flood-fill', difficulty: 'easy', patternKey: 'islands', index: 2 },
+  { title: 'Number of Closed Islands', normalizedTitle: 'number-of-closed-islands', difficulty: 'easy', patternKey: 'islands', index: 3 },
+  { title: 'Problem Challenge 1', normalizedTitle: 'problem-challenge-1', difficulty: 'easy', patternKey: 'islands', index: 4 },
+  { title: 'Problem Challenge 2', normalizedTitle: 'problem-challenge-2', difficulty: 'medium', patternKey: 'islands', index: 5 },
+  { title: 'Problem Challenge 3', normalizedTitle: 'problem-challenge-3', difficulty: 'medium', patternKey: 'islands', index: 6 },
+
   // Two Heaps
   { title: 'Find the Median of a Number Stream', normalizedTitle: 'find-the-median-of-a-number-stream', difficulty: 'medium', patternKey: 'two-heaps', index: 0 },
   { title: 'Sliding Window Median', normalizedTitle: 'sliding-window-median', difficulty: 'hard', patternKey: 'two-heaps', index: 1 },
@@ -119,6 +160,24 @@ export const GTCI_CURRICULUM: CurriculumProblem[] = [
   { title: 'Evaluate Expression', normalizedTitle: 'evaluate-expression', difficulty: 'hard', patternKey: 'subsets', index: 6 },
   { title: 'Structurally Unique Binary Search Trees', normalizedTitle: 'structurally-unique-binary-search-trees', difficulty: 'hard', patternKey: 'subsets', index: 7 },
   { title: 'Count of Structurally Unique Binary Search Trees', normalizedTitle: 'count-of-structurally-unique-binary-search-trees', difficulty: 'hard', patternKey: 'subsets', index: 8 },
+
+  // Binary Search
+  { title: 'Order-agnostic Binary Search', normalizedTitle: 'order-agnostic-binary-search', difficulty: 'easy', patternKey: 'binary-search', index: 0 },
+  { title: 'Ceiling of a Number', normalizedTitle: 'ceiling-of-a-number', difficulty: 'medium', patternKey: 'binary-search', index: 1 },
+  { title: 'Next Letter', normalizedTitle: 'next-letter', difficulty: 'medium', patternKey: 'binary-search', index: 2 },
+  { title: 'Number Range', normalizedTitle: 'number-range', difficulty: 'medium', patternKey: 'binary-search', index: 3 },
+  { title: 'Search in a Sorted Infinite Array', normalizedTitle: 'search-in-a-sorted-infinite-array', difficulty: 'medium', patternKey: 'binary-search', index: 4 },
+  { title: 'Minimum Difference Element', normalizedTitle: 'minimum-difference-element', difficulty: 'medium', patternKey: 'binary-search', index: 5 },
+  { title: 'Bitonic Array Maximum', normalizedTitle: 'bitonic-array-maximum', difficulty: 'easy', patternKey: 'binary-search', index: 6 },
+  { title: 'Search Bitonic Array', normalizedTitle: 'search-bitonic-array', difficulty: 'medium', patternKey: 'binary-search', index: 7 },
+  { title: 'Search in Rotated Array', normalizedTitle: 'search-in-rotated-array', difficulty: 'medium', patternKey: 'binary-search', index: 8 },
+  { title: 'Rotation Count', normalizedTitle: 'rotation-count', difficulty: 'medium', patternKey: 'binary-search', index: 9 },
+
+  // Bitwise XOR
+  { title: 'Single Number', normalizedTitle: 'single-number', difficulty: 'easy', patternKey: 'bitwise-xor', index: 0 },
+  { title: 'Two Single Numbers', normalizedTitle: 'two-single-numbers', difficulty: 'medium', patternKey: 'bitwise-xor', index: 1 },
+  { title: 'Complement of Base 10 Number', normalizedTitle: 'complement-of-base-10-number', difficulty: 'medium', patternKey: 'bitwise-xor', index: 2 },
+  { title: 'Flip and Invert an Image', normalizedTitle: 'flip-and-invert-an-image', difficulty: 'hard', patternKey: 'bitwise-xor', index: 3 },
 
   // Top K Elements
   { title: 'Top K Numbers', normalizedTitle: 'top-k-numbers', difficulty: 'easy', patternKey: 'top-k-elements', index: 0 },
@@ -143,14 +202,13 @@ export const GTCI_CURRICULUM: CurriculumProblem[] = [
   { title: 'Smallest Number Range', normalizedTitle: 'smallest-number-range', difficulty: 'hard', patternKey: 'k-way-merge', index: 3 },
   { title: 'K Pairs with Largest Sums', normalizedTitle: 'k-pairs-with-largest-sums', difficulty: 'hard', patternKey: 'k-way-merge', index: 4 },
 
-  // Topological Sort
-  { title: 'Topological Sort', normalizedTitle: 'topological-sort', difficulty: 'medium', patternKey: 'topological-sort', index: 0 },
-  { title: 'Tasks Scheduling', normalizedTitle: 'tasks-scheduling', difficulty: 'medium', patternKey: 'topological-sort', index: 1 },
-  { title: 'Tasks Scheduling Order', normalizedTitle: 'tasks-scheduling-order', difficulty: 'medium', patternKey: 'topological-sort', index: 2 },
-  { title: 'All Tasks Scheduling Orders', normalizedTitle: 'all-tasks-scheduling-orders', difficulty: 'hard', patternKey: 'topological-sort', index: 3 },
-  { title: 'Alien Dictionary', normalizedTitle: 'alien-dictionary', difficulty: 'hard', patternKey: 'topological-sort', index: 4 },
-  { title: 'Reconstructing a Sequence', normalizedTitle: 'reconstructing-a-sequence', difficulty: 'hard', patternKey: 'topological-sort', index: 5 },
-  { title: 'Minimum Height Trees', normalizedTitle: 'minimum-height-trees', difficulty: 'hard', patternKey: 'topological-sort', index: 6 },
+  // Greedy
+  { title: 'Valid Palindrome II', normalizedTitle: 'valid-palindrome-ii', difficulty: 'easy', patternKey: 'greedy', index: 0 },
+  { title: 'Maximum Length of Pair Chain', normalizedTitle: 'maximum-length-of-pair-chain', difficulty: 'medium', patternKey: 'greedy', index: 1 },
+  { title: 'Minimum Add to Make Parentheses Valid', normalizedTitle: 'minimum-add-to-make-parentheses-valid', difficulty: 'medium', patternKey: 'greedy', index: 2 },
+  { title: 'Remove Duplicate Letters', normalizedTitle: 'remove-duplicate-letters', difficulty: 'medium', patternKey: 'greedy', index: 3 },
+  { title: 'Largest Palindromic Number', normalizedTitle: 'largest-palindromic-number', difficulty: 'medium', patternKey: 'greedy', index: 4 },
+  { title: 'Removing Minimum and Maximum From Array', normalizedTitle: 'removing-minimum-and-maximum-from-array', difficulty: 'medium', patternKey: 'greedy', index: 5 },
 
   // Dynamic Programming
   { title: '0/1 Knapsack', normalizedTitle: '0-1-knapsack', difficulty: 'medium', patternKey: 'dynamic-programming', index: 0 },
@@ -170,6 +228,87 @@ export const GTCI_CURRICULUM: CurriculumProblem[] = [
   { title: 'Count of Palindromic Substrings', normalizedTitle: 'count-of-palindromic-substrings', difficulty: 'medium', patternKey: 'dynamic-programming', index: 14 },
   { title: 'Minimum Deletions in a String to make it a Palindrome', normalizedTitle: 'minimum-deletions-in-a-string-to-make-it-a-palindrome', difficulty: 'medium', patternKey: 'dynamic-programming', index: 15 },
   { title: 'Palindromic Partitioning', normalizedTitle: 'palindromic-partitioning', difficulty: 'hard', patternKey: 'dynamic-programming', index: 16 },
+
+  // Backtracking
+  { title: 'Combination Sum', normalizedTitle: 'combination-sum', difficulty: 'medium', patternKey: 'backtracking', index: 0 },
+  { title: 'Word Search', normalizedTitle: 'word-search', difficulty: 'medium', patternKey: 'backtracking', index: 1 },
+  { title: 'Factor Combinations', normalizedTitle: 'factor-combinations', difficulty: 'medium', patternKey: 'backtracking', index: 2 },
+  { title: 'Split a String Into the Max Number of Unique Substrings', normalizedTitle: 'split-a-string-into-the-max-number-of-unique-substrings', difficulty: 'medium', patternKey: 'backtracking', index: 3 },
+  { title: 'Sudoku Solver', normalizedTitle: 'sudoku-solver', difficulty: 'hard', patternKey: 'backtracking', index: 4 },
+
+  // Trie
+  { title: 'Implement Trie (Prefix Tree)', normalizedTitle: 'implement-trie-prefix-tree', difficulty: 'medium', patternKey: 'trie', index: 0 },
+  { title: 'Index Pairs of a String', normalizedTitle: 'index-pairs-of-a-string', difficulty: 'easy', patternKey: 'trie', index: 1 },
+  { title: 'Design Add and Search Words Data Structure', normalizedTitle: 'design-add-and-search-words-data-structure', difficulty: 'medium', patternKey: 'trie', index: 2 },
+  { title: 'Extra Characters in a String', normalizedTitle: 'extra-characters-in-a-string', difficulty: 'medium', patternKey: 'trie', index: 3 },
+  { title: 'Search Suggestions System', normalizedTitle: 'search-suggestions-system', difficulty: 'medium', patternKey: 'trie', index: 4 },
+
+  // Topological Sort
+  { title: 'Topological Sort', normalizedTitle: 'topological-sort', difficulty: 'medium', patternKey: 'topological-sort', index: 0 },
+  { title: 'Tasks Scheduling', normalizedTitle: 'tasks-scheduling', difficulty: 'medium', patternKey: 'topological-sort', index: 1 },
+  { title: 'Tasks Scheduling Order', normalizedTitle: 'tasks-scheduling-order', difficulty: 'medium', patternKey: 'topological-sort', index: 2 },
+  { title: 'All Tasks Scheduling Orders', normalizedTitle: 'all-tasks-scheduling-orders', difficulty: 'hard', patternKey: 'topological-sort', index: 3 },
+  { title: 'Alien Dictionary', normalizedTitle: 'alien-dictionary', difficulty: 'hard', patternKey: 'topological-sort', index: 4 },
+  { title: 'Reconstructing a Sequence', normalizedTitle: 'reconstructing-a-sequence', difficulty: 'hard', patternKey: 'topological-sort', index: 5 },
+  { title: 'Minimum Height Trees', normalizedTitle: 'minimum-height-trees', difficulty: 'hard', patternKey: 'topological-sort', index: 6 },
+
+  // Union Find (Number of Provinces omitted — exists in Graph)
+  { title: 'Redundant Connection', normalizedTitle: 'redundant-connection', difficulty: 'medium', patternKey: 'union-find', index: 0 },
+  { title: 'Is Graph Bipartite?', normalizedTitle: 'is-graph-bipartite', difficulty: 'medium', patternKey: 'union-find', index: 1 },
+  { title: 'Path With Minimum Effort', normalizedTitle: 'path-with-minimum-effort', difficulty: 'medium', patternKey: 'union-find', index: 2 },
+
+  // Ordered Set
+  { title: 'Merge Similar Items', normalizedTitle: 'merge-similar-items', difficulty: 'easy', patternKey: 'ordered-set', index: 0 },
+  { title: '132 Pattern', normalizedTitle: '132-pattern', difficulty: 'medium', patternKey: 'ordered-set', index: 1 },
+  { title: 'My Calendar I', normalizedTitle: 'my-calendar-i', difficulty: 'medium', patternKey: 'ordered-set', index: 2 },
+  { title: 'Longest Continuous Subarray', normalizedTitle: 'longest-continuous-subarray', difficulty: 'medium', patternKey: 'ordered-set', index: 3 },
+
+  // Prefix Sum
+  { title: 'Find the Middle Index in Array', normalizedTitle: 'find-the-middle-index-in-array', difficulty: 'easy', patternKey: 'prefix-sum', index: 0 },
+  { title: 'Left and Right Sum Differences', normalizedTitle: 'left-and-right-sum-differences', difficulty: 'easy', patternKey: 'prefix-sum', index: 1 },
+  { title: 'Maximum Size Subarray Sum Equals k', normalizedTitle: 'maximum-size-subarray-sum-equals-k', difficulty: 'medium', patternKey: 'prefix-sum', index: 2 },
+  { title: 'Binary Subarrays With Sum', normalizedTitle: 'binary-subarrays-with-sum', difficulty: 'medium', patternKey: 'prefix-sum', index: 3 },
+  { title: 'Subarray Sums Divisible by K', normalizedTitle: 'subarray-sums-divisible-by-k', difficulty: 'medium', patternKey: 'prefix-sum', index: 4 },
+  { title: 'Sum of Absolute Differences in a Sorted Array', normalizedTitle: 'sum-of-absolute-differences-in-a-sorted-array', difficulty: 'medium', patternKey: 'prefix-sum', index: 5 },
+  { title: 'Subarray Sum Equals K', normalizedTitle: 'subarray-sum-equals-k', difficulty: 'medium', patternKey: 'prefix-sum', index: 6 },
+
+  // Multi-threaded (Kth Smallest Number omitted — exists in Top K Elements)
+  { title: 'Same Tree', normalizedTitle: 'same-tree', difficulty: 'medium', patternKey: 'multi-threaded', index: 0 },
+  { title: 'Invert Binary Tree', normalizedTitle: 'invert-binary-tree', difficulty: 'medium', patternKey: 'multi-threaded', index: 1 },
+  { title: 'Binary Search Tree Iterator', normalizedTitle: 'binary-search-tree-iterator', difficulty: 'medium', patternKey: 'multi-threaded', index: 2 },
+
+  // Bonus (duplicates from other sections omitted: Daily Temperatures, Implement Trie, Design Add and Search Words)
+  { title: 'Two Sum', normalizedTitle: 'two-sum', difficulty: 'easy', patternKey: 'bonus', index: 0 },
+  { title: 'Valid Perfect Square', normalizedTitle: 'valid-perfect-square', difficulty: 'easy', patternKey: 'bonus', index: 1 },
+  { title: 'Best Time to Buy and Sell Stock', normalizedTitle: 'best-time-to-buy-and-sell-stock', difficulty: 'easy', patternKey: 'bonus', index: 2 },
+  { title: 'Valid Parentheses', normalizedTitle: 'valid-parentheses', difficulty: 'easy', patternKey: 'bonus', index: 3 },
+  { title: 'Subtree of Another Tree', normalizedTitle: 'subtree-of-another-tree', difficulty: 'easy', patternKey: 'bonus', index: 4 },
+  { title: 'Design Parking System', normalizedTitle: 'design-parking-system', difficulty: 'easy', patternKey: 'bonus', index: 5 },
+  { title: 'Group Anagrams', normalizedTitle: 'group-anagrams', difficulty: 'medium', patternKey: 'bonus', index: 6 },
+  { title: 'Decode String', normalizedTitle: 'decode-string', difficulty: 'medium', patternKey: 'bonus', index: 7 },
+  { title: 'Valid Sudoku', normalizedTitle: 'valid-sudoku', difficulty: 'medium', patternKey: 'bonus', index: 8 },
+  { title: 'Product of Array Except Self', normalizedTitle: 'product-of-array-except-self', difficulty: 'medium', patternKey: 'bonus', index: 9 },
+  { title: 'Maximum Product Subarray', normalizedTitle: 'maximum-product-subarray', difficulty: 'medium', patternKey: 'bonus', index: 10 },
+  { title: 'Container With Most Water', normalizedTitle: 'container-with-most-water', difficulty: 'medium', patternKey: 'bonus', index: 11 },
+  { title: 'Palindromic Substrings', normalizedTitle: 'palindromic-substrings', difficulty: 'medium', patternKey: 'bonus', index: 12 },
+  { title: 'Remove Nth Node From End of List', normalizedTitle: 'remove-nth-node-from-end-of-list', difficulty: 'medium', patternKey: 'bonus', index: 13 },
+  { title: 'Find Minimum in Rotated Sorted Array', normalizedTitle: 'find-minimum-in-rotated-sorted-array', difficulty: 'medium', patternKey: 'bonus', index: 14 },
+  { title: 'Pacific Atlantic Water Flow', normalizedTitle: 'pacific-atlantic-water-flow', difficulty: 'medium', patternKey: 'bonus', index: 15 },
+  { title: 'Validate Binary Search Tree', normalizedTitle: 'validate-binary-search-tree', difficulty: 'medium', patternKey: 'bonus', index: 16 },
+  { title: 'Construct Binary Tree from Preorder and Inorder Traversal', normalizedTitle: 'construct-binary-tree-from-preorder-and-inorder-traversal', difficulty: 'medium', patternKey: 'bonus', index: 17 },
+  { title: 'Clone Graph', normalizedTitle: 'clone-graph', difficulty: 'medium', patternKey: 'bonus', index: 18 },
+  { title: 'House Robber II', normalizedTitle: 'house-robber-ii', difficulty: 'medium', patternKey: 'bonus', index: 19 },
+  { title: 'Decode Ways', normalizedTitle: 'decode-ways', difficulty: 'medium', patternKey: 'bonus', index: 20 },
+  { title: 'Unique Paths', normalizedTitle: 'unique-paths', difficulty: 'medium', patternKey: 'bonus', index: 21 },
+  { title: 'Word Break', normalizedTitle: 'word-break', difficulty: 'medium', patternKey: 'bonus', index: 22 },
+  { title: 'Lowest Common Ancestor of a Binary Search Tree', normalizedTitle: 'lowest-common-ancestor-of-a-binary-search-tree', difficulty: 'medium', patternKey: 'bonus', index: 23 },
+  { title: 'Longest Consecutive Sequence', normalizedTitle: 'longest-consecutive-sequence', difficulty: 'medium', patternKey: 'bonus', index: 24 },
+  { title: 'Meeting Rooms II', normalizedTitle: 'meeting-rooms-ii', difficulty: 'medium', patternKey: 'bonus', index: 25 },
+  { title: 'Encode and Decode Strings', normalizedTitle: 'encode-and-decode-strings', difficulty: 'medium', patternKey: 'bonus', index: 26 },
+  { title: 'Number of Connected Components in an Undirected Graph', normalizedTitle: 'number-of-connected-components-in-an-undirected-graph', difficulty: 'medium', patternKey: 'bonus', index: 27 },
+  { title: 'Graph Valid Tree', normalizedTitle: 'graph-valid-tree', difficulty: 'medium', patternKey: 'bonus', index: 28 },
+  { title: 'Longest Valid Parentheses', normalizedTitle: 'longest-valid-parentheses', difficulty: 'hard', patternKey: 'bonus', index: 29 },
+  { title: 'Serialize and Deserialize Binary Tree', normalizedTitle: 'serialize-and-deserialize-binary-tree', difficulty: 'hard', patternKey: 'bonus', index: 30 },
 ];
 
 // Normalized title lookup map
@@ -178,23 +317,38 @@ for (const problem of GTCI_CURRICULUM) {
   curriculumByNormalizedTitle.set(problem.normalizedTitle, problem);
 }
 
-// Get all unique patterns in display order
+// Get all unique patterns in course display order
 export const PATTERN_ORDER = [
+  'warmup',
   'two-pointers',
   'fast-slow-pointers',
   'sliding-window',
   'merge-intervals',
   'cyclic-sort',
   'linked-list-reversal',
-  'binary-search',
+  'stack',
+  'monotonic-stack',
+  'level-order-traversal',
   'tree-bfs',
   'tree-dfs',
+  'graph',
+  'islands',
   'two-heaps',
   'subsets',
+  'binary-search',
+  'bitwise-xor',
   'top-k-elements',
   'k-way-merge',
-  'topological-sort',
+  'greedy',
   'dynamic-programming',
+  'backtracking',
+  'trie',
+  'topological-sort',
+  'union-find',
+  'ordered-set',
+  'prefix-sum',
+  'multi-threaded',
+  'bonus',
 ];
 
 // Get problems by pattern
@@ -209,4 +363,12 @@ export function normalizeTitle(title: string): string {
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
     .trim();
+}
+
+// DesignGurus course base URL
+const DESIGNGURUS_BASE = 'https://www.designgurus.io/course-play/grokking-the-coding-interview/lesson';
+
+// Get the DesignGurus URL for a problem by its normalized title
+export function getDesignGurusUrl(normalizedTitle: string): string {
+  return `${DESIGNGURUS_BASE}/${normalizedTitle}`;
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { getDesignGurusUrl } from '@/lib/curriculum';
 
 interface StudyStats {
   totalCurriculumProblems: number;
@@ -258,6 +259,18 @@ export default function StudyLogPage() {
                               {!problem.studyData && (
                                 <span className="text-slate-600">Not started</span>
                               )}
+                              <a
+                                href={problem.studyData?.url || getDesignGurusUrl(problem.normalizedTitle)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-slate-600 hover:text-indigo-400 transition-colors"
+                                title="Open on DesignGurus"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </a>
                               <svg
                                 className="w-5 h-5"
                                 fill="none"

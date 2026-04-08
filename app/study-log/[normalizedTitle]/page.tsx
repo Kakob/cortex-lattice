@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { getDesignGurusUrl } from '@/lib/curriculum';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -244,16 +245,14 @@ export default function ProblemDetailPage() {
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400 capitalize">
                   {curriculum.patternKey.replace(/-/g, ' ')}
                 </span>
-                {studyData?.url && (
-                  <a
-                    href={studyData.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-slate-500 hover:text-indigo-400 transition-colors"
-                  >
-                    Open on {studyData.platform === 'grokking' ? 'DesignGurus' : 'LeetCode'} &rarr;
-                  </a>
-                )}
+                <a
+                  href={studyData?.url || getDesignGurusUrl(normalizedTitle)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-slate-500 hover:text-indigo-400 transition-colors"
+                >
+                  Open on {studyData?.platform === 'leetcode' ? 'LeetCode' : 'DesignGurus'} &rarr;
+                </a>
               </div>
             </div>
           </div>
