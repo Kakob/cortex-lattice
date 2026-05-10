@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { ChunkErrorRecovery } from "@/components/ChunkErrorRecovery";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="min-h-screen bg-surface-dark text-foreground antialiased">
-        <SessionProvider session={session}>{children}</SessionProvider>
+        <SessionProvider session={session}>
+          {children}
+          <ChunkErrorRecovery />
+        </SessionProvider>
       </body>
     </html>
   );
