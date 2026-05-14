@@ -93,7 +93,7 @@ export function BottomSheet({
   // Toggle sheet
   const handleToggle = useCallback(async () => {
     const newState = !isOpen;
-    const snapPoint = newState ? "half" : "peek";
+    const snapPoint = newState ? "full" : "peek";
     const newPosition = getSnapPosition(snapPoint);
 
     await controls.start({
