@@ -25,10 +25,11 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import type { LearningGuide as LearningGuideType } from "@/lib/types";
+import type { LearningGuide as LearningGuideType, Problem } from "@/lib/types";
 
 interface LearningGuideProps {
   guide: LearningGuideType;
+  problem?: Problem;
 }
 
 type SectionId = "problem" | "guidance" | "solution";
@@ -69,7 +70,7 @@ const SECTIONS: SectionConfig[] = [
   },
 ];
 
-export function LearningGuide({ guide }: LearningGuideProps) {
+export function LearningGuide({ guide, problem }: LearningGuideProps) {
   const [expandedSection, setExpandedSection] = useState<SectionId | null>(null);
 
   const toggleSection = (id: SectionId) => {
@@ -77,7 +78,7 @@ export function LearningGuide({ guide }: LearningGuideProps) {
   };
 
   return (
-    <div className="space-y-3 pb-8">
+    <div className="space-y-3 pb-[20vh]">
       <h2 className="mb-4 text-lg font-semibold text-gray-100">
         Learning Guide
       </h2>
@@ -89,6 +90,7 @@ export function LearningGuide({ guide }: LearningGuideProps) {
           isExpanded={expandedSection === section.id}
           onToggle={() => toggleSection(section.id)}
           guide={guide}
+          problem={problem}
         />
       ))}
     </div>
@@ -100,9 +102,10 @@ interface SectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   guide: LearningGuideType;
+  problem?: Problem;
 }
 
-function Section({ config, isExpanded, onToggle, guide }: SectionProps) {
+function Section({ config, isExpanded, onToggle, guide, problem }: SectionProps) {
   const { id, title, icon: Icon, color, bgColor, borderColor } = config;
 
   return (
@@ -135,7 +138,7 @@ function Section({ config, isExpanded, onToggle, guide }: SectionProps) {
             className="overflow-hidden"
           >
             <div className="border-t border-gray-700/50 px-4 py-4">
-              {id === "problem" && <ProblemSection guide={guide} />}
+              {id === "problem" && <ProblemSection guide={guide} problem={problem} />}
               {id === "guidance" && <GuidanceSection guide={guide} />}
               {id === "solution" && <SolutionSection guide={guide} />}
             </div>
@@ -150,8 +153,9 @@ function Section({ config, isExpanded, onToggle, guide }: SectionProps) {
 // Problem Statement Section
 // =============================================================================
 
-function ProblemSection({ guide }: { guide: LearningGuideType }) {
+function ProblemSection({ guide, problem }: { guide: LearningGuideType; problem?: Problem }) {
   const { problemContext } = guide;
+  const description = problem?.description ?? problemContext.description;
 
   return (
     <div className="space-y-6">
@@ -187,6 +191,64 @@ function ProblemSection({ guide }: { guide: LearningGuideType }) {
           </span>
         </div>
       </div>
+
+      {/* Description */}
+      {description && (
+        <div>
+          <h4 className="mb-2 text-sm font-medium text-gray-200">Description</h4>
+          <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-300">
+            {description}
+          </pre>
+        </div>
+      )}
+
+      {/* Examples */}
+      {problem && problem.examples.length > 0 && (
+        <div>
+          <h4 className="mb-3 text-sm font-medium text-gray-200">Examples</h4>
+          <div className="space-y-3">
+            {problem.examples.map((example, i) => (
+              <div key={i} className="rounded-lg bg-surface-dark p-4 text-sm">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div>
+                    <span className="text-xs font-medium uppercase text-gray-500">
+                      Input
+                    </span>
+                    <pre className="mt-1 text-gray-300">
+                      {JSON.stringify(example.input, null, 2)}
+                    </pre>
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium uppercase text-gray-500">
+                      Output
+                    </span>
+                    <pre className="mt-1 text-green-400">
+                      {JSON.stringify(example.output, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+                {example.explanation && (
+                  <p className="mt-2 text-gray-400">{example.explanation}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Constraints */}
+      {problem && problem.constraints.length > 0 && (
+        <div>
+          <h4 className="mb-2 text-sm font-medium text-gray-200">Constraints</h4>
+          <ul className="list-inside list-disc space-y-1 text-sm text-gray-400">
+            {problem.constraints.map((constraint, i) => (
+              <li key={i} className="font-mono">
+                {constraint}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Learning Objectives */}
       {problemContext.patternLearningObjectives.length > 0 && (

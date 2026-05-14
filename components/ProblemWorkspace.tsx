@@ -15,7 +15,7 @@ import { LearningGuide } from "./LearningGuide";
 import { UserMenu } from "./auth/UserMenu";
 import { executeCode } from "@/lib/api";
 import type { Problem, LearningGuide as LearningGuideType, ExecutionResult, ThemeInfo } from "@/lib/types";
-import { ArrowLeft, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 
 interface ProblemWorkspaceProps {
@@ -31,7 +31,6 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
   const [isRunning, setIsRunning] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const [showDescription, setShowDescription] = useState(false);
   const [showTestPanel, setShowTestPanel] = useState(true);
 
   const handleThemeChange = useCallback(
@@ -117,79 +116,9 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
               onThemeChange={handleThemeChange}
             />
           )}
-          <button
-            onClick={() => setShowDescription(!showDescription)}
-            className="flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-surface-light"
-          >
-            <BookOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Problem</span>
-          </button>
           <UserMenu />
         </div>
       </header>
-
-      {/* Problem Description Panel (collapsible) */}
-      {showDescription && (
-        <div className="border-b border-gray-700 bg-surface-light p-4">
-          <div className="mx-auto max-w-3xl space-y-4">
-            {/* Story context */}
-            {problem.storyContext && (
-              <div className="rounded-lg bg-surface p-4 text-sm text-gray-300">
-                {problem.storyContext}
-              </div>
-            )}
-
-            {/* Description */}
-            <div className="prose prose-invert prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap font-sans text-gray-300">
-                {problem.description}
-              </pre>
-            </div>
-
-            {/* Examples */}
-            <div className="space-y-3">
-              <h3 className="font-medium text-gray-200">Examples</h3>
-              {problem.examples.map((example, i) => (
-                <div key={i} className="rounded-lg bg-surface p-4 text-sm">
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <div>
-                      <span className="text-xs font-medium uppercase text-gray-500">
-                        Input
-                      </span>
-                      <pre className="mt-1 text-gray-300">
-                        {JSON.stringify(example.input, null, 2)}
-                      </pre>
-                    </div>
-                    <div>
-                      <span className="text-xs font-medium uppercase text-gray-500">
-                        Output
-                      </span>
-                      <pre className="mt-1 text-green-400">
-                        {JSON.stringify(example.output, null, 2)}
-                      </pre>
-                    </div>
-                  </div>
-                  {example.explanation && (
-                    <p className="mt-2 text-gray-400">{example.explanation}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Constraints */}
-            <div>
-              <h3 className="font-medium text-gray-200">Constraints</h3>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-gray-400">
-                {problem.constraints.map((constraint, i) => (
-                  <li key={i} className="font-mono">
-                    {constraint}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -234,7 +163,7 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
 
       {/* Bottom Sheet with Learning Guide */}
       <BottomSheet isOpen={bottomSheetOpen} onOpenChange={setBottomSheetOpen}>
-        <LearningGuide guide={learningGuide} />
+        <LearningGuide guide={learningGuide} problem={problem} />
       </BottomSheet>
     </div>
   );
