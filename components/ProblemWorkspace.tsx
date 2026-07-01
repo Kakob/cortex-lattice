@@ -14,6 +14,7 @@ import { BottomSheet } from "./BottomSheet";
 import { LearningGuide } from "./LearningGuide";
 import { UserMenu } from "./auth/UserMenu";
 import { executeCode } from "@/lib/api";
+import { useCodePersistence } from "@/hooks/useCodePersistence";
 import type { Problem, LearningGuide as LearningGuideType, ExecutionResult, ThemeInfo } from "@/lib/types";
 import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
@@ -33,6 +34,11 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const [showTestPanel, setShowTestPanel] = useState(true);
 
+  const { code, setCode, resetToStarter, hasChanges } = useCodePersistence(
+    problem.id,
+    problem.starterCodePython
+  );
+
   const handleThemeChange = useCallback(
     (newThemeId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -44,14 +50,14 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
 
   // Handle code execution
   const handleRunCode = useCallback(
-    async (code: string) => {
+    async (codeToRun: string) => {
       setIsRunning(true);
       setExecutionResult(null);
 
       try {
         const result = await executeCode({
           problemId: problem.id,
-          code,
+          code: codeToRun,
           language: "python",
           themeId,
         });
@@ -126,7 +132,10 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
         <div className="flex-1 overflow-hidden">
           <CodeEditor
             problemId={problem.id}
-            initialCode={problem.starterCodePython}
+            code={code}
+            setCode={setCode}
+            resetToStarter={resetToStarter}
+            hasChanges={hasChanges}
             language="python"
             onRun={handleRunCode}
             isRunning={isRunning}
@@ -163,7 +172,12 @@ export function ProblemWorkspace({ problem, learningGuide, themeId }: ProblemWor
 
       {/* Bottom Sheet with Learning Guide */}
       <BottomSheet isOpen={bottomSheetOpen} onOpenChange={setBottomSheetOpen}>
-        <LearningGuide guide={learningGuide} problem={problem} />
+        <LearningGuide
+          guide={learningGuide}
+          problem={problem}
+          userCode={code}
+          starterCode={problem.starterCodePython}
+        />
       </BottomSheet>
     </div>
   );

@@ -11,7 +11,6 @@
 import { useCallback, Suspense, lazy, useState, useRef } from "react";
 import { Play, Loader2, RotateCcw } from "lucide-react";
 import { useIsMobile } from "@/hooks/useMediaQuery";
-import { useCodePersistence } from "@/hooks/useCodePersistence";
 import { useSessionContext } from "@/hooks/useSessionContext";
 import { useSlashCommands } from "@/hooks/useSlashCommands";
 import SlashAutocomplete from "./SlashAutocomplete";
@@ -24,7 +23,10 @@ const CodeMirrorEditor = lazy(() => import("./editors/CodeMirrorEditor"));
 
 interface CodeEditorProps {
   problemId: string;
-  initialCode: string;
+  code: string;
+  setCode: (code: string) => void;
+  resetToStarter: () => void;
+  hasChanges: boolean;
   language?: string;
   onRun?: (code: string) => void;
   isRunning?: boolean;
@@ -44,7 +46,10 @@ function EditorLoading() {
 
 export function CodeEditor({
   problemId,
-  initialCode,
+  code,
+  setCode,
+  resetToStarter,
+  hasChanges,
   language = "python",
   onRun,
   isRunning = false,
@@ -52,10 +57,6 @@ export function CodeEditor({
   testResults,
   revealedHints,
 }: CodeEditorProps) {
-  const { code, setCode, resetToStarter, hasChanges } = useCodePersistence(
-    problemId,
-    initialCode
-  );
   const isMobile = useIsMobile();
 
   // Session context for slash commands

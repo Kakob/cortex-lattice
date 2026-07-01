@@ -71,6 +71,13 @@ approach_explanation:
       action: "Return result"
       why: "Output the answer"
 
+  # Optional: case-insensitive regex source strings that signal this approach
+  # in a user's in-progress code. Used by the Learning Guide to highlight the
+  # matching approach card with "We think you're attempting this approach".
+  signature_tokens:
+    - "left.*right"
+    - "while.*<"
+
 # Alternative approaches for comparison
 alternative_solutions:
   - name: "Brute Force"
@@ -84,6 +91,21 @@ alternative_solutions:
       space: "O(1)"
     when_to_use: "Never for this problem - strictly worse"
     teaching_value: "Shows WHY the optimal solution is better"
+    # Optional: numbered steps for this approach — shown one at a time in the UI
+    step_by_step:
+      - step: 1
+        action: "Outer loop over each element"
+        why: "Examine every starting position"
+      - step: 2
+        action: "Inner loop over remaining elements"
+        why: "Check all pairings with the outer index"
+      - step: 3
+        action: "Return when condition matches"
+        why: "First match wins"
+    # Optional: regex tokens used to detect this approach in user code
+    signature_tokens:
+      - "for .* in"
+      - "for .* in .*:\\s*\\n\\s*for "
 
   - name: "Hash Map"
     approach: "Use extra space for faster lookup"
@@ -92,6 +114,21 @@ alternative_solutions:
       space: "O(n)"
     when_to_use: "When input is not sorted"
     teaching_value: "Shows space/time trade-off"
+    step_by_step:
+      - step: 1
+        action: "Initialize empty hash set/map"
+        why: "O(1) membership checks later"
+      - step: 2
+        action: "Single pass, check complement, then insert"
+        why: "Trades space for time"
+      - step: 3
+        action: "Return when complement found, else not-found"
+        why: "Single linear scan suffices"
+    signature_tokens:
+      - "set\\("
+      - "dict\\("
+      - "\\{\\}"
+      - " in "
 
 # Pattern recognition
 pattern_signature:

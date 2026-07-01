@@ -466,15 +466,12 @@ export interface LearningGuide {
 
   // Solution Section (from solution.yaml)
   solution: {
-    solutionApproach: string[];
+    coreInsight?: string;
     complexity: {
       time: string;
       space: string;
     };
-    coreInsight?: string;
-    stepByStep?: SolutionStep[];
-    codePython?: string;
-    alternativeSolutions?: AlternativeSolutionBrief[];
+    approaches: ApproachVariant[];
   };
 
   // Pattern Transfer (from guidance.yaml)
@@ -489,12 +486,19 @@ export interface SolutionStep {
   why?: string;
 }
 
-export interface AlternativeSolutionBrief {
+export interface ApproachVariant {
+  id: string;
   name: string;
+  isPrimary: boolean;
   approach: string;
-  time: string;
-  space: string;
+  complexity: {
+    time: string;
+    space: string;
+  };
   whenToUse?: string;
+  codePython?: string;
+  stepByStep?: SolutionStep[];
+  signatureTokens?: string[];
 }
 
 export interface PatternTransferProblem {

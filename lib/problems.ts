@@ -625,6 +625,7 @@ interface RawSolution {
       action: string;
       why?: string;
     }>;
+    signature_tokens?: string[];
   };
   alternative_solutions?: Array<{
     name: string;
@@ -634,7 +635,21 @@ interface RawSolution {
       space: string;
     };
     when_to_use?: string;
+    code_python?: string;
+    step_by_step?: Array<{
+      step: number;
+      action: string;
+      why?: string;
+    }>;
+    signature_tokens?: string[];
   }>;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 /**
@@ -686,26 +701,57 @@ export async function buildLearningGuide(
     realWorld: guidance?.hints?.real_world?.map((h) => h.text) || [],
   };
 
-  const solution = {
-    solutionApproach: guidance?.hints?.solution_approach?.steps || [],
-    complexity: guidance?.complexity || {
-      time: problem.complexityAnalysis?.time?.optimal || "Unknown",
-      space: problem.complexityAnalysis?.space?.optimal || "Unknown",
-    },
-    coreInsight: solutionRaw?.approach_explanation?.core_insight,
-    stepByStep: solutionRaw?.approach_explanation?.step_by_step?.map((s) => ({
+  const complexity = guidance?.complexity || {
+    time: problem.complexityAnalysis?.time?.optimal || "Unknown",
+    space: problem.complexityAnalysis?.space?.optimal || "Unknown",
+  };
+
+  const primaryStepByStep =
+    solutionRaw?.approach_explanation?.step_by_step?.map((s) => ({
       step: s.step,
       action: s.action,
       why: s.why,
-    })),
+    })) ||
+    guidance?.hints?.solution_approach?.steps?.map((s, i) => ({
+      step: i + 1,
+      action: s,
+    }));
+
+  const primaryApproach = {
+    id: "primary",
+    name: "Primary Solution",
+    isPrimary: true,
+    approach: solutionRaw?.approach_explanation?.core_insight?.split("\n")[0] ?? "",
+    complexity,
     codePython: solutionRaw?.solution_code_python,
-    alternativeSolutions: solutionRaw?.alternative_solutions?.map((alt) => ({
+    stepByStep: primaryStepByStep,
+    signatureTokens: solutionRaw?.approach_explanation?.signature_tokens,
+  };
+
+  const alternativeApproaches =
+    solutionRaw?.alternative_solutions?.map((alt) => ({
+      id: `alt:${slugify(alt.name)}`,
       name: alt.name,
+      isPrimary: false,
       approach: alt.approach,
-      time: alt.complexity.time,
-      space: alt.complexity.space,
+      complexity: {
+        time: alt.complexity.time,
+        space: alt.complexity.space,
+      },
       whenToUse: alt.when_to_use,
-    })),
+      codePython: alt.code_python,
+      stepByStep: alt.step_by_step?.map((s) => ({
+        step: s.step,
+        action: s.action,
+        why: s.why,
+      })),
+      signatureTokens: alt.signature_tokens,
+    })) ?? [];
+
+  const solution = {
+    coreInsight: solutionRaw?.approach_explanation?.core_insight,
+    complexity,
+    approaches: [primaryApproach, ...alternativeApproaches],
   };
 
   const patternTransfer = guidance?.pattern_transfer?.similar_problems
